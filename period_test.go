@@ -259,7 +259,7 @@ func TestPeriodRangeDays(t *testing.T) {
 	period := NewPeriod(start, end)
 
 	var count int
-	for _ = range period.RangeDays() {
+	for range period.RangeDays() {
 		count++
 	}
 
@@ -275,7 +275,7 @@ func TestPeriodRangeHours(t *testing.T) {
 	period := NewPeriod(start, end)
 
 	var count int
-	for _ = range period.RangeHours() {
+	for range period.RangeHours() {
 		count++
 	}
 
