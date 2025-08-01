@@ -1,6 +1,6 @@
 # ChronoGo
 
-[![Version](https://img.shields.io/badge/version-v0.1.1-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.2.0-green.svg)](https://github.com/coredds/ChronoGo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -231,6 +231,123 @@ fmt.Println(dt.Format("02/01/2006 15:04"))            // "25/12/2023 15:30"
 fmt.Println(dt.Format("Jan 2, 2006 at 3:04 PM"))      // "Dec 25, 2023 at 3:30 PM"
 ```
 
+### Enhanced Utility Methods
+
+```go
+dt := chronogo.Date(2023, time.October, 15, 14, 30, 45, 0, time.UTC)
+
+// Start/End operations
+fmt.Println(dt.StartOfDay())     // "2023-10-15T00:00:00Z"
+fmt.Println(dt.EndOfDay())       // "2023-10-15T23:59:59.999999999Z"
+fmt.Println(dt.StartOfMonth())   // "2023-10-01T00:00:00Z"
+fmt.Println(dt.EndOfMonth())     // "2023-10-31T23:59:59.999999999Z"
+fmt.Println(dt.StartOfWeek())    // "2023-10-09T00:00:00Z" (Monday)
+fmt.Println(dt.EndOfWeek())      // "2023-10-15T23:59:59.999999999Z" (Sunday)
+fmt.Println(dt.StartOfYear())    // "2023-01-01T00:00:00Z"
+fmt.Println(dt.EndOfYear())      // "2023-12-31T23:59:59.999999999Z"
+
+// Quarter operations
+fmt.Println(dt.Quarter())           // 4 (Q4)
+fmt.Println(dt.StartOfQuarter())    // "2023-10-01T00:00:00Z"
+fmt.Println(dt.EndOfQuarter())      // "2023-12-31T23:59:59.999999999Z"
+
+// Weekday/Weekend detection
+fmt.Println(dt.IsWeekend())      // true (Sunday)
+fmt.Println(dt.IsWeekday())      // false
+
+// Day and week information
+fmt.Println(dt.DayOfYear())      // 288
+year, week := dt.ISOWeek()
+fmt.Printf("ISO Week: %d-%d\n", year, week) // "ISO Week: 2023-41"
+fmt.Println(dt.ISOWeekYear())    // 2023
+fmt.Println(dt.ISOWeekNumber())  // 41
+fmt.Println(dt.WeekOfYear())     // 41
+```
+
+### Fluent API for Enhanced Readability
+
+```go
+// Fluent duration building and application
+now := chronogo.Now()
+
+// Build complex durations with method chaining
+future := now.AddFluent().
+    Years(1).
+    Months(2).
+    Days(10).
+    Hours(5).
+    Minutes(30).
+    Seconds(45).
+    To(now)
+
+// Or subtract from a date
+past := now.AddFluent().
+    Days(30).
+    Hours(5).
+    From(now)
+
+// Fluent setting of date/time components
+result := now.Set().
+    Year(2024).
+    Month(time.December).
+    Day(25).
+    Hour(15).
+    Minute(30).
+    Second(0).
+    Timezone(timezone).
+    Build()
+```
+
+### Enhanced Duration Type
+
+```go
+// Create enhanced duration
+duration := chronogo.NewDuration(25*time.Hour + 30*time.Minute + 45*time.Second)
+duration2 := chronogo.NewDurationFromComponents(2, 15, 30) // 2h 15m 30s
+
+// Human-readable operations
+fmt.Println(duration.String())           // "25h30m45s"
+fmt.Println(duration.HumanString())      // "1 day"
+fmt.Printf("Days: %.2f\n", duration.Days())     // "Days: 1.06"
+fmt.Printf("Weeks: %.2f\n", duration.Weeks())   // "Weeks: 0.15"
+fmt.Printf("Months: %.2f\n", duration.Months()) // "Months: 0.03"
+fmt.Printf("Years: %.2f\n", duration.Years())   // "Years: 0.003"
+
+// Duration arithmetic
+sum := duration.Add(duration2)
+diff := duration.Subtract(duration2)
+product := duration.Multiply(2.5)
+quotient := duration.Divide(2)
+
+// Duration properties
+fmt.Println(duration.IsPositive()) // true
+fmt.Println(duration.IsNegative()) // false
+fmt.Println(duration.IsZero())     // false
+fmt.Println(duration.Abs())        // Absolute value
+```
+
+## Quick Reference
+
+### New API Methods (v0.2.0)
+
+| Category | Methods | Description |
+|----------|---------|-------------|
+| **Start/End** | `StartOfDay()`, `EndOfDay()`, `StartOfMonth()`, `EndOfMonth()`, `StartOfWeek()`, `EndOfWeek()`, `StartOfYear()`, `EndOfYear()`, `StartOfQuarter()`, `EndOfQuarter()` | Set DateTime to beginning or end of time periods |
+| **Weekend/Weekday** | `IsWeekend()`, `IsWeekday()` | Check if date falls on weekend or weekday |
+| **Quarter** | `Quarter()`, `StartOfQuarter()`, `EndOfQuarter()` | Quarter-based operations (Q1-Q4) |
+| **ISO Week** | `ISOWeek()`, `ISOWeekYear()`, `ISOWeekNumber()`, `WeekOfYear()` | ISO 8601 week operations |
+| **Date Info** | `DayOfYear()` | Additional date information |
+| **Fluent API** | `AddFluent()`, `Set()` | Method chaining for complex operations |
+| **Enhanced Duration** | `NewDuration()`, `NewDurationFromComponents()` | Enhanced duration type with human-readable operations |
+
+### Duration Operations
+| Method | Description |
+|--------|-------------|
+| `Days()`, `Weeks()`, `Months()`, `Years()` | Get duration in different units |
+| `HumanString()` | Human-readable representation |
+| `Add()`, `Subtract()`, `Multiply()`, `Divide()` | Duration arithmetic |
+| `IsPositive()`, `IsNegative()`, `IsZero()`, `Abs()` | Duration properties |
+
 ## API Compatibility
 
 ChronoGo's `DateTime` type embeds Go's standard `time.Time`, making it a drop-in replacement in most cases. You can use all standard `time.Time` methods while gaining access to ChronoGo's enhanced functionality.
@@ -247,6 +364,11 @@ fmt.Println(dt.Unix())
 // Plus ChronoGo enhancements
 fmt.Println(dt.DiffForHumans())
 fmt.Println(dt.AddDays(5).SetHour(14))
+
+// New v0.2.0 methods
+fmt.Println(dt.StartOfDay())
+fmt.Println(dt.IsWeekend())
+fmt.Println(dt.Quarter())
 ```
 
 ## Error Handling
@@ -320,6 +442,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Roadmap
 
+### Completed in v0.2.0 ✅
+- [x] Enhanced utility methods (StartOfDay, EndOfDay, etc.)
+- [x] Weekend and weekday detection
+- [x] Quarter operations and ISO week support
+- [x] Fluent API for method chaining
+- [x] Enhanced duration type with human-readable operations
+
+### Planned Features
 - [ ] Localization support for human-readable strings
 - [ ] Business day calculations
 - [ ] Recurrence rules (RRULE support)
@@ -327,6 +457,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Duration parsing from strings
 - [ ] More comprehensive DST transition handling
 - [ ] Performance optimizations
+- [ ] Benchmark tests and performance profiling
 
 ## Changelog
 

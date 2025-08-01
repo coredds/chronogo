@@ -121,7 +121,7 @@ func TestTimezoneConversions(t *testing.T) {
 func TestIsDST(t *testing.T) {
 	// This test might be system-dependent, so we'll just check the method exists
 	dt := Now()
-	_ = dt.IsDST() // Should not panic
+	dt.IsDST() // Should not panic
 }
 
 func TestIsLeapYear(t *testing.T) {

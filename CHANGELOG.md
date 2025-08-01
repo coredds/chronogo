@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-08
+
+### Added
+- **Enhanced Utility Methods**: Added comprehensive start/end operations
+  - `StartOfDay()`, `EndOfDay()` - Set time to beginning/end of day
+  - `StartOfMonth()`, `EndOfMonth()` - Set to beginning/end of month
+  - `StartOfWeek()`, `EndOfWeek()` - Set to beginning/end of week (Monday-Sunday)
+  - `StartOfYear()`, `EndOfYear()` - Set to beginning/end of year
+  - `StartOfQuarter()`, `EndOfQuarter()` - Set to beginning/end of quarter
+
+- **Weekend and Weekday Detection**
+  - `IsWeekend()` - Check if date falls on Saturday or Sunday
+  - `IsWeekday()` - Check if date falls on Monday through Friday
+
+- **Quarter Operations**
+  - `Quarter()` - Get quarter number (1-4)
+  - Quarter-based start/end operations
+
+- **Enhanced Date Information**
+  - `DayOfYear()` - Get day number within the year (1-366)
+  - `ISOWeek()` - Get ISO 8601 year and week number
+  - `ISOWeekYear()` - Get ISO 8601 year for the week
+  - `ISOWeekNumber()` - Get ISO 8601 week number (1-53)
+  - `WeekOfYear()` - Get week number within the year
+
+- **Fluent API for Enhanced Readability**
+  - `AddFluent()` - Returns FluentDuration for chaining time additions
+  - `Set()` - Returns FluentDateTime for chaining component setting
+  - Method chaining for complex date/time operations
+  - Improved code readability with builder pattern
+
+- **Enhanced Duration Type (`ChronoDuration`)**
+  - `NewDuration()` - Create from time.Duration
+  - `NewDurationFromComponents()` - Create from hours, minutes, seconds
+  - Human-readable duration methods: `Days()`, `Weeks()`, `Months()`, `Years()`
+  - `HumanString()` - Human-readable string representation
+  - Duration arithmetic: `Add()`, `Subtract()`, `Multiply()`, `Divide()`
+  - Duration properties: `IsPositive()`, `IsNegative()`, `IsZero()`, `Abs()`
+
+### Enhanced
+- **Test Coverage**: Added comprehensive tests for all new API features
+- **Demo Application**: Updated to showcase new API capabilities
+- **Documentation**: Extensive README updates with examples for new features
+
 ## [0.1.1] - 2024-01-15
 
 ### Added

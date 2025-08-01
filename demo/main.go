@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/coredds/ChronoGo"
+	chronogo "github.com/coredds/ChronoGo"
 )
 
 func main() {
@@ -90,6 +90,54 @@ func main() {
 	fmt.Printf("   %s before %s: %t\n", dt1.ToDateString(), dt2.ToDateString(), dt1.Before(dt2))
 	fmt.Printf("   %s is past: %t\n", dt1.ToDateString(), dt1.IsPast())
 	fmt.Printf("   2024 is leap year: %t\n", chronogo.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC).IsLeapYear())
+	fmt.Println()
+
+	// New API Features
+	fmt.Println("9. New API Features:")
+
+	// Utility methods
+	testDate := chronogo.Date(2023, time.October, 15, 14, 30, 45, 0, time.UTC) // Sunday
+	fmt.Printf("   Date: %s\n", testDate.ToDateString())
+	fmt.Printf("   Start of day: %s\n", testDate.StartOfDay().ToDateTimeString())
+	fmt.Printf("   End of day: %s\n", testDate.EndOfDay().ToDateTimeString())
+	fmt.Printf("   Start of month: %s\n", testDate.StartOfMonth().ToDateString())
+	fmt.Printf("   End of month: %s\n", testDate.EndOfMonth().ToDateString())
+	fmt.Printf("   Start of quarter: %s\n", testDate.StartOfQuarter().ToDateString())
+	fmt.Printf("   End of quarter: %s\n", testDate.EndOfQuarter().ToDateString())
+	fmt.Printf("   Quarter: %d\n", testDate.Quarter())
+	fmt.Printf("   Is weekend: %t\n", testDate.IsWeekend())
+	fmt.Printf("   Is weekday: %t\n", testDate.IsWeekday())
+	fmt.Printf("   Day of year: %d\n", testDate.DayOfYear())
+	year, week := testDate.ISOWeek()
+	fmt.Printf("   ISO week: %d-%d\n", year, week)
+	fmt.Println()
+
+	// Fluent API
+	fmt.Println("10. Fluent API:")
+	base := chronogo.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	// Fluent duration addition
+	fluentResult := base.AddFluent().Years(1).Months(2).Days(10).Hours(5).Minutes(30).To(base)
+	fmt.Printf("   Base date: %s\n", base.ToDateString())
+	fmt.Printf("   After fluent addition: %s\n", fluentResult.ToDateTimeString())
+
+	// Fluent setting
+	fluentSet := base.Set().Year(2024).Month(time.December).Day(25).Hour(15).Minute(30).Build()
+	fmt.Printf("   Fluent set result: %s\n", fluentSet.ToDateTimeString())
+	fmt.Println()
+
+	// Enhanced Duration
+	fmt.Println("11. Enhanced Duration:")
+	chronoDuration := chronogo.NewDuration(25*time.Hour + 30*time.Minute + 45*time.Second)
+	fmt.Printf("   Duration: %s\n", chronoDuration.String())
+	fmt.Printf("   Human readable: %s\n", chronoDuration.HumanString())
+	fmt.Printf("   Days: %.2f\n", chronoDuration.Days())
+	fmt.Printf("   Weeks: %.2f\n", chronoDuration.Weeks())
+	fmt.Printf("   Is positive: %t\n", chronoDuration.IsPositive())
+
+	duration2 := chronogo.NewDurationFromComponents(2, 15, 30)
+	sum := chronoDuration.Add(duration2)
+	fmt.Printf("   Sum with 2h15m30s: %s\n", sum.String())
 	fmt.Println()
 
 	fmt.Println("=== Demo Complete ===")
