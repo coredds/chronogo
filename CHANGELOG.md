@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-08
+
 ### Added
 - **Enhanced Utility Methods**: Added comprehensive start/end operations
   - `StartOfDay()`, `EndOfDay()` - Set time to beginning/end of day

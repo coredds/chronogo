@@ -1,6 +1,6 @@
 # ChronoGo
 
-[![Version](https://img.shields.io/badge/version-v0.1.1-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.2.0-green.svg)](https://github.com/coredds/ChronoGo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -326,6 +326,28 @@ fmt.Println(duration.IsZero())     // false
 fmt.Println(duration.Abs())        // Absolute value
 ```
 
+## Quick Reference
+
+### New API Methods (v0.2.0)
+
+| Category | Methods | Description |
+|----------|---------|-------------|
+| **Start/End** | `StartOfDay()`, `EndOfDay()`, `StartOfMonth()`, `EndOfMonth()`, `StartOfWeek()`, `EndOfWeek()`, `StartOfYear()`, `EndOfYear()`, `StartOfQuarter()`, `EndOfQuarter()` | Set DateTime to beginning or end of time periods |
+| **Weekend/Weekday** | `IsWeekend()`, `IsWeekday()` | Check if date falls on weekend or weekday |
+| **Quarter** | `Quarter()`, `StartOfQuarter()`, `EndOfQuarter()` | Quarter-based operations (Q1-Q4) |
+| **ISO Week** | `ISOWeek()`, `ISOWeekYear()`, `ISOWeekNumber()`, `WeekOfYear()` | ISO 8601 week operations |
+| **Date Info** | `DayOfYear()` | Additional date information |
+| **Fluent API** | `AddFluent()`, `Set()` | Method chaining for complex operations |
+| **Enhanced Duration** | `NewDuration()`, `NewDurationFromComponents()` | Enhanced duration type with human-readable operations |
+
+### Duration Operations
+| Method | Description |
+|--------|-------------|
+| `Days()`, `Weeks()`, `Months()`, `Years()` | Get duration in different units |
+| `HumanString()` | Human-readable representation |
+| `Add()`, `Subtract()`, `Multiply()`, `Divide()` | Duration arithmetic |
+| `IsPositive()`, `IsNegative()`, `IsZero()`, `Abs()` | Duration properties |
+
 ## API Compatibility
 
 ChronoGo's `DateTime` type embeds Go's standard `time.Time`, making it a drop-in replacement in most cases. You can use all standard `time.Time` methods while gaining access to ChronoGo's enhanced functionality.
@@ -342,6 +364,11 @@ fmt.Println(dt.Unix())
 // Plus ChronoGo enhancements
 fmt.Println(dt.DiffForHumans())
 fmt.Println(dt.AddDays(5).SetHour(14))
+
+// New v0.2.0 methods
+fmt.Println(dt.StartOfDay())
+fmt.Println(dt.IsWeekend())
+fmt.Println(dt.Quarter())
 ```
 
 ## Error Handling
@@ -415,6 +442,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Roadmap
 
+### Completed in v0.2.0 ✅
+- [x] Enhanced utility methods (StartOfDay, EndOfDay, etc.)
+- [x] Weekend and weekday detection
+- [x] Quarter operations and ISO week support
+- [x] Fluent API for method chaining
+- [x] Enhanced duration type with human-readable operations
+
+### Planned Features
 - [ ] Localization support for human-readable strings
 - [ ] Business day calculations
 - [ ] Recurrence rules (RRULE support)
@@ -422,6 +457,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Duration parsing from strings
 - [ ] More comprehensive DST transition handling
 - [ ] Performance optimizations
+- [ ] Benchmark tests and performance profiling
 
 ## Changelog
 
