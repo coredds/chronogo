@@ -268,3 +268,113 @@ func (dt DateTime) String() string {
 func (dt DateTime) Format(layout string) string {
 	return dt.Time.Format(layout)
 }
+
+// StartOfDay returns a new DateTime set to the beginning of the day (00:00:00).
+func (dt DateTime) StartOfDay() DateTime {
+	return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, dt.Location())}
+}
+
+// EndOfDay returns a new DateTime set to the end of the day (23:59:59.999999999).
+func (dt DateTime) EndOfDay() DateTime {
+	return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), 23, 59, 59, 999999999, dt.Location())}
+}
+
+// StartOfMonth returns a new DateTime set to the beginning of the month (first day at 00:00:00).
+func (dt DateTime) StartOfMonth() DateTime {
+	return DateTime{time.Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, dt.Location())}
+}
+
+// EndOfMonth returns a new DateTime set to the end of the month (last day at 23:59:59.999999999).
+func (dt DateTime) EndOfMonth() DateTime {
+	year, month, _ := dt.Date()
+	firstOfNextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, dt.Location())
+	lastOfMonth := firstOfNextMonth.AddDate(0, 0, -1)
+	return DateTime{time.Date(lastOfMonth.Year(), lastOfMonth.Month(), lastOfMonth.Day(), 23, 59, 59, 999999999, dt.Location())}
+}
+
+// StartOfWeek returns a new DateTime set to the beginning of the week (Monday at 00:00:00).
+func (dt DateTime) StartOfWeek() DateTime {
+	weekday := dt.Weekday()
+	// In Go, Sunday = 0, Monday = 1, etc. We want Monday = 0 for ISO 8601
+	daysFromMonday := (int(weekday) + 6) % 7
+	startOfWeek := dt.AddDays(-daysFromMonday).StartOfDay()
+	return startOfWeek
+}
+
+// EndOfWeek returns a new DateTime set to the end of the week (Sunday at 23:59:59.999999999).
+func (dt DateTime) EndOfWeek() DateTime {
+	return dt.StartOfWeek().AddDays(6).EndOfDay()
+}
+
+// StartOfYear returns a new DateTime set to the beginning of the year (January 1st at 00:00:00).
+func (dt DateTime) StartOfYear() DateTime {
+	return DateTime{time.Date(dt.Year(), time.January, 1, 0, 0, 0, 0, dt.Location())}
+}
+
+// EndOfYear returns a new DateTime set to the end of the year (December 31st at 23:59:59.999999999).
+func (dt DateTime) EndOfYear() DateTime {
+	return DateTime{time.Date(dt.Year(), time.December, 31, 23, 59, 59, 999999999, dt.Location())}
+}
+
+// IsWeekend returns whether the datetime falls on a weekend (Saturday or Sunday).
+func (dt DateTime) IsWeekend() bool {
+	weekday := dt.Weekday()
+	return weekday == time.Saturday || weekday == time.Sunday
+}
+
+// IsWeekday returns whether the datetime falls on a weekday (Monday through Friday).
+func (dt DateTime) IsWeekday() bool {
+	return !dt.IsWeekend()
+}
+
+// Quarter returns the quarter of the year (1-4).
+func (dt DateTime) Quarter() int {
+	month := int(dt.Month())
+	return (month-1)/3 + 1
+}
+
+// StartOfQuarter returns a new DateTime set to the beginning of the quarter.
+func (dt DateTime) StartOfQuarter() DateTime {
+	quarter := dt.Quarter()
+	month := time.Month((quarter-1)*3 + 1)
+	return DateTime{time.Date(dt.Year(), month, 1, 0, 0, 0, 0, dt.Location())}
+}
+
+// EndOfQuarter returns a new DateTime set to the end of the quarter.
+func (dt DateTime) EndOfQuarter() DateTime {
+	quarter := dt.Quarter()
+	month := time.Month(quarter * 3)
+	// Get the last day of the quarter month
+	firstOfNextMonth := time.Date(dt.Year(), month+1, 1, 0, 0, 0, 0, dt.Location())
+	lastOfQuarter := firstOfNextMonth.AddDate(0, 0, -1)
+	return DateTime{time.Date(lastOfQuarter.Year(), lastOfQuarter.Month(), lastOfQuarter.Day(), 23, 59, 59, 999999999, dt.Location())}
+}
+
+// ISOWeek returns the ISO 8601 year and week number.
+// Week 1 is the first week with at least 4 days in the new year.
+func (dt DateTime) ISOWeek() (year, week int) {
+	return dt.Time.ISOWeek()
+}
+
+// ISOWeekYear returns the ISO 8601 year for the week containing the datetime.
+func (dt DateTime) ISOWeekYear() int {
+	year, _ := dt.Time.ISOWeek()
+	return year
+}
+
+// ISOWeekNumber returns the ISO 8601 week number (1-53).
+func (dt DateTime) ISOWeekNumber() int {
+	_, week := dt.Time.ISOWeek()
+	return week
+}
+
+// DayOfYear returns the day of the year (1-366).
+func (dt DateTime) DayOfYear() int {
+	return dt.Time.YearDay()
+}
+
+// WeekOfYear returns the week of the year (1-53) based on ISO 8601.
+func (dt DateTime) WeekOfYear() int {
+	_, week := dt.Time.ISOWeek()
+	return week
+}
