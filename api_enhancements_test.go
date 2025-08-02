@@ -298,11 +298,11 @@ func TestFluentDuration(t *testing.T) {
 func TestFluentDurationAccuracy(t *testing.T) {
 	t.Run("Year arithmetic with leap year", func(t *testing.T) {
 		base := Date(2020, time.February, 29, 12, 0, 0, 0, time.UTC) // Leap year
-		
+
 		// Add 1 year - Go's time package handles this by moving to March 1st in non-leap years
 		result := base.AddFluent().Years(1).To(base)
 		expected := Date(2021, time.March, 1, 12, 0, 0, 0, time.UTC) // Go's behavior for Feb 29 + 1 year
-		
+
 		if !result.Equal(expected) {
 			t.Errorf("Year addition from leap year: got %v, expected %v", result, expected)
 		}
@@ -310,11 +310,11 @@ func TestFluentDurationAccuracy(t *testing.T) {
 
 	t.Run("Month arithmetic with overflow", func(t *testing.T) {
 		base := Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC)
-		
+
 		// Add 1 month - Go's time package handles this by adding overflow days to next month
 		result := base.AddFluent().Months(1).To(base)
 		expected := Date(2023, time.March, 3, 12, 0, 0, 0, time.UTC) // Jan 31 + 1 month = Mar 3 (Feb has 28 days)
-		
+
 		if !result.Equal(expected) {
 			t.Errorf("Month addition overflow: got %v, expected %v", result, expected)
 		}
@@ -322,7 +322,7 @@ func TestFluentDurationAccuracy(t *testing.T) {
 
 	t.Run("Combined calendar and time arithmetic", func(t *testing.T) {
 		base := Date(2020, time.December, 31, 15, 30, 45, 0, time.UTC)
-		
+
 		// Add 1 year, 2 months, 5 days, 3 hours
 		result := base.AddFluent().
 			Years(1).
@@ -330,13 +330,13 @@ func TestFluentDurationAccuracy(t *testing.T) {
 			Days(5).
 			Hours(3).
 			To(base)
-		
+
 		// Expected: 2020-12-31 + 1 year = 2021-12-31
 		// + 2 months = 2022-03-03 (Dec 31 + 2 months overflow to March)
 		// + 5 days = 2022-03-08
 		// + 3 hours = 2022-03-08 18:30:45
 		expected := Date(2022, time.March, 8, 18, 30, 45, 0, time.UTC)
-		
+
 		if !result.Equal(expected) {
 			t.Errorf("Combined arithmetic: got %v, expected %v", result, expected)
 		}
@@ -345,7 +345,7 @@ func TestFluentDurationAccuracy(t *testing.T) {
 	t.Run("Zero values", func(t *testing.T) {
 		base := Date(2023, time.June, 15, 12, 30, 45, 0, time.UTC)
 		result := base.AddFluent().Years(0).Months(0).Days(0).To(base)
-		
+
 		if !result.Equal(base) {
 			t.Errorf("Zero additions should return unchanged date: got %v, expected %v", result, base)
 		}

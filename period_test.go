@@ -309,13 +309,13 @@ func TestPeriodRangeWithContext(t *testing.T) {
 		period := NewPeriod(start, end)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		
+
 		// Start iteration
 		ch := period.RangeWithContext(ctx, "days", 1)
-		
+
 		received := 0
 		done := make(chan bool)
-		
+
 		go func() {
 			for range ch {
 				received++
@@ -341,9 +341,9 @@ func TestPeriodRangeWithContext(t *testing.T) {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
 		defer cancel()
-		
+
 		ch := period.RangeWithContext(ctx, "days", 1)
-		
+
 		received := 0
 		for range ch {
 			received++
@@ -363,7 +363,7 @@ func TestPeriodRangeWithContext(t *testing.T) {
 
 		// Test that the original Range method still works and uses RangeWithContext internally
 		ch := period.Range("days", 1)
-		
+
 		received := 0
 		for range ch {
 			received++

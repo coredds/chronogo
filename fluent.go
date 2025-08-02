@@ -16,7 +16,7 @@ type FluentDateTime struct {
 // while maintaining precision for time-based operations.
 type FluentDuration struct {
 	years    int           // Number of years to add/subtract
-	months   int           // Number of months to add/subtract  
+	months   int           // Number of months to add/subtract
 	duration time.Duration // Time-based duration (days, hours, minutes, seconds, etc.)
 }
 
