@@ -1,6 +1,7 @@
 package chronogo
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -208,6 +209,13 @@ func (p Period) String() string {
 // Range returns a channel that yields DateTime instances within the period.
 // The step parameter determines the unit: "days", "hours", "minutes", "seconds".
 func (p Period) Range(unit string, step ...int) <-chan DateTime {
+	return p.RangeWithContext(context.Background(), unit, step...)
+}
+
+// RangeWithContext returns a channel that yields DateTime instances within the period with context cancellation.
+// The step parameter determines the unit: "years", "months", "days", "hours", "minutes", "seconds".
+// This method provides memory-safe iteration by respecting context cancellation and preventing goroutine leaks.
+func (p Period) RangeWithContext(ctx context.Context, unit string, step ...int) <-chan DateTime {
 	stepSize := 1
 	if len(step) > 0 {
 		stepSize = step[0]
@@ -221,7 +229,12 @@ func (p Period) Range(unit string, step ...int) <-chan DateTime {
 		current := p.Start
 
 		for !current.After(p.End) {
-			ch <- current
+			select {
+			case <-ctx.Done():
+				return // Context cancelled, stop iteration
+			case ch <- current:
+				// Successfully sent, continue
+			}
 
 			switch unit {
 			case "years":
