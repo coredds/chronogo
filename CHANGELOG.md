@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-01-08
+
+### Fixed
+- **IsDST() Method**: Fixed incorrect logic that compared against UTC offset instead of standard winter offset
+  - Now properly detects daylight saving time across all IANA timezones
+  - Added comprehensive tests for multiple timezones and seasons (NY, London, UTC)
+
+- **FluentDuration Accuracy**: Fixed inaccurate year/month approximations in calendar arithmetic
+  - Calendar units (years/months) now stored separately from time units
+  - Follows Go's time package behavior for month/year overflow and leap year handling
+  - Eliminates approximation errors in business logic calculations
+
+- **Period.Range Memory Safety**: Added context cancellation to prevent goroutine leaks
+  - New `RangeWithContext()` method with proper cancellation support
+  - Maintains backward compatibility with existing `Range()` method
+  - Prevents memory leaks in long-running or abandoned iterations
+
+### Enhanced
+- **Test Organization**: Reorganized critical fix tests into appropriate test files by functionality
+- **Code Quality**: Applied go fmt formatting and ensured GitHub CI compliance
+- **Documentation**: Updated method documentation for fixed implementations
+
 ## [0.2.0] - 2025-01-08
 
 ### Added
