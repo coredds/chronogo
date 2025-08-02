@@ -303,19 +303,19 @@ func TestPeriodForEach(t *testing.T) {
 
 // TestPeriodRangeWithContext tests the context cancellation in Period.Range
 func TestPeriodRangeWithContext(t *testing.T) {
-		t.Run("Context cancellation stops iteration", func(t *testing.T) {
+	t.Run("Context cancellation stops iteration", func(t *testing.T) {
 		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 		end := Date(2023, time.January, 10, 0, 0, 0, 0, time.UTC)
 		period := NewPeriod(start, end)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		
+
 		// Start iteration
 		ch := period.RangeWithContext(ctx, "days", 1)
-		
+
 		received := 0
 		done := make(chan bool)
-		
+
 		go func() {
 			defer func() { done <- true }() // Ensure done is always sent
 			for range ch {
