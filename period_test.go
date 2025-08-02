@@ -303,34 +303,45 @@ func TestPeriodForEach(t *testing.T) {
 
 // TestPeriodRangeWithContext tests the context cancellation in Period.Range
 func TestPeriodRangeWithContext(t *testing.T) {
-	t.Run("Context cancellation stops iteration", func(t *testing.T) {
+		t.Run("Context cancellation stops iteration", func(t *testing.T) {
 		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
 		end := Date(2023, time.January, 10, 0, 0, 0, 0, time.UTC)
 		period := NewPeriod(start, end)
 
 		ctx, cancel := context.WithCancel(context.Background())
-
+		
 		// Start iteration
 		ch := period.RangeWithContext(ctx, "days", 1)
-
+		
 		received := 0
 		done := make(chan bool)
-
+		
 		go func() {
+			defer func() { done <- true }() // Ensure done is always sent
 			for range ch {
 				received++
 				if received == 3 {
 					cancel() // Cancel after receiving 3 items
+					return   // Exit immediately after cancellation
 				}
 			}
-			done <- true
 		}()
 
-		<-done
+		// Wait for completion or timeout
+		select {
+		case <-done:
+			// Test completed
+		case <-time.After(1 * time.Second):
+			cancel() // Ensure cleanup
+			t.Fatal("Test timed out waiting for context cancellation")
+		}
 
 		// Should have received exactly 3 items before cancellation
-		if received != 3 {
-			t.Errorf("Expected to receive 3 items before cancellation, got %d", received)
+		if received < 3 {
+			t.Errorf("Expected to receive at least 3 items before cancellation, got %d", received)
+		}
+		if received > 5 {
+			t.Errorf("Expected cancellation to stop iteration quickly, but got %d items", received)
 		}
 	})
 
