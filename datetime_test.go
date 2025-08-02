@@ -119,9 +119,60 @@ func TestTimezoneConversions(t *testing.T) {
 }
 
 func TestIsDST(t *testing.T) {
-	// This test might be system-dependent, so we'll just check the method exists
-	dt := Now()
-	dt.IsDST() // Should not panic
+	// Test cases for different timezones and seasons
+	testCases := []struct {
+		name     string
+		location string
+		date     time.Time
+		expected bool
+	}{
+		{
+			name:     "New York summer (DST)",
+			location: "America/New_York",
+			date:     time.Date(2023, time.July, 15, 12, 0, 0, 0, time.UTC),
+			expected: true,
+		},
+		{
+			name:     "New York winter (no DST)",
+			location: "America/New_York",
+			date:     time.Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC),
+			expected: false,
+		},
+		{
+			name:     "London summer (BST)",
+			location: "Europe/London",
+			date:     time.Date(2023, time.July, 15, 12, 0, 0, 0, time.UTC),
+			expected: true,
+		},
+		{
+			name:     "London winter (GMT)",
+			location: "Europe/London",
+			date:     time.Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC),
+			expected: false,
+		},
+		{
+			name:     "UTC (never DST)",
+			location: "UTC",
+			date:     time.Date(2023, time.July, 15, 12, 0, 0, 0, time.UTC),
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			loc, err := time.LoadLocation(tc.location)
+			if err != nil {
+				t.Skipf("Skipping test: timezone %s not available", tc.location)
+			}
+
+			dt := DateTime{tc.date.In(loc)}
+			result := dt.IsDST()
+
+			if result != tc.expected {
+				t.Errorf("IsDST() for %s = %v, expected %v", tc.name, result, tc.expected)
+			}
+		})
+	}
 }
 
 func TestIsLeapYear(t *testing.T) {

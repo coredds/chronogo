@@ -278,26 +278,78 @@ func TestDayOfYear(t *testing.T) {
 
 // Test fluent API
 func TestFluentDuration(t *testing.T) {
-	now := Now()
+	// Test with a fixed base date to get predictable results
+	base := Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
 
-	// Test chaining different units
-	future := now.AddFluent().Years(1).Months(2).Days(3).Hours(4).Minutes(5).Seconds(6).To(now)
+	// Test chaining different units - now uses accurate calendar arithmetic
+	result := base.AddFluent().Years(1).Months(2).Days(3).Hours(4).Minutes(5).Seconds(6).To(base)
 
-	// Calculate expected duration (approximate since years/months are approximate in fluent duration)
-	expectedDuration := 365*24*time.Hour + // 1 year (approximate)
-		60*24*time.Hour + // 2 months (approximate)
-		3*24*time.Hour + // 3 days
-		4*time.Hour + // 4 hours
-		5*time.Minute + // 5 minutes
-		6*time.Second // 6 seconds
+	// Expected: 2023-01-01 + 1 year = 2024-01-01
+	// + 2 months = 2024-03-01 + 3 days = 2024-03-04
+	// + 4 hours 5 minutes 6 seconds = 2024-03-04 16:05:06
+	expected := Date(2024, time.March, 4, 16, 5, 6, 0, time.UTC)
 
-	actualDuration := future.Sub(now)
-
-	// Allow some tolerance due to approximation
-	tolerance := 24 * time.Hour
-	if actualDuration < expectedDuration-tolerance || actualDuration > expectedDuration+tolerance {
-		t.Errorf("Fluent duration calculation outside expected range: got %v, expected around %v", actualDuration, expectedDuration)
+	if !result.Equal(expected) {
+		t.Errorf("Fluent duration calculation: got %v, expected %v", result, expected)
 	}
+}
+
+// TestFluentDurationAccuracy tests accurate calendar arithmetic
+func TestFluentDurationAccuracy(t *testing.T) {
+	t.Run("Year arithmetic with leap year", func(t *testing.T) {
+		base := Date(2020, time.February, 29, 12, 0, 0, 0, time.UTC) // Leap year
+
+		// Add 1 year - Go's time package handles this by moving to March 1st in non-leap years
+		result := base.AddFluent().Years(1).To(base)
+		expected := Date(2021, time.March, 1, 12, 0, 0, 0, time.UTC) // Go's behavior for Feb 29 + 1 year
+
+		if !result.Equal(expected) {
+			t.Errorf("Year addition from leap year: got %v, expected %v", result, expected)
+		}
+	})
+
+	t.Run("Month arithmetic with overflow", func(t *testing.T) {
+		base := Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC)
+
+		// Add 1 month - Go's time package handles this by adding overflow days to next month
+		result := base.AddFluent().Months(1).To(base)
+		expected := Date(2023, time.March, 3, 12, 0, 0, 0, time.UTC) // Jan 31 + 1 month = Mar 3 (Feb has 28 days)
+
+		if !result.Equal(expected) {
+			t.Errorf("Month addition overflow: got %v, expected %v", result, expected)
+		}
+	})
+
+	t.Run("Combined calendar and time arithmetic", func(t *testing.T) {
+		base := Date(2020, time.December, 31, 15, 30, 45, 0, time.UTC)
+
+		// Add 1 year, 2 months, 5 days, 3 hours
+		result := base.AddFluent().
+			Years(1).
+			Months(2).
+			Days(5).
+			Hours(3).
+			To(base)
+
+		// Expected: 2020-12-31 + 1 year = 2021-12-31
+		// + 2 months = 2022-03-03 (Dec 31 + 2 months overflow to March)
+		// + 5 days = 2022-03-08
+		// + 3 hours = 2022-03-08 18:30:45
+		expected := Date(2022, time.March, 8, 18, 30, 45, 0, time.UTC)
+
+		if !result.Equal(expected) {
+			t.Errorf("Combined arithmetic: got %v, expected %v", result, expected)
+		}
+	})
+
+	t.Run("Zero values", func(t *testing.T) {
+		base := Date(2023, time.June, 15, 12, 30, 45, 0, time.UTC)
+		result := base.AddFluent().Years(0).Months(0).Days(0).To(base)
+
+		if !result.Equal(base) {
+			t.Errorf("Zero additions should return unchanged date: got %v, expected %v", result, base)
+		}
+	})
 }
 
 func TestFluentDateTime(t *testing.T) {

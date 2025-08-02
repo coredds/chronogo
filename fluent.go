@@ -11,13 +11,18 @@ type FluentDateTime struct {
 }
 
 // FluentDuration provides a fluent API for building durations with human-readable methods.
+// It stores calendar units (years, months) separately from time units for accurate arithmetic.
+// This design ensures that date arithmetic follows Go's time package behavior for calendar operations
+// while maintaining precision for time-based operations.
 type FluentDuration struct {
-	duration time.Duration
+	years    int           // Number of years to add/subtract
+	months   int           // Number of months to add/subtract
+	duration time.Duration // Time-based duration (days, hours, minutes, seconds, etc.)
 }
 
 // AddFluent returns a FluentDuration for adding time units to the DateTime.
 func (dt DateTime) AddFluent() *FluentDuration {
-	return &FluentDuration{duration: 0}
+	return &FluentDuration{years: 0, months: 0, duration: 0}
 }
 
 // Set returns a FluentDateTime for setting specific components of the DateTime.
@@ -27,16 +32,13 @@ func (dt DateTime) Set() *FluentDateTime {
 
 // Years adds the specified number of years to the duration.
 func (fd *FluentDuration) Years(years int) *FluentDuration {
-	// For fluent duration, we need to approximate years as days
-	// This is approximate since years have different numbers of days
-	fd.duration += time.Duration(years) * 365 * 24 * time.Hour
+	fd.years += years
 	return fd
 }
 
 // Months adds the specified number of months to the duration.
 func (fd *FluentDuration) Months(months int) *FluentDuration {
-	// Approximate months as 30 days
-	fd.duration += time.Duration(months) * 30 * 24 * time.Hour
+	fd.months += months
 	return fd
 }
 
@@ -90,12 +92,18 @@ func (fd *FluentDuration) Nanoseconds(nanoseconds int) *FluentDuration {
 
 // To applies the accumulated duration to a DateTime and returns the result.
 func (fd *FluentDuration) To(dt DateTime) DateTime {
-	return dt.Add(fd.duration)
+	// Apply calendar-based arithmetic first (years and months)
+	result := dt.AddYears(fd.years).AddMonths(fd.months)
+	// Then apply time-based duration
+	return result.Add(fd.duration)
 }
 
 // From subtracts the accumulated duration from a DateTime and returns the result.
 func (fd *FluentDuration) From(dt DateTime) DateTime {
-	return dt.Subtract(fd.duration)
+	// Apply calendar-based arithmetic first (years and months) in reverse
+	result := dt.AddYears(-fd.years).AddMonths(-fd.months)
+	// Then subtract time-based duration
+	return result.Subtract(fd.duration)
 }
 
 // Year sets the year component.

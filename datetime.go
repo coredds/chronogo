@@ -88,9 +88,16 @@ func (dt DateTime) Location() *time.Location {
 
 // IsDST returns whether the datetime is in daylight saving time.
 func (dt DateTime) IsDST() bool {
-	_, offset := dt.Time.Zone()
-	_, stdOffset := dt.UTC().Time.Zone()
-	return offset != stdOffset
+	// Get the current zone offset
+	_, currentOffset := dt.Time.Zone()
+
+	// Get the standard offset by checking January 1st (winter time) in the same location
+	// This works because DST is typically not in effect in January for most locations
+	winterTime := time.Date(dt.Year(), time.January, 1, 12, 0, 0, 0, dt.Location())
+	_, standardOffset := winterTime.Zone()
+
+	// If current offset is greater than standard offset, we're likely in DST
+	return currentOffset > standardOffset
 }
 
 // IsUTC returns whether the datetime is in UTC timezone.
