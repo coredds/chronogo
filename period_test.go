@@ -1,6 +1,7 @@
 package chronogo
 
 import (
+	"context"
 	"testing"
 	"time"
 )
@@ -298,4 +299,80 @@ func TestPeriodForEach(t *testing.T) {
 	if count != 3 {
 		t.Errorf("ForEach should iterate 3 times, got %d", count)
 	}
+}
+
+// TestPeriodRangeWithContext tests the context cancellation in Period.Range
+func TestPeriodRangeWithContext(t *testing.T) {
+	t.Run("Context cancellation stops iteration", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 10, 0, 0, 0, 0, time.UTC)
+		period := NewPeriod(start, end)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		
+		// Start iteration
+		ch := period.RangeWithContext(ctx, "days", 1)
+		
+		received := 0
+		done := make(chan bool)
+		
+		go func() {
+			for range ch {
+				received++
+				if received == 3 {
+					cancel() // Cancel after receiving 3 items
+				}
+			}
+			done <- true
+		}()
+
+		<-done
+
+		// Should have received exactly 3 items before cancellation
+		if received != 3 {
+			t.Errorf("Expected to receive 3 items before cancellation, got %d", received)
+		}
+	})
+
+	t.Run("Context timeout stops iteration", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 10, 0, 0, 0, 0, time.UTC)
+		period := NewPeriod(start, end)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+		defer cancel()
+		
+		ch := period.RangeWithContext(ctx, "days", 1)
+		
+		received := 0
+		for range ch {
+			received++
+			time.Sleep(20 * time.Millisecond) // Slow processing to trigger timeout
+		}
+
+		// Should not receive all 10 items due to timeout
+		if received >= 10 {
+			t.Errorf("Expected timeout to stop iteration early, but received all %d items", received)
+		}
+	})
+
+	t.Run("Backward compatibility with Range method", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 3, 0, 0, 0, 0, time.UTC)
+		period := NewPeriod(start, end)
+
+		// Test that the original Range method still works and uses RangeWithContext internally
+		ch := period.Range("days", 1)
+		
+		received := 0
+		for range ch {
+			received++
+		}
+
+		// Should receive 3 items: Jan 1, 2, 3 (inclusive of start and end)
+		expected := 3
+		if received != expected {
+			t.Errorf("Range method: expected %d items, got %d", expected, received)
+		}
+	})
 }
