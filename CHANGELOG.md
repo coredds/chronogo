@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2025-01-08
+
+### Added
+- **Additional Date Utility Methods**: Added comprehensive date checking and calculation methods
+  - `IsFirstDayOfMonth()` - Check if the date is the first day of the month
+  - `IsLastDayOfMonth()` - Check if the date is the last day of the month (handles leap years)
+  - `IsFirstDayOfYear()` - Check if the date is January 1st
+  - `IsLastDayOfYear()` - Check if the date is December 31st
+  - `WeekOfMonth()` - Get week number within month (1-6 based on days 1-7, 8-14, etc.)
+  - `DaysInMonth()` - Get number of days in current month (properly handles leap years)
+  - `DaysInYear()` - Get 365 or 366 based on leap year calculation
+
+### Enhanced
+- **Documentation**: Updated README with new utility methods examples and API reference
+- **Test Coverage**: Added comprehensive tests for all new utility methods with edge case coverage
+- **API Consistency**: New methods follow existing naming conventions and return patterns
+
 ## [0.2.1] - 2025-01-08
 
 ### Fixed
