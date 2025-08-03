@@ -1,4 +1,4 @@
-// ChronoGo Demo v0.2.1
+// ChronoGo Demo v0.2.2
 module demo
 
 go 1.21
