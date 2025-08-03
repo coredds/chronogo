@@ -507,7 +507,7 @@ func TestWeekOfMonth(t *testing.T) {
 		{"Day 28", Date(2023, time.January, 28, 12, 0, 0, 0, time.UTC), 4},
 		{"Day 29", Date(2023, time.January, 29, 12, 0, 0, 0, time.UTC), 5},
 		{"Day 31", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), 5},
-		
+
 		// Test different months
 		{"June 1st", Date(2023, time.June, 1, 12, 0, 0, 0, time.UTC), 1},
 		{"June 8th", Date(2023, time.June, 8, 12, 0, 0, 0, time.UTC), 2},
