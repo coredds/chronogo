@@ -262,6 +262,15 @@ fmt.Printf("ISO Week: %d-%d\n", year, week) // "ISO Week: 2023-41"
 fmt.Println(dt.ISOWeekYear())    // 2023
 fmt.Println(dt.ISOWeekNumber())  // 41
 fmt.Println(dt.WeekOfYear())     // 41
+
+// Additional date utilities
+fmt.Println(dt.IsFirstDayOfMonth()) // false (15th is not first day)
+fmt.Println(dt.IsLastDayOfMonth())  // false (15th is not last day)
+fmt.Println(dt.IsFirstDayOfYear())  // false (not January 1st)
+fmt.Println(dt.IsLastDayOfYear())   // false (not December 31st)
+fmt.Println(dt.WeekOfMonth())       // 3 (15th falls in 3rd week of month)
+fmt.Println(dt.DaysInMonth())       // 31 (October has 31 days)
+fmt.Println(dt.DaysInYear())        // 365 (2023 is not a leap year)
 ```
 
 ### Fluent API for Enhanced Readability
@@ -328,7 +337,7 @@ fmt.Println(duration.Abs())        // Absolute value
 
 ## Quick Reference
 
-### New API Methods (v0.2.0)
+### New API Methods (v0.2.0+)
 
 | Category | Methods | Description |
 |----------|---------|-------------|
@@ -337,6 +346,7 @@ fmt.Println(duration.Abs())        // Absolute value
 | **Quarter** | `Quarter()`, `StartOfQuarter()`, `EndOfQuarter()` | Quarter-based operations (Q1-Q4) |
 | **ISO Week** | `ISOWeek()`, `ISOWeekYear()`, `ISOWeekNumber()`, `WeekOfYear()` | ISO 8601 week operations |
 | **Date Info** | `DayOfYear()` | Additional date information |
+| **Date Utilities** | `IsFirstDayOfMonth()`, `IsLastDayOfMonth()`, `IsFirstDayOfYear()`, `IsLastDayOfYear()`, `WeekOfMonth()`, `DaysInMonth()`, `DaysInYear()` | Additional date utility methods for common date checks and calculations |
 | **Fluent API** | `AddFluent()`, `Set()` | Method chaining for complex operations |
 | **Enhanced Duration** | `NewDuration()`, `NewDurationFromComponents()` | Enhanced duration type with human-readable operations |
 

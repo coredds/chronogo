@@ -394,3 +394,187 @@ func TestFormat(t *testing.T) {
 		t.Errorf("Format(): expected %s, got %s", expected, formatted)
 	}
 }
+
+func TestIsFirstDayOfMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"First day of January", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), true},
+		{"First day of February", Date(2023, time.February, 1, 0, 0, 0, 0, time.UTC), true},
+		{"Second day of January", Date(2023, time.January, 2, 12, 0, 0, 0, time.UTC), false},
+		{"Last day of January", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-month", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsFirstDayOfMonth()
+			if result != test.expected {
+				t.Errorf("IsFirstDayOfMonth() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIsLastDayOfMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"Last day of January", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), true},
+		{"Last day of February (non-leap)", Date(2023, time.February, 28, 12, 0, 0, 0, time.UTC), true},
+		{"Last day of February (leap)", Date(2024, time.February, 29, 12, 0, 0, 0, time.UTC), true},
+		{"Last day of April", Date(2023, time.April, 30, 12, 0, 0, 0, time.UTC), true},
+		{"First day of month", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-month", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+		{"February 28 in leap year", Date(2024, time.February, 28, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsLastDayOfMonth()
+			if result != test.expected {
+				t.Errorf("IsLastDayOfMonth() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIsFirstDayOfYear(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"January 1st, 2023", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), true},
+		{"January 1st, 2024", Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC), true},
+		{"January 2nd", Date(2023, time.January, 2, 12, 0, 0, 0, time.UTC), false},
+		{"December 31st", Date(2023, time.December, 31, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-year", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsFirstDayOfYear()
+			if result != test.expected {
+				t.Errorf("IsFirstDayOfYear() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIsLastDayOfYear(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"December 31st, 2023", Date(2023, time.December, 31, 12, 0, 0, 0, time.UTC), true},
+		{"December 31st, 2024", Date(2024, time.December, 31, 23, 59, 59, 0, time.UTC), true},
+		{"December 30th", Date(2023, time.December, 30, 12, 0, 0, 0, time.UTC), false},
+		{"January 1st", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-year", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsLastDayOfYear()
+			if result != test.expected {
+				t.Errorf("IsLastDayOfYear() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestWeekOfMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected int
+	}{
+		// Days 1-7 are in week 1, days 8-14 are in week 2, etc.
+		{"Day 1", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), 1},
+		{"Day 2", Date(2023, time.January, 2, 12, 0, 0, 0, time.UTC), 1},
+		{"Day 7", Date(2023, time.January, 7, 12, 0, 0, 0, time.UTC), 1},
+		{"Day 8", Date(2023, time.January, 8, 12, 0, 0, 0, time.UTC), 2},
+		{"Day 14", Date(2023, time.January, 14, 12, 0, 0, 0, time.UTC), 2},
+		{"Day 15", Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC), 3},
+		{"Day 21", Date(2023, time.January, 21, 12, 0, 0, 0, time.UTC), 3},
+		{"Day 22", Date(2023, time.January, 22, 12, 0, 0, 0, time.UTC), 4},
+		{"Day 28", Date(2023, time.January, 28, 12, 0, 0, 0, time.UTC), 4},
+		{"Day 29", Date(2023, time.January, 29, 12, 0, 0, 0, time.UTC), 5},
+		{"Day 31", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), 5},
+		
+		// Test different months
+		{"June 1st", Date(2023, time.June, 1, 12, 0, 0, 0, time.UTC), 1},
+		{"June 8th", Date(2023, time.June, 8, 12, 0, 0, 0, time.UTC), 2},
+		{"June 15th", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), 3},
+		{"June 30th", Date(2023, time.June, 30, 12, 0, 0, 0, time.UTC), 5},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.WeekOfMonth()
+			if result != test.expected {
+				t.Errorf("WeekOfMonth() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestDaysInMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected int
+	}{
+		{"January 2023", Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"February 2023 (non-leap)", Date(2023, time.February, 15, 12, 0, 0, 0, time.UTC), 28},
+		{"February 2024 (leap)", Date(2024, time.February, 15, 12, 0, 0, 0, time.UTC), 29},
+		{"March 2023", Date(2023, time.March, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"April 2023", Date(2023, time.April, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"May 2023", Date(2023, time.May, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"June 2023", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"July 2023", Date(2023, time.July, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"August 2023", Date(2023, time.August, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"September 2023", Date(2023, time.September, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"October 2023", Date(2023, time.October, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"November 2023", Date(2023, time.November, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"December 2023", Date(2023, time.December, 15, 12, 0, 0, 0, time.UTC), 31},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.DaysInMonth()
+			if result != test.expected {
+				t.Errorf("DaysInMonth() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestDaysInYear(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected int
+	}{
+		{"2023 (non-leap year)", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), 365},
+		{"2024 (leap year)", Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC), 366},
+		{"2000 (leap year)", Date(2000, time.June, 15, 12, 0, 0, 0, time.UTC), 366},
+		{"1900 (non-leap year)", Date(1900, time.June, 15, 12, 0, 0, 0, time.UTC), 365},
+		{"2100 (non-leap year)", Date(2100, time.June, 15, 12, 0, 0, 0, time.UTC), 365},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.DaysInYear()
+			if result != test.expected {
+				t.Errorf("DaysInYear() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
