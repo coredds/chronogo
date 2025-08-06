@@ -260,8 +260,7 @@ fmt.Println(dt.DayOfYear())      // 288
 year, week := dt.ISOWeek()
 fmt.Printf("ISO Week: %d-%d\n", year, week) // "ISO Week: 2023-41"
 fmt.Println(dt.ISOWeekYear())    // 2023
-fmt.Println(dt.ISOWeekNumber())  // 41
-fmt.Println(dt.WeekOfYear())     // 41
+   fmt.Println(dt.ISOWeekNumber())  // 41
 ```
 
 ### Fluent API for Enhanced Readability
@@ -335,7 +334,7 @@ fmt.Println(duration.Abs())        // Absolute value
 | **Start/End** | `StartOfDay()`, `EndOfDay()`, `StartOfMonth()`, `EndOfMonth()`, `StartOfWeek()`, `EndOfWeek()`, `StartOfYear()`, `EndOfYear()`, `StartOfQuarter()`, `EndOfQuarter()` | Set DateTime to beginning or end of time periods |
 | **Weekend/Weekday** | `IsWeekend()`, `IsWeekday()` | Check if date falls on weekend or weekday |
 | **Quarter** | `Quarter()`, `StartOfQuarter()`, `EndOfQuarter()` | Quarter-based operations (Q1-Q4) |
-| **ISO Week** | `ISOWeek()`, `ISOWeekYear()`, `ISOWeekNumber()`, `WeekOfYear()` | ISO 8601 week operations |
+| **ISO Week** | `ISOWeek()`, `ISOWeekYear()`, `ISOWeekNumber()` | ISO 8601 week operations |
 | **Date Info** | `DayOfYear()` | Additional date information |
 | **Fluent API** | `AddFluent()`, `Set()` | Method chaining for complex operations |
 | **Enhanced Duration** | `NewDuration()`, `NewDurationFromComponents()` | Enhanced duration type with human-readable operations |

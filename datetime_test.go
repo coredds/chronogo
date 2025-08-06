@@ -165,7 +165,9 @@ func TestIsDST(t *testing.T) {
 				t.Skipf("Skipping test: timezone %s not available", tc.location)
 			}
 
-			dt := DateTime{tc.date.In(loc)}
+			// Create a time.Time in the specific location, then check if it's in DST
+			specificTime := time.Date(tc.date.Year(), tc.date.Month(), tc.date.Day(), 12, 0, 0, 0, loc)
+			dt := DateTime{specificTime}
 			result := dt.IsDST()
 
 			if result != tc.expected {

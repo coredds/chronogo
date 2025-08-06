@@ -29,8 +29,7 @@ func NowIn(loc *time.Location) DateTime {
 
 // Today returns today's date at midnight in the local timezone.
 func Today() DateTime {
-	now := time.Now()
-	return DateTime{time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())}
+	return Now().StartOfDay()
 }
 
 // TodayIn returns today's date at midnight in the specified timezone.
@@ -41,14 +40,12 @@ func TodayIn(loc *time.Location) DateTime {
 
 // Tomorrow returns tomorrow's date at midnight in the local timezone.
 func Tomorrow() DateTime {
-	now := time.Now().AddDate(0, 0, 1)
-	return DateTime{time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())}
+	return Now().AddDays(1).StartOfDay()
 }
 
 // Yesterday returns yesterday's date at midnight in the local timezone.
 func Yesterday() DateTime {
-	now := time.Now().AddDate(0, 0, -1)
-	return DateTime{time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())}
+	return Now().AddDays(-1).StartOfDay()
 }
 
 // Date creates a DateTime similar to time.Date() but returns our DateTime type.
@@ -88,16 +85,11 @@ func (dt DateTime) Location() *time.Location {
 
 // IsDST returns whether the datetime is in daylight saving time.
 func (dt DateTime) IsDST() bool {
-	// Get the current zone offset
-	_, currentOffset := dt.Time.Zone()
-
-	// Get the standard offset by checking January 1st (winter time) in the same location
-	// This works because DST is typically not in effect in January for most locations
-	winterTime := time.Date(dt.Year(), time.January, 1, 12, 0, 0, 0, dt.Location())
-	_, standardOffset := winterTime.Zone()
-
-	// If current offset is greater than standard offset, we're likely in DST
-	return currentOffset > standardOffset
+	// A time is in DST if its zone offset is different from the standard offset.
+	// We find the standard offset by checking a time in deep winter (January 1st).
+	_, regularOffset := time.Date(dt.Year(), time.January, 1, 0, 0, 0, 0, dt.Location()).Zone()
+	_, dstOffset := dt.Zone()
+	return regularOffset != dstOffset
 }
 
 // IsUTC returns whether the datetime is in UTC timezone.
@@ -293,10 +285,7 @@ func (dt DateTime) StartOfMonth() DateTime {
 
 // EndOfMonth returns a new DateTime set to the end of the month (last day at 23:59:59.999999999).
 func (dt DateTime) EndOfMonth() DateTime {
-	year, month, _ := dt.Date()
-	firstOfNextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, dt.Location())
-	lastOfMonth := firstOfNextMonth.AddDate(0, 0, -1)
-	return DateTime{time.Date(lastOfMonth.Year(), lastOfMonth.Month(), lastOfMonth.Day(), 23, 59, 59, 999999999, dt.Location())}
+	return dt.StartOfMonth().AddMonths(1).AddDays(-1).EndOfDay()
 }
 
 // StartOfWeek returns a new DateTime set to the beginning of the week (Monday at 00:00:00).
@@ -349,12 +338,7 @@ func (dt DateTime) StartOfQuarter() DateTime {
 
 // EndOfQuarter returns a new DateTime set to the end of the quarter.
 func (dt DateTime) EndOfQuarter() DateTime {
-	quarter := dt.Quarter()
-	month := time.Month(quarter * 3)
-	// Get the last day of the quarter month
-	firstOfNextMonth := time.Date(dt.Year(), month+1, 1, 0, 0, 0, 0, dt.Location())
-	lastOfQuarter := firstOfNextMonth.AddDate(0, 0, -1)
-	return DateTime{time.Date(lastOfQuarter.Year(), lastOfQuarter.Month(), lastOfQuarter.Day(), 23, 59, 59, 999999999, dt.Location())}
+	return dt.StartOfQuarter().AddMonths(3).AddDays(-1).EndOfDay()
 }
 
 // ISOWeek returns the ISO 8601 year and week number.
@@ -378,10 +362,4 @@ func (dt DateTime) ISOWeekNumber() int {
 // DayOfYear returns the day of the year (1-366).
 func (dt DateTime) DayOfYear() int {
 	return dt.Time.YearDay()
-}
-
-// WeekOfYear returns the week of the year (1-53) based on ISO 8601.
-func (dt DateTime) WeekOfYear() int {
-	_, week := dt.Time.ISOWeek()
-	return week
 }

@@ -52,7 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ISOWeek()` - Get ISO 8601 year and week number
   - `ISOWeekYear()` - Get ISO 8601 year for the week
   - `ISOWeekNumber()` - Get ISO 8601 week number (1-53)
-  - `WeekOfYear()` - Get week number within the year
 
 - **Fluent API for Enhanced Readability**
   - `AddFluent()` - Returns FluentDuration for chaining time additions
