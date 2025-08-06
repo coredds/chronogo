@@ -396,3 +396,458 @@ func TestFormat(t *testing.T) {
 		t.Errorf("Format(): expected %s, got %s", expected, formatted)
 	}
 }
+
+func TestIsFirstDayOfMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"First day of January", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), true},
+		{"First day of February", Date(2023, time.February, 1, 0, 0, 0, 0, time.UTC), true},
+		{"Second day of January", Date(2023, time.January, 2, 12, 0, 0, 0, time.UTC), false},
+		{"Last day of January", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-month", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsFirstDayOfMonth()
+			if result != test.expected {
+				t.Errorf("IsFirstDayOfMonth() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIsLastDayOfMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"Last day of January", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), true},
+		{"Last day of February (non-leap)", Date(2023, time.February, 28, 12, 0, 0, 0, time.UTC), true},
+		{"Last day of February (leap)", Date(2024, time.February, 29, 12, 0, 0, 0, time.UTC), true},
+		{"Last day of April", Date(2023, time.April, 30, 12, 0, 0, 0, time.UTC), true},
+		{"First day of month", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-month", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+		{"February 28 in leap year", Date(2024, time.February, 28, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsLastDayOfMonth()
+			if result != test.expected {
+				t.Errorf("IsLastDayOfMonth() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIsFirstDayOfYear(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"January 1st, 2023", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), true},
+		{"January 1st, 2024", Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC), true},
+		{"January 2nd", Date(2023, time.January, 2, 12, 0, 0, 0, time.UTC), false},
+		{"December 31st", Date(2023, time.December, 31, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-year", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsFirstDayOfYear()
+			if result != test.expected {
+				t.Errorf("IsFirstDayOfYear() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestIsLastDayOfYear(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"December 31st, 2023", Date(2023, time.December, 31, 12, 0, 0, 0, time.UTC), true},
+		{"December 31st, 2024", Date(2024, time.December, 31, 23, 59, 59, 0, time.UTC), true},
+		{"December 30th", Date(2023, time.December, 30, 12, 0, 0, 0, time.UTC), false},
+		{"January 1st", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), false},
+		{"Mid-year", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.IsLastDayOfYear()
+			if result != test.expected {
+				t.Errorf("IsLastDayOfYear() for %s: expected %t, got %t", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestWeekOfMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected int
+	}{
+		// Days 1-7 are in week 1, days 8-14 are in week 2, etc.
+		{"Day 1", Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), 1},
+		{"Day 2", Date(2023, time.January, 2, 12, 0, 0, 0, time.UTC), 1},
+		{"Day 7", Date(2023, time.January, 7, 12, 0, 0, 0, time.UTC), 1},
+		{"Day 8", Date(2023, time.January, 8, 12, 0, 0, 0, time.UTC), 2},
+		{"Day 14", Date(2023, time.January, 14, 12, 0, 0, 0, time.UTC), 2},
+		{"Day 15", Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC), 3},
+		{"Day 21", Date(2023, time.January, 21, 12, 0, 0, 0, time.UTC), 3},
+		{"Day 22", Date(2023, time.January, 22, 12, 0, 0, 0, time.UTC), 4},
+		{"Day 28", Date(2023, time.January, 28, 12, 0, 0, 0, time.UTC), 4},
+		{"Day 29", Date(2023, time.January, 29, 12, 0, 0, 0, time.UTC), 5},
+		{"Day 31", Date(2023, time.January, 31, 12, 0, 0, 0, time.UTC), 5},
+
+		// Test different months
+		{"June 1st", Date(2023, time.June, 1, 12, 0, 0, 0, time.UTC), 1},
+		{"June 8th", Date(2023, time.June, 8, 12, 0, 0, 0, time.UTC), 2},
+		{"June 15th", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), 3},
+		{"June 30th", Date(2023, time.June, 30, 12, 0, 0, 0, time.UTC), 5},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.WeekOfMonth()
+			if result != test.expected {
+				t.Errorf("WeekOfMonth() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestDaysInMonth(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected int
+	}{
+		{"January 2023", Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"February 2023 (non-leap)", Date(2023, time.February, 15, 12, 0, 0, 0, time.UTC), 28},
+		{"February 2024 (leap)", Date(2024, time.February, 15, 12, 0, 0, 0, time.UTC), 29},
+		{"March 2023", Date(2023, time.March, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"April 2023", Date(2023, time.April, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"May 2023", Date(2023, time.May, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"June 2023", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"July 2023", Date(2023, time.July, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"August 2023", Date(2023, time.August, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"September 2023", Date(2023, time.September, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"October 2023", Date(2023, time.October, 15, 12, 0, 0, 0, time.UTC), 31},
+		{"November 2023", Date(2023, time.November, 15, 12, 0, 0, 0, time.UTC), 30},
+		{"December 2023", Date(2023, time.December, 15, 12, 0, 0, 0, time.UTC), 31},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.DaysInMonth()
+			if result != test.expected {
+				t.Errorf("DaysInMonth() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+func TestDaysInYear(t *testing.T) {
+	tests := []struct {
+		name     string
+		date     DateTime
+		expected int
+	}{
+		{"2023 (non-leap year)", Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC), 365},
+		{"2024 (leap year)", Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC), 366},
+		{"2000 (leap year)", Date(2000, time.June, 15, 12, 0, 0, 0, time.UTC), 366},
+		{"1900 (non-leap year)", Date(1900, time.June, 15, 12, 0, 0, 0, time.UTC), 365},
+		{"2100 (non-leap year)", Date(2100, time.June, 15, 12, 0, 0, 0, time.UTC), 365},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := test.date.DaysInYear()
+			if result != test.expected {
+				t.Errorf("DaysInYear() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
+			}
+		})
+	}
+}
+
+// Start/End operations tests
+func TestStartOfDay(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
+	startOfDay := dt.StartOfDay()
+
+	expected := Date(2023, time.December, 25, 0, 0, 0, 0, time.UTC)
+	if !startOfDay.Equal(expected) {
+		t.Errorf("StartOfDay() = %v, want %v", startOfDay, expected)
+	}
+}
+
+func TestEndOfDay(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
+	endOfDay := dt.EndOfDay()
+
+	expected := Date(2023, time.December, 25, 23, 59, 59, 999999999, time.UTC)
+	if !endOfDay.Equal(expected) {
+		t.Errorf("EndOfDay() = %v, want %v", endOfDay, expected)
+	}
+}
+
+func TestStartOfMonth(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
+	startOfMonth := dt.StartOfMonth()
+
+	expected := Date(2023, time.December, 1, 0, 0, 0, 0, time.UTC)
+	if !startOfMonth.Equal(expected) {
+		t.Errorf("StartOfMonth() = %v, want %v", startOfMonth, expected)
+	}
+}
+
+func TestEndOfMonth(t *testing.T) {
+	tests := []struct {
+		input    DateTime
+		expected DateTime
+	}{
+		{
+			Date(2023, time.December, 15, 15, 30, 45, 123456789, time.UTC),
+			Date(2023, time.December, 31, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			Date(2024, time.February, 15, 12, 0, 0, 0, time.UTC), // Leap year
+			Date(2024, time.February, 29, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			Date(2023, time.February, 15, 12, 0, 0, 0, time.UTC), // Non-leap year
+			Date(2023, time.February, 28, 23, 59, 59, 999999999, time.UTC),
+		},
+	}
+
+	for _, test := range tests {
+		result := test.input.EndOfMonth()
+		if !result.Equal(test.expected) {
+			t.Errorf("EndOfMonth() for %v = %v, want %v", test.input, result, test.expected)
+		}
+	}
+}
+
+func TestStartOfWeek(t *testing.T) {
+	// Test with a Thursday (2023-12-21)
+	dt := Date(2023, time.December, 21, 15, 30, 45, 123456789, time.UTC)
+	startOfWeek := dt.StartOfWeek()
+
+	// Should be Monday 2023-12-18
+	expected := Date(2023, time.December, 18, 0, 0, 0, 0, time.UTC)
+	if !startOfWeek.Equal(expected) {
+		t.Errorf("StartOfWeek() = %v, want %v", startOfWeek, expected)
+	}
+}
+
+func TestEndOfWeek(t *testing.T) {
+	// Test with a Thursday (2023-12-21)
+	dt := Date(2023, time.December, 21, 15, 30, 45, 123456789, time.UTC)
+	endOfWeek := dt.EndOfWeek()
+
+	// Should be Sunday 2023-12-24
+	expected := Date(2023, time.December, 24, 23, 59, 59, 999999999, time.UTC)
+	if !endOfWeek.Equal(expected) {
+		t.Errorf("EndOfWeek() = %v, want %v", endOfWeek, expected)
+	}
+}
+
+func TestStartOfYear(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
+	startOfYear := dt.StartOfYear()
+
+	expected := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	if !startOfYear.Equal(expected) {
+		t.Errorf("StartOfYear() = %v, want %v", startOfYear, expected)
+	}
+}
+
+func TestEndOfYear(t *testing.T) {
+	dt := Date(2023, time.June, 15, 15, 30, 45, 123456789, time.UTC)
+	endOfYear := dt.EndOfYear()
+
+	expected := Date(2023, time.December, 31, 23, 59, 59, 999999999, time.UTC)
+	if !endOfYear.Equal(expected) {
+		t.Errorf("EndOfYear() = %v, want %v", endOfYear, expected)
+	}
+}
+
+func TestIsWeekend(t *testing.T) {
+	tests := []struct {
+		dt       DateTime
+		expected bool
+	}{
+		{Date(2023, time.December, 23, 12, 0, 0, 0, time.UTC), true},  // Saturday
+		{Date(2023, time.December, 24, 12, 0, 0, 0, time.UTC), true},  // Sunday
+		{Date(2023, time.December, 25, 12, 0, 0, 0, time.UTC), false}, // Monday
+		{Date(2023, time.December, 22, 12, 0, 0, 0, time.UTC), false}, // Friday
+	}
+
+	for _, test := range tests {
+		result := test.dt.IsWeekend()
+		if result != test.expected {
+			t.Errorf("IsWeekend() for %v = %v, want %v", test.dt.Weekday(), result, test.expected)
+		}
+	}
+}
+
+func TestIsWeekday(t *testing.T) {
+	tests := []struct {
+		dt       DateTime
+		expected bool
+	}{
+		{Date(2023, time.December, 23, 12, 0, 0, 0, time.UTC), false}, // Saturday
+		{Date(2023, time.December, 24, 12, 0, 0, 0, time.UTC), false}, // Sunday
+		{Date(2023, time.December, 25, 12, 0, 0, 0, time.UTC), true},  // Monday
+		{Date(2023, time.December, 22, 12, 0, 0, 0, time.UTC), true},  // Friday
+	}
+
+	for _, test := range tests {
+		result := test.dt.IsWeekday()
+		if result != test.expected {
+			t.Errorf("IsWeekday() for %v = %v, want %v", test.dt.Weekday(), result, test.expected)
+		}
+	}
+}
+
+func TestQuarter(t *testing.T) {
+	tests := []struct {
+		dt       DateTime
+		expected int
+	}{
+		{Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC), 1},
+		{Date(2023, time.March, 31, 12, 0, 0, 0, time.UTC), 1},
+		{Date(2023, time.April, 1, 12, 0, 0, 0, time.UTC), 2},
+		{Date(2023, time.June, 30, 12, 0, 0, 0, time.UTC), 2},
+		{Date(2023, time.July, 1, 12, 0, 0, 0, time.UTC), 3},
+		{Date(2023, time.September, 30, 12, 0, 0, 0, time.UTC), 3},
+		{Date(2023, time.October, 1, 12, 0, 0, 0, time.UTC), 4},
+		{Date(2023, time.December, 31, 12, 0, 0, 0, time.UTC), 4},
+	}
+
+	for _, test := range tests {
+		result := test.dt.Quarter()
+		if result != test.expected {
+			t.Errorf("Quarter() for %v = %v, want %v", test.dt.Month(), result, test.expected)
+		}
+	}
+}
+
+func TestStartOfQuarter(t *testing.T) {
+	tests := []struct {
+		input    DateTime
+		expected DateTime
+	}{
+		{
+			Date(2023, time.February, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			Date(2023, time.May, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.April, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			Date(2023, time.August, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.July, 1, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			Date(2023, time.November, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.October, 1, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	for _, test := range tests {
+		result := test.input.StartOfQuarter()
+		if !result.Equal(test.expected) {
+			t.Errorf("StartOfQuarter() for %v = %v, want %v", test.input, result, test.expected)
+		}
+	}
+}
+
+func TestEndOfQuarter(t *testing.T) {
+	tests := []struct {
+		input    DateTime
+		expected DateTime
+	}{
+		{
+			Date(2023, time.February, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.March, 31, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			Date(2023, time.May, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.June, 30, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			Date(2023, time.August, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.September, 30, 23, 59, 59, 999999999, time.UTC),
+		},
+		{
+			Date(2023, time.November, 15, 12, 0, 0, 0, time.UTC),
+			Date(2023, time.December, 31, 23, 59, 59, 999999999, time.UTC),
+		},
+	}
+
+	for _, test := range tests {
+		result := test.input.EndOfQuarter()
+		if !result.Equal(test.expected) {
+			t.Errorf("EndOfQuarter() for %v = %v, want %v", test.input, result, test.expected)
+		}
+	}
+}
+
+func TestISOWeek(t *testing.T) {
+	dt := Date(2023, time.December, 25, 12, 0, 0, 0, time.UTC)
+	year, week := dt.ISOWeek()
+
+	// December 25, 2023 should be in week 52 of 2023
+	if year != 2023 || week != 52 {
+		t.Errorf("ISOWeek() = (%d, %d), want (2023, 52)", year, week)
+	}
+}
+
+func TestISOWeekYear(t *testing.T) {
+	dt := Date(2023, time.December, 25, 12, 0, 0, 0, time.UTC)
+	year := dt.ISOWeekYear()
+
+	if year != 2023 {
+		t.Errorf("ISOWeekYear() = %d, want 2023", year)
+	}
+}
+
+func TestISOWeekNumber(t *testing.T) {
+	dt := Date(2023, time.December, 25, 12, 0, 0, 0, time.UTC)
+	week := dt.ISOWeekNumber()
+
+	if week != 52 {
+		t.Errorf("ISOWeekNumber() = %d, want 52", week)
+	}
+}
+
+func TestDayOfYear(t *testing.T) {
+	tests := []struct {
+		dt       DateTime
+		expected int
+	}{
+		{Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC), 1},
+		{Date(2023, time.December, 31, 12, 0, 0, 0, time.UTC), 365},
+		{Date(2024, time.December, 31, 12, 0, 0, 0, time.UTC), 366}, // Leap year
+	}
+
+	for _, test := range tests {
+		result := test.dt.DayOfYear()
+		if result != test.expected {
+			t.Errorf("DayOfYear() for %v = %d, want %d", test.dt, result, test.expected)
+		}
+	}
+}

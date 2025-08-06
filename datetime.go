@@ -363,3 +363,48 @@ func (dt DateTime) ISOWeekNumber() int {
 func (dt DateTime) DayOfYear() int {
 	return dt.Time.YearDay()
 }
+
+// IsFirstDayOfMonth returns whether the datetime is the first day of the month.
+func (dt DateTime) IsFirstDayOfMonth() bool {
+	return dt.Day() == 1
+}
+
+// IsLastDayOfMonth returns whether the datetime is the last day of the month.
+func (dt DateTime) IsLastDayOfMonth() bool {
+	return dt.Day() == dt.DaysInMonth()
+}
+
+// IsFirstDayOfYear returns whether the datetime is the first day of the year (January 1st).
+func (dt DateTime) IsFirstDayOfYear() bool {
+	return dt.Month() == time.January && dt.Day() == 1
+}
+
+// IsLastDayOfYear returns whether the datetime is the last day of the year (December 31st).
+func (dt DateTime) IsLastDayOfYear() bool {
+	return dt.Month() == time.December && dt.Day() == 31
+}
+
+// WeekOfMonth returns the week number within the month (1-6).
+// The first week of the month is the week containing the first day of the month.
+func (dt DateTime) WeekOfMonth() int {
+	// Simple calculation: (day - 1) / 7 + 1
+	// This ensures that days 1-7 are in week 1, days 8-14 are in week 2, etc.
+	return ((dt.Day() - 1) / 7) + 1
+}
+
+// DaysInMonth returns the number of days in the datetime's month.
+func (dt DateTime) DaysInMonth() int {
+	year, month, _ := dt.Date()
+	// Create the first day of the next month and subtract one day
+	firstOfNextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, dt.Location())
+	lastOfCurrentMonth := firstOfNextMonth.AddDate(0, 0, -1)
+	return lastOfCurrentMonth.Day()
+}
+
+// DaysInYear returns the number of days in the datetime's year (365 or 366 for leap years).
+func (dt DateTime) DaysInYear() int {
+	if dt.IsLeapYear() {
+		return 366
+	}
+	return 365
+}
