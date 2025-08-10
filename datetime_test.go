@@ -177,6 +177,35 @@ func TestIsDST(t *testing.T) {
 	}
 }
 
+func TestJSONTextSQLInterfaces(t *testing.T) {
+	// JSON marshal/unmarshal
+	dt := Date(2023, time.December, 25, 15, 30, 0, 0, time.UTC)
+	b, err := dt.MarshalJSON()
+	if err != nil {
+		t.Fatalf("MarshalJSON error: %v", err)
+	}
+	var dt2 DateTime
+	if err := dt2.UnmarshalJSON(b); err != nil {
+		t.Fatalf("UnmarshalJSON error: %v", err)
+	}
+	if !dt.Equal(dt2) {
+		t.Errorf("JSON round-trip mismatch: %v vs %v", dt, dt2)
+	}
+
+	// Text marshal/unmarshal
+	text, err := dt.MarshalText()
+	if err != nil {
+		t.Fatalf("MarshalText error: %v", err)
+	}
+	var dt3 DateTime
+	if err := dt3.UnmarshalText(text); err != nil {
+		t.Fatalf("UnmarshalText error: %v", err)
+	}
+	if !dt.Equal(dt3) {
+		t.Errorf("Text round-trip mismatch: %v vs %v", dt, dt3)
+	}
+}
+
 func TestIsLeapYear(t *testing.T) {
 	tests := []struct {
 		year     int
@@ -524,6 +553,43 @@ func TestWeekOfMonth(t *testing.T) {
 				t.Errorf("WeekOfMonth() for %s: expected %d, got %d", test.date.ToDateString(), test.expected, result)
 			}
 		})
+	}
+}
+
+func TestWeekOfMonthISO(t *testing.T) {
+	tests := []struct {
+		date     DateTime
+		expected int
+	}{
+		// January 2023 starts on Sunday (ISO Monday-start => Sunday offset 6)
+		{Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC), 1}, // Sun
+		{Date(2023, time.January, 2, 0, 0, 0, 0, time.UTC), 2}, // Mon
+		{Date(2023, time.January, 8, 0, 0, 0, 0, time.UTC), 2}, // Sun
+		{Date(2023, time.January, 9, 0, 0, 0, 0, time.UTC), 3}, // Mon
+	}
+
+	for _, tt := range tests {
+		if got := tt.date.WeekOfMonthISO(); got != tt.expected {
+			t.Errorf("WeekOfMonthISO(%s) = %d, want %d", tt.date.ToDateString(), got, tt.expected)
+		}
+	}
+}
+
+func TestWeekOfMonthWithStart(t *testing.T) {
+	// Use Sunday as start of week
+	tests := []struct {
+		date     DateTime
+		expected int
+	}{
+		// January 2023 starts on Sunday -> week 1
+		{Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC), 1}, // Sun
+		{Date(2023, time.January, 7, 0, 0, 0, 0, time.UTC), 1}, // Sat
+		{Date(2023, time.January, 8, 0, 0, 0, 0, time.UTC), 2}, // Sun
+	}
+	for _, tt := range tests {
+		if got := tt.date.WeekOfMonthWithStart(time.Sunday); got != tt.expected {
+			t.Errorf("WeekOfMonthWithStart(%s) = %d, want %d", tt.date.ToDateString(), got, tt.expected)
+		}
 	}
 }
 

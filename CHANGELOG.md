@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- JSON/Text marshalers and SQL `driver.Valuer`/`sql.Scanner` for `DateTime`
+- Unix time helpers: `UnixMilli/UnixMicro/UnixNano` and `FromUnixMilli/Micro/Nano`
+- Week-of-month helpers: `WeekOfMonthISO()` and `WeekOfMonthWithStart(start)`
+- GitHub Actions CI matrix across OS and Go versions; coverage artifact upload
+- Makefile with common developer tasks
+
+### Changed
+- `IsDST()` now determines standard offset via minimum offset observed in the year for the location (robust across hemispheres)
+- README updates: CI badge, Go Reference badge, Unix helpers, serialization/DB docs, examples section, Makefile usage
+
+### Fixed
+- Repository hygiene: added `.gitignore` for binaries/coverage; removed committed demo binary
+
 ## [0.2.2] - 2025-01-08
 
 ### Added

@@ -3,6 +3,9 @@
 package chronogo
 
 import (
+	"database/sql/driver"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -85,11 +88,21 @@ func (dt DateTime) Location() *time.Location {
 
 // IsDST returns whether the datetime is in daylight saving time.
 func (dt DateTime) IsDST() bool {
-	// A time is in DST if its zone offset is different from the standard offset.
-	// We find the standard offset by checking a time in deep winter (January 1st).
-	_, regularOffset := time.Date(dt.Year(), time.January, 1, 0, 0, 0, 0, dt.Location()).Zone()
-	_, dstOffset := dt.Zone()
-	return regularOffset != dstOffset
+	// Determine standard (non-DST) offset as the minimum offset observed across the year
+	// for this location. This handles both northern and southern hemispheres.
+	loc := dt.Location()
+	year := dt.Year()
+
+	minOffset := int(1<<31 - 1)
+	for month := time.January; month <= time.December; month++ {
+		t := time.Date(year, month, 1, 0, 0, 0, 0, loc)
+		_, off := t.Zone()
+		if off < minOffset {
+			minOffset = off
+		}
+	}
+	_, currentOffset := dt.Zone()
+	return currentOffset != minOffset
 }
 
 // IsUTC returns whether the datetime is in UTC timezone.
@@ -193,6 +206,24 @@ func (dt DateTime) Sub(other DateTime) time.Duration {
 	return dt.Time.Sub(other.Time)
 }
 
+// UnixMilli returns t as a Unix time, the number of milliseconds elapsed
+// since January 1, 1970 UTC.
+func (dt DateTime) UnixMilli() int64 {
+	return dt.Time.UnixMilli()
+}
+
+// UnixMicro returns t as a Unix time, the number of microseconds elapsed
+// since January 1, 1970 UTC.
+func (dt DateTime) UnixMicro() int64 {
+	return dt.Time.UnixMicro()
+}
+
+// UnixNano returns t as a Unix time, the number of nanoseconds elapsed
+// since January 1, 1970 UTC.
+func (dt DateTime) UnixNano() int64 {
+	return dt.Time.UnixNano()
+}
+
 // SetYear returns a new DateTime with the year set to the specified value.
 func (dt DateTime) SetYear(year int) DateTime {
 	return DateTime{time.Date(year, dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), dt.Second(), dt.Nanosecond(), dt.Location())}
@@ -266,6 +297,94 @@ func (dt DateTime) String() string {
 // Format formats the datetime using Go's time format layout.
 func (dt DateTime) Format(layout string) string {
 	return dt.Time.Format(layout)
+}
+
+// IsZero reports whether the time instant is January 1, year 1, 00:00:00 UTC.
+func (dt DateTime) IsZero() bool {
+	return dt.Time.IsZero()
+}
+
+// Unwrap returns the underlying time.Time value.
+func (dt DateTime) Unwrap() time.Time {
+	return dt.Time
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (dt DateTime) MarshalText() ([]byte, error) {
+	return []byte(dt.ToISO8601String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (dt *DateTime) UnmarshalText(data []byte) error {
+	s := strings.TrimSpace(string(data))
+	if s == "" {
+		*dt = DateTime{}
+		return nil
+	}
+	parsed, err := Parse(s)
+	if err != nil {
+		return err
+	}
+	*dt = parsed
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler.
+func (dt DateTime) MarshalJSON() ([]byte, error) {
+	// Quote the ISO 8601 string
+	return []byte(fmt.Sprintf("\"%s\"", dt.ToISO8601String())), nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (dt *DateTime) UnmarshalJSON(data []byte) error {
+	s := strings.TrimSpace(string(data))
+	if s == "null" || s == "" {
+		*dt = DateTime{}
+		return nil
+	}
+	// Trim surrounding quotes if present
+	if len(s) >= 2 && ((s[0] == '"' && s[len(s)-1] == '"') || (s[0] == '\'' && s[len(s)-1] == '\'')) {
+		s = s[1 : len(s)-1]
+	}
+	parsed, err := Parse(s)
+	if err != nil {
+		return err
+	}
+	*dt = parsed
+	return nil
+}
+
+// Value implements the driver.Valuer interface for database serialization.
+func (dt DateTime) Value() (driver.Value, error) {
+	return dt.Time, nil
+}
+
+// Scan implements the sql.Scanner interface for database deserialization.
+func (dt *DateTime) Scan(value any) error {
+	switch v := value.(type) {
+	case time.Time:
+		*dt = DateTime{v}
+		return nil
+	case string:
+		parsed, err := Parse(v)
+		if err != nil {
+			return err
+		}
+		*dt = parsed
+		return nil
+	case []byte:
+		parsed, err := Parse(string(v))
+		if err != nil {
+			return err
+		}
+		*dt = parsed
+		return nil
+	case nil:
+		*dt = DateTime{}
+		return nil
+	default:
+		return fmt.Errorf("unsupported Scan type %T", value)
+	}
 }
 
 // StartOfDay returns a new DateTime set to the beginning of the day (00:00:00).
@@ -392,6 +511,24 @@ func (dt DateTime) WeekOfMonth() int {
 	return ((dt.Day() - 1) / 7) + 1
 }
 
+// WeekOfMonthISO returns the ISO-style week of month using Monday as the first day of week
+// and accounting for the weekday of the month's first day.
+func (dt DateTime) WeekOfMonthISO() int {
+	firstOfMonth := Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, dt.Location())
+	// Convert Go's weekday (Sun=0..Sat=6) to ISO (Mon=0..Sun=6)
+	offset := (int(firstOfMonth.Weekday()) + 6) % 7
+	return ((offset + dt.Day() - 1) / 7) + 1
+}
+
+// WeekOfMonthWithStart returns the week of the month using a custom week start day.
+// For example, start = time.Sunday yields Sunday-start weeks.
+func (dt DateTime) WeekOfMonthWithStart(start time.Weekday) int {
+	firstOfMonth := Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, dt.Location())
+	// Compute offset from desired start day
+	offset := (int(firstOfMonth.Weekday()) - int(start) + 7) % 7
+	return ((offset + dt.Day() - 1) / 7) + 1
+}
+
 // DaysInMonth returns the number of days in the datetime's month.
 func (dt DateTime) DaysInMonth() int {
 	year, month, _ := dt.Date()
@@ -407,4 +544,19 @@ func (dt DateTime) DaysInYear() int {
 		return 366
 	}
 	return 365
+}
+
+// FromUnixMilli creates a DateTime from a Unix timestamp in milliseconds in the specified location.
+func FromUnixMilli(ms int64, loc *time.Location) DateTime {
+	return DateTime{time.UnixMilli(ms).In(loc)}
+}
+
+// FromUnixMicro creates a DateTime from a Unix timestamp in microseconds in the specified location.
+func FromUnixMicro(us int64, loc *time.Location) DateTime {
+	return DateTime{time.UnixMicro(us).In(loc)}
+}
+
+// FromUnixNano creates a DateTime from a Unix timestamp in nanoseconds in the specified location.
+func FromUnixNano(ns int64, loc *time.Location) DateTime {
+	return DateTime{time.Unix(0, ns).In(loc)}
 }

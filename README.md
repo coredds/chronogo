@@ -1,8 +1,10 @@
 # ChronoGo
 
-[![Version](https://img.shields.io/badge/version-v0.2.2-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.3.0-green.svg)](https://github.com/coredds/ChronoGo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/coredds/ChronoGo.svg)](https://pkg.go.dev/github.com/coredds/ChronoGo)
 
 **ChronoGo** is a Go implementation inspired by Python's [Pendulum](https://pendulum.eustace.io/) library. It provides a powerful and easy-to-use datetime and timezone library that enhances Go's standard `time` package with a fluent API, better timezone handling, and human-friendly datetime operations.
 
@@ -30,6 +32,8 @@
 - 🎯 **Comprehensive parsing** for common datetime formats
 - ✅ **Thread-safe** operations
 - 🧪 **Well-tested** with extensive unit test coverage
+- 🔌 **Serialization-ready**: JSON/Text marshalers and SQL driver integration
+- ⏱️ **Unix helpers**: conversions and constructors for seconds/ms/µs/ns
 
 ## Installation
 
@@ -91,9 +95,11 @@ func main() {
 | **Quarter** | `Quarter()`, `StartOfQuarter()`, `EndOfQuarter()` | Quarter-based operations (Q1-Q4) |
 | **ISO Week** | `ISOWeek()`, `ISOWeekYear()`, `ISOWeekNumber()` | ISO 8601 week operations |
 | **Date Info** | `DayOfYear()` | Additional date information |
-| **Date Utilities** | `IsFirstDayOfMonth()`, `IsLastDayOfMonth()`, `IsFirstDayOfYear()`, `IsLastDayOfYear()`, `WeekOfMonth()`, `DaysInMonth()`, `DaysInYear()` | Additional date utility methods for common date checks and calculations |
+| **Date Utilities** | `IsFirstDayOfMonth()`, `IsLastDayOfMonth()`, `IsFirstDayOfYear()`, `IsLastDayOfYear()`, `WeekOfMonth()`, `WeekOfMonthISO()`, `WeekOfMonthWithStart(start time.Weekday)`, `DaysInMonth()`, `DaysInYear()` | Additional date utility methods for common date checks and calculations |
 | **Fluent API** | `AddFluent()`, `Set()` | Method chaining for complex operations |
 | **Enhanced Duration** | `NewDuration()`, `NewDurationFromComponents()` | Enhanced duration type with human-readable operations |
+| **Unix Helpers** | `UnixMilli()`, `UnixMicro()`, `UnixNano()`, `FromUnixMilli()`, `FromUnixMicro()`, `FromUnixNano()` | Convert to/from various Unix time resolutions |
+| **Serialization/DB** | `MarshalJSON()`, `UnmarshalJSON()`, `MarshalText()`, `UnmarshalText()`, `Value()`, `Scan()` | Seamless JSON/Text/SQL integration |
 
 ### Duration Operations
 | Method | Description |
@@ -120,8 +126,19 @@ dt5, _ := chronogo.ParseRFC3339("2023-12-25T15:30:45Z")
 // Parse with custom format
 dt6, _ := chronogo.FromFormat("25/12/2023 15:30", "02/01/2006 15:04")
 
-// Parse Unix timestamp
-dt7, _ := chronogo.TryParseUnix("1640995200")
+// Parse Unix timestamp (supports seconds/ms/µs/ns; signed)
+dt7, _ := chronogo.TryParseUnix("1640995200")      // seconds
+dt8, _ := chronogo.TryParseUnix("1640995200000")   // milliseconds
+dt9, _ := chronogo.TryParseUnix("1640995200000000") // microseconds
+dt10, _ := chronogo.TryParseUnix("1640995200000000000") // nanoseconds
+```
+
+### Examples
+
+Explore rich examples in `example_test.go` which are runnable via `go test`. You can also build and run the demo:
+
+```bash
+go run ./cmd/chrono-demo
 ```
 
 ### String Formatting Options
@@ -137,6 +154,16 @@ fmt.Println(dt.ToISO8601String())  // "2023-12-25T15:30:45Z"
 
 // Custom formats (using Go's time format)
 fmt.Println(dt.Format("Monday, January 2, 2006"))     // "Monday, December 25, 2023"
+// Unix helpers
+fmt.Println(dt.Unix())       // seconds
+fmt.Println(dt.UnixMilli())  // milliseconds
+fmt.Println(dt.UnixMicro())  // microseconds
+fmt.Println(dt.UnixNano())   // nanoseconds
+
+// Construct from Unix values in a specific location
+fmt.Println(chronogo.FromUnixMilli(1703516445000, time.UTC))
+fmt.Println(chronogo.FromUnixMicro(1703516445000000, time.UTC))
+fmt.Println(chronogo.FromUnixNano(1703516445000000000, time.UTC))
 fmt.Println(dt.Format("02/01/2006 15:04"))            // "25/12/2023 15:30"
 fmt.Println(dt.Format("Jan 2, 2006 at 3:04 PM"))      // "Dec 25, 2023 at 3:30 PM"
 ```
@@ -190,7 +217,9 @@ fmt.Println(dt.ISOWeekNumber())  // 41
 // Additional date utilities
 fmt.Println(dt.IsFirstDayOfMonth()) // false (15th is not first day)
 fmt.Println(dt.IsLastDayOfMonth())  // false (15th is not last day)
-fmt.Println(dt.WeekOfMonth())       // 3 (15th falls in 3rd week of month)
+fmt.Println(dt.WeekOfMonth())       // 3 (simple grouping by days 1-7, 8-14, ...)
+fmt.Println(dt.WeekOfMonthISO())    // ISO-style week-of-month (Mon-start)
+fmt.Println(dt.WeekOfMonthWithStart(time.Sunday)) // Sunday-start week-of-month
 fmt.Println(dt.DaysInMonth())       // 31 (October has 31 days)
 fmt.Println(dt.DaysInYear())        // 365 (2023 is not a leap year)
 ```
@@ -267,6 +296,26 @@ fmt.Println(dt.IsWeekend())
 fmt.Println(dt.Quarter())
 ```
 
+### Serialization & Database Integration
+
+```go
+dt := chronogo.Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
+
+// JSON
+b, _ := dt.MarshalJSON()
+var dt2 chronogo.DateTime
+_ = dt2.UnmarshalJSON(b)
+
+// Text
+txt, _ := dt.MarshalText()
+var dt3 chronogo.DateTime
+_ = dt3.UnmarshalText(txt)
+
+// SQL (database/sql)
+// DateTime implements driver.Valuer and sql.Scanner
+// so it can be used as a struct field mapped to TIMESTAMP columns.
+```
+
 ## Error Handling
 
 ChronoGo provides detailed error information for parsing operations:
@@ -285,20 +334,28 @@ if err != nil {
 Run the test suite:
 
 ```bash
-go test ./...
+make test
 ```
 
 Run tests with coverage:
 
 ```bash
-go test -cover ./...
+make cover
 ```
 
 Run benchmarks:
 
 ```bash
-go test -bench=. ./...
+make bench
 ```
+
+### Continuous Integration
+
+This repository includes GitHub Actions CI with a cross-platform, multi-version matrix:
+- OS: Ubuntu, macOS, Windows
+- Go: 1.21.x, 1.22.x
+
+CI runs vet, unit tests, race tests where CGO is available, and publishes coverage as an artifact.
 
 ## Contributing
 
@@ -319,7 +376,7 @@ Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTIN
 
 3. Run tests:
    ```bash
-   go test ./...
+   make test
    ```
 
 ## License & Related Projects

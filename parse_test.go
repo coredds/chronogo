@@ -205,11 +205,13 @@ func TestTryParseUnix(t *testing.T) {
 		expected string
 		hasError bool
 	}{
-		{"1640995200", "2022-01-01T00:00:00Z", false},    // Valid Unix timestamp
-		{"1640995200000", "2022-01-01T00:00:00Z", false}, // Unix timestamp with milliseconds
-		{"abc", "", true},            // Invalid
-		{"99999999999999", "", true}, // Too large
-		{"-1", "", true},             // Negative
+		{"1640995200", "2022-01-01T00:00:00Z", false},          // Valid Unix timestamp
+		{"1640995200000", "2022-01-01T00:00:00Z", false},       // Unix timestamp with milliseconds
+		{"1640995200000000", "2022-01-01T00:00:00Z", false},    // Unix timestamp with microseconds
+		{"1640995200000000000", "2022-01-01T00:00:00Z", false}, // Unix timestamp with nanoseconds
+		{"abc", "", true},                     // Invalid
+		{"99999999999999", "", true},          // Invalid length (14)
+		{"-1", "1969-12-31T23:59:59Z", false}, // Negative seconds
 	}
 
 	for _, test := range tests {
