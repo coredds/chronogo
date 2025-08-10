@@ -135,23 +135,35 @@ func Instance(t time.Time) DateTime {
 
 // parseUnixTimestamp attempts to parse a Unix timestamp string.
 func parseUnixTimestamp(value string) (DateTime, error) {
-	// Try to parse as Unix timestamp (seconds)
-	if timestamp, err := strconv.ParseInt(value, 10, 64); err == nil {
-		if timestamp > 0 && timestamp < 4102444800 { // reasonable range: 1970-2100
-			return DateTime{time.Unix(timestamp, 0).UTC()}, nil
-		}
+	s := strings.TrimSpace(value)
+	if s == "" {
+		return DateTime{}, errors.New("invalid Unix timestamp")
 	}
 
-	// Try to parse as Unix timestamp with milliseconds
-	if len(value) == 13 {
-		if timestamp, err := strconv.ParseInt(value, 10, 64); err == nil {
-			seconds := timestamp / 1000
-			nanoseconds := (timestamp % 1000) * 1000000
-			return DateTime{time.Unix(seconds, nanoseconds).UTC()}, nil
-		}
+	// Detect length ignoring leading sign
+	signless := s
+	if s[0] == '-' || s[0] == '+' {
+		signless = s[1:]
 	}
 
-	return DateTime{}, errors.New("invalid Unix timestamp")
+	// Parse as int64
+	ts, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return DateTime{}, errors.New("invalid Unix timestamp")
+	}
+
+	switch l := len(signless); l {
+	case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10: // seconds (support small absolute values too)
+		return DateTime{time.Unix(ts, 0).UTC()}, nil
+	case 13: // milliseconds
+		return DateTime{time.UnixMilli(ts).UTC()}, nil
+	case 16: // microseconds
+		return DateTime{time.UnixMicro(ts).UTC()}, nil
+	case 19: // nanoseconds
+		return DateTime{time.Unix(0, ts).UTC()}, nil
+	default:
+		return DateTime{}, errors.New("invalid Unix timestamp length")
+	}
 }
 
 // TryParseUnix attempts to parse a string as a Unix timestamp.

@@ -1,3 +1,27 @@
+# Binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage/
+
+# Go coverage
+coverage.out
+
+# IDE/editor
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Demo binary (if built locally)
+demo/demo.exe
 # Binaries for programs and plugins
 *.exe
 *.exe~
