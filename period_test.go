@@ -387,3 +387,30 @@ func TestPeriodRangeWithContext(t *testing.T) {
 		}
 	})
 }
+
+// Quick wins tests: typed iteration helper
+func TestPeriodRangeByUnit(t *testing.T) {
+	loc := time.UTC
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, loc)
+	end := Date(2023, time.January, 10, 0, 0, 0, 0, loc)
+	p := NewPeriod(start, end)
+
+	// Every 3 days
+	cnt := 0
+	prev := start
+	for d := range p.RangeByUnit(UnitDay, 3) {
+		if cnt == 0 && !d.Equal(start) {
+			t.Fatalf("First day should be start, got %v", d)
+		}
+		if cnt > 0 {
+			if diff := d.Sub(prev); diff != 72*time.Hour { // 3 days
+				t.Fatalf("Step mismatch: got %v", diff)
+			}
+		}
+		prev = d
+		cnt++
+	}
+	if cnt == 0 {
+		t.Fatalf("Expected at least one iteration")
+	}
+}

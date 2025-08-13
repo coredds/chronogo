@@ -917,3 +917,103 @@ func TestDayOfYear(t *testing.T) {
 		}
 	}
 }
+
+// Quick wins tests: Truncate, Round, Clamp, Between
+func TestTruncate(t *testing.T) {
+	loc := time.UTC
+	dt := Date(2023, time.June, 15, 13, 27, 59, 987654321, loc)
+
+	if got := dt.Truncate(UnitSecond); !got.Equal(Date(2023, time.June, 15, 13, 27, 59, 0, loc)) {
+		t.Errorf("Truncate second mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitMinute); !got.Equal(Date(2023, time.June, 15, 13, 27, 0, 0, loc)) {
+		t.Errorf("Truncate minute mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitHour); !got.Equal(Date(2023, time.June, 15, 13, 0, 0, 0, loc)) {
+		t.Errorf("Truncate hour mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitDay); !got.Equal(Date(2023, time.June, 15, 0, 0, 0, 0, loc)) {
+		t.Errorf("Truncate day mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitWeek); !got.Equal(Date(2023, time.June, 12, 0, 0, 0, 0, loc)) { // Monday of that week
+		t.Errorf("Truncate week mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitMonth); !got.Equal(Date(2023, time.June, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Truncate month mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitQuarter); !got.Equal(Date(2023, time.April, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Truncate quarter mismatch: %v", got)
+	}
+	if got := dt.Truncate(UnitYear); !got.Equal(Date(2023, time.January, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Truncate year mismatch: %v", got)
+	}
+}
+
+func TestRound(t *testing.T) {
+	loc := time.UTC
+	// Hour rounding
+	down := Date(2023, time.June, 15, 13, 10, 0, 0, loc)
+	up := Date(2023, time.June, 15, 13, 40, 0, 0, loc)
+	if got := down.Round(UnitHour); !got.Equal(Date(2023, time.June, 15, 13, 0, 0, 0, loc)) {
+		t.Errorf("Round hour down mismatch: %v", got)
+	}
+	if got := up.Round(UnitHour); !got.Equal(Date(2023, time.June, 15, 14, 0, 0, 0, loc)) {
+		t.Errorf("Round hour up mismatch: %v", got)
+	}
+
+	// Day rounding
+	dayDown := Date(2023, time.June, 15, 10, 0, 0, 0, loc)
+	dayUp := Date(2023, time.June, 15, 18, 0, 0, 0, loc)
+	if got := dayDown.Round(UnitDay); !got.Equal(Date(2023, time.June, 15, 0, 0, 0, 0, loc)) {
+		t.Errorf("Round day down mismatch: %v", got)
+	}
+	if got := dayUp.Round(UnitDay); !got.Equal(Date(2023, time.June, 16, 0, 0, 0, 0, loc)) {
+		t.Errorf("Round day up mismatch: %v", got)
+	}
+
+	// Month rounding in 30-day month (June)
+	monthDown := Date(2023, time.June, 10, 12, 0, 0, 0, loc)
+	monthUp := Date(2023, time.June, 20, 12, 0, 0, 0, loc)
+	if got := monthDown.Round(UnitMonth); !got.Equal(Date(2023, time.June, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Round month down mismatch: %v", got)
+	}
+	if got := monthUp.Round(UnitMonth); !got.Equal(Date(2023, time.July, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Round month up mismatch: %v", got)
+	}
+
+	// Quarter rounding (Q2: Apr 1 - Jul 1)
+	quarterDown := Date(2023, time.May, 1, 12, 0, 0, 0, loc)
+	quarterUp := Date(2023, time.June, 25, 12, 0, 0, 0, loc)
+	if got := quarterDown.Round(UnitQuarter); !got.Equal(Date(2023, time.April, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Round quarter down mismatch: %v", got)
+	}
+	if got := quarterUp.Round(UnitQuarter); !got.Equal(Date(2023, time.July, 1, 0, 0, 0, 0, loc)) {
+		t.Errorf("Round quarter up mismatch: %v", got)
+	}
+}
+
+func TestClampAndBetween(t *testing.T) {
+	loc := time.UTC
+	min := Date(2023, time.January, 1, 0, 0, 0, 0, loc)
+	max := Date(2023, time.January, 10, 0, 0, 0, 0, loc)
+	inside := Date(2023, time.January, 5, 0, 0, 0, 0, loc)
+	below := Date(2022, time.December, 31, 23, 59, 0, 0, loc)
+	above := Date(2023, time.January, 11, 0, 0, 0, 0, loc)
+
+	if got := below.Clamp(min, max); !got.Equal(min) {
+		t.Errorf("Clamp below -> min expected, got %v", got)
+	}
+	if got := above.Clamp(min, max); !got.Equal(max) {
+		t.Errorf("Clamp above -> max expected, got %v", got)
+	}
+	if got := inside.Clamp(min, max); !got.Equal(inside) {
+		t.Errorf("Clamp inside should be itself, got %v", got)
+	}
+
+	if !inside.Between(max, min, true) { // reversed bounds, inclusive
+		t.Errorf("Between inclusive with reversed bounds should be true")
+	}
+	if inside.Between(min, min, false) { // exclusive identical bounds
+		t.Errorf("Between exclusive identical bounds should be false")
+	}
+}
