@@ -15,12 +15,21 @@ var (
 
 	// Common layouts for parsing
 	commonLayouts = []string{
+		// strict RFC/ISO
 		time.RFC3339,
 		time.RFC3339Nano,
 		"2006-01-02T15:04:05Z07:00",
-		"2006-01-02T15:04:05",
+		// space and naive
 		"2006-01-02 15:04:05",
+		"2006-01-02 15:04",
 		"2006-01-02",
+		// lenient separators and compact
+		"2006/01/02 15:04:05",
+		"2006/01/02",
+		"2006-1-2 15:04:05",
+		"2006-1-2",
+		"20060102",
+		// time-only
 		"15:04:05",
 		"15:04",
 	}
@@ -36,13 +45,13 @@ func (e ParseError) Error() string {
 	return fmt.Sprintf("failed to parse '%s': %s", e.Input, e.Reason)
 }
 
-// Parse parses a datetime string using common formats.
-// It supports ISO 8601, RFC 3339, and other common datetime formats.
+// Parse parses a datetime string using common formats (lenient by default) in UTC.
 func Parse(value string) (DateTime, error) {
 	return ParseInLocation(value, time.UTC)
 }
 
 // ParseInLocation parses a datetime string in the specified location.
+// ParseInLocation parses a datetime string in the specified location using a lenient set of formats.
 func ParseInLocation(value string, loc *time.Location) (DateTime, error) {
 	value = strings.TrimSpace(value)
 
@@ -50,22 +59,42 @@ func ParseInLocation(value string, loc *time.Location) (DateTime, error) {
 		return DateTime{}, ParseError{Input: value, Reason: "empty string"}
 	}
 
-	// Try each common layout
+	// Try each common layout (lenient set)
 	for _, layout := range commonLayouts {
 		if t, err := time.ParseInLocation(layout, value, loc); err == nil {
 			return DateTime{t}, nil
 		}
 	}
 
-	// Try without timezone info, defaulting to provided location
-	if t, err := time.ParseInLocation("2006-01-02T15:04:05", value, loc); err == nil {
-		return DateTime{t}, nil
-	}
-
 	return DateTime{}, ParseError{
 		Input:  value,
 		Reason: "no matching format found",
 	}
+}
+
+// ParseStrict parses using a stricter set of layouts (RFC3339 and ISO8601 variants only).
+func ParseStrict(value string) (DateTime, error) {
+	return ParseStrictInLocation(value, time.UTC)
+}
+
+// ParseStrictInLocation is the location-aware strict parser.
+func ParseStrictInLocation(value string, loc *time.Location) (DateTime, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return DateTime{}, ParseError{Input: value, Reason: "empty string"}
+	}
+	strictLayouts := []string{
+		time.RFC3339,
+		time.RFC3339Nano,
+		"2006-01-02T15:04:05Z07:00",
+		"2006-01-02T15:04:05",
+	}
+	for _, layout := range strictLayouts {
+		if t, err := time.ParseInLocation(layout, value, loc); err == nil {
+			return DateTime{t}, nil
+		}
+	}
+	return DateTime{}, ParseError{Input: value, Reason: "no matching strict format found"}
 }
 
 // ParseISO8601 parses an ISO 8601 formatted datetime string.
