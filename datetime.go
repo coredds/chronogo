@@ -5,14 +5,56 @@ package chronogo
 import (
 	"database/sql/driver"
 	"fmt"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
+)
+
+// Unit represents a logical time unit used by various helpers.
+type Unit int
+
+const (
+	UnitSecond Unit = iota
+	UnitMinute
+	UnitHour
+	UnitDay
+	UnitWeek
+	UnitMonth
+	UnitQuarter
+	UnitYear
 )
 
 // DateTime wraps Go's time.Time to extend functionality while maintaining compatibility.
 // It provides timezone-aware datetime operations with a fluent API.
 type DateTime struct {
 	time.Time
+}
+
+// cache for standard (non-DST) timezone offsets per (location, year)
+var standardOffsetCache sync.Map // key string -> int (seconds east of UTC)
+
+func standardOffsetKey(loc *time.Location, year int) string {
+	// loc.String() returns IANA name (e.g., "America/New_York") or "Local"
+	return loc.String() + "|" + strconv.Itoa(year)
+}
+
+func getStandardOffset(loc *time.Location, year int) int {
+	key := standardOffsetKey(loc, year)
+	if v, ok := standardOffsetCache.Load(key); ok {
+		return v.(int)
+	}
+	// Compute minimum offset observed across the year as standard offset
+	minOffset := int(1<<31 - 1)
+	for month := time.January; month <= time.December; month++ {
+		t := time.Date(year, month, 1, 0, 0, 0, 0, loc)
+		_, off := t.Zone()
+		if off < minOffset {
+			minOffset = off
+		}
+	}
+	standardOffsetCache.Store(key, minOffset)
+	return minOffset
 }
 
 // Now returns the current datetime in the local timezone.
@@ -88,19 +130,10 @@ func (dt DateTime) Location() *time.Location {
 
 // IsDST returns whether the datetime is in daylight saving time.
 func (dt DateTime) IsDST() bool {
-	// Determine standard (non-DST) offset as the minimum offset observed across the year
-	// for this location. This handles both northern and southern hemispheres.
+	// Determine standard (non-DST) offset via cached minimum offset across the year.
 	loc := dt.Location()
 	year := dt.Year()
-
-	minOffset := int(1<<31 - 1)
-	for month := time.January; month <= time.December; month++ {
-		t := time.Date(year, month, 1, 0, 0, 0, 0, loc)
-		_, off := t.Zone()
-		if off < minOffset {
-			minOffset = off
-		}
-	}
+	minOffset := getStandardOffset(loc, year)
 	_, currentOffset := dt.Zone()
 	return currentOffset != minOffset
 }
@@ -307,6 +340,99 @@ func (dt DateTime) IsZero() bool {
 // Unwrap returns the underlying time.Time value.
 func (dt DateTime) Unwrap() time.Time {
 	return dt.Time
+}
+
+// Truncate returns dt truncated to the start of the given unit.
+// For calendar units (day/week/month/quarter/year) this aligns to the logical
+// start boundary in the current location (e.g., StartOfDay, Monday StartOfWeek).
+func (dt DateTime) Truncate(unit Unit) DateTime {
+	switch unit {
+	case UnitSecond:
+		return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), dt.Second(), 0, dt.Location())}
+	case UnitMinute:
+		return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), 0, 0, dt.Location())}
+	case UnitHour:
+		return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), 0, 0, 0, dt.Location())}
+	case UnitDay:
+		return dt.StartOfDay()
+	case UnitWeek:
+		return dt.StartOfWeek()
+	case UnitMonth:
+		return dt.StartOfMonth()
+	case UnitQuarter:
+		return dt.StartOfQuarter()
+	case UnitYear:
+		return dt.StartOfYear()
+	default:
+		return dt
+	}
+}
+
+// Round returns dt rounded to the nearest boundary of the given unit.
+// Ties are rounded up to the next boundary.
+// Calendar-aware for day/week/month/quarter/year using local timezone boundaries.
+func (dt DateTime) Round(unit Unit) DateTime {
+	start := dt.Truncate(unit)
+
+	var next DateTime
+	switch unit {
+	case UnitSecond:
+		next = start.AddSeconds(1)
+	case UnitMinute:
+		next = start.AddMinutes(1)
+	case UnitHour:
+		next = start.AddHours(1)
+	case UnitDay:
+		next = start.AddDays(1)
+	case UnitWeek:
+		next = start.AddDays(7)
+	case UnitMonth:
+		next = start.AddMonths(1)
+	case UnitQuarter:
+		next = start.AddMonths(3)
+	case UnitYear:
+		next = start.AddYears(1)
+	default:
+		return dt
+	}
+
+	// Use duration between boundaries to decide rounding
+	toStart := dt.Sub(start)
+	boundary := next.Sub(start)
+	if toStart*2 < boundary {
+		return start
+	}
+	return next
+}
+
+// Clamp returns dt clamped to the [min, max] range (order-agnostic).
+func (dt DateTime) Clamp(a, b DateTime) DateTime {
+	min := a
+	max := b
+	if b.Before(a) {
+		min, max = b, a
+	}
+	if dt.Before(min) {
+		return min
+	}
+	if dt.After(max) {
+		return max
+	}
+	return dt
+}
+
+// Between reports whether dt is within the range (a, b) or [a, b] depending on inclusive.
+// The order of a and b does not matter.
+func (dt DateTime) Between(a, b DateTime, inclusive bool) bool {
+	min := a
+	max := b
+	if b.Before(a) {
+		min, max = b, a
+	}
+	if inclusive {
+		return !dt.Before(min) && !dt.After(max)
+	}
+	return dt.After(min) && dt.Before(max)
 }
 
 // MarshalText implements encoding.TextMarshaler.
