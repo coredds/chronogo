@@ -134,6 +134,28 @@ func TestChronoDuration(t *testing.T) {
 	}
 }
 
+func TestParseISODuration(t *testing.T) {
+	tests := []struct {
+		in     string
+		expect string
+	}{
+		{"PT15M", "15m0s"},
+		{"PT1H30M", "1h30m0s"},
+		{"P2W", "336h0m0s"}, // 2 weeks -> 336 hours
+		{"P1DT2H", "26h0m0s"},
+		{"-PT45S", "-45s"},
+	}
+	for _, tt := range tests {
+		d, err := ParseISODuration(tt.in)
+		if err != nil {
+			t.Fatalf("ParseISODuration failed for %q: %v", tt.in, err)
+		}
+		if d.String() != tt.expect {
+			t.Fatalf("ParseISODuration(%q) got %q want %q", tt.in, d.String(), tt.expect)
+		}
+	}
+}
+
 func TestChronoDurationFromComponents(t *testing.T) {
 	d := NewDurationFromComponents(2, 30, 45)
 	expected := 2*time.Hour + 30*time.Minute + 45*time.Second

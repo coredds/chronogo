@@ -15,6 +15,9 @@ func TestParse(t *testing.T) {
 		{"2023-12-25T15:30:45+00:00", "2023-12-25T15:30:45Z", false},
 		{"2023-12-25 15:30:45", "2023-12-25T15:30:45Z", false},
 		{"2023-12-25", "2023-12-25T00:00:00Z", false},
+		{"2023/12/25", "2023-12-25T00:00:00Z", false},
+		{"2023-1-2 3:04:05", "2023-01-02T03:04:05Z", false},
+		{"20231225", "2023-12-25T00:00:00Z", false},
 		{"15:30:45", "", false}, // Time only, will have today's date
 		{"invalid", "", true},
 		{"", "", true},
@@ -43,6 +46,25 @@ func TestParse(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestParseStrict(t *testing.T) {
+	valid := []string{
+		"2023-12-25T15:30:45Z",
+		"2023-12-25T15:30:45",
+	}
+	for _, s := range valid {
+		if _, err := ParseStrict(s); err != nil {
+			t.Fatalf("ParseStrict failed for %q: %v", s, err)
+		}
+	}
+
+	invalid := []string{"2023/12/25", "2023-12-25 15:30:45", "20231225"}
+	for _, s := range invalid {
+		if _, err := ParseStrict(s); err == nil {
+			t.Fatalf("ParseStrict should reject %q", s)
+		}
 	}
 }
 

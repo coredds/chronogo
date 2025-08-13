@@ -13,10 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Week-of-month helpers: `WeekOfMonthISO()` and `WeekOfMonthWithStart(start)`
 - GitHub Actions CI matrix across OS and Go versions; coverage artifact upload
 - Makefile with common developer tasks
+- Rounding and range utilities: `Truncate(unit)`, `Round(unit)`, `Clamp(min,max)`, `Between(a,b,inclusive)`; typed iteration `RangeByUnit(unit, step...)`
+- Parsing: `ParseStrict`, `ParseStrictInLocation`, and ISO 8601 duration parsing via `ParseISODuration`
 
 ### Changed
 - `IsDST()` now determines standard offset via minimum offset observed in the year for the location (robust across hemispheres)
 - README updates: CI badge, Go Reference badge, Unix helpers, serialization/DB docs, examples section, Makefile usage
+ - README docs for rounding/range utilities and DST notes
+ - README docs for strict parsing and ISO 8601 duration parsing
 
 ### Fixed
 - Repository hygiene: added `.gitignore` for binaries/coverage; removed committed demo binary

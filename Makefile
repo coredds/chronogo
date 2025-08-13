@@ -6,7 +6,7 @@ test:
 	go test ./...
 
 cover:
-	go test -coverprofile=coverage.out ./...
+	go test -covermode=count -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 
 race:
@@ -23,4 +23,5 @@ fmt:
 	go fmt ./...
 
 ci: fmt test cover
+
 

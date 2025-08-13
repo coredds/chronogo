@@ -258,6 +258,57 @@ func (p Period) RangeWithContext(ctx context.Context, unit string, step ...int) 
 	return ch
 }
 
+// RangeByUnit returns a channel that yields DateTime instances within the period using typed units.
+func (p Period) RangeByUnit(unit Unit, step ...int) <-chan DateTime {
+	return p.RangeByUnitWithContext(context.Background(), unit, step...)
+}
+
+// RangeByUnitWithContext returns a channel that yields DateTime instances within the period
+// using typed units with context cancellation support.
+func (p Period) RangeByUnitWithContext(ctx context.Context, unit Unit, step ...int) <-chan DateTime {
+	stepSize := 1
+	if len(step) > 0 {
+		stepSize = step[0]
+	}
+
+	ch := make(chan DateTime)
+	go func() {
+		defer close(ch)
+
+		current := p.Start
+		for !current.After(p.End) {
+			select {
+			case <-ctx.Done():
+				return
+			case ch <- current:
+			}
+
+			switch unit {
+			case UnitYear:
+				current = current.AddYears(stepSize)
+			case UnitMonth:
+				current = current.AddMonths(stepSize)
+			case UnitDay, UnitWeek:
+				// For weeks, step in days by 7*stepSize
+				inc := stepSize
+				if unit == UnitWeek {
+					inc = stepSize * 7
+				}
+				current = current.AddDays(inc)
+			case UnitHour:
+				current = current.AddHours(stepSize)
+			case UnitMinute:
+				current = current.AddMinutes(stepSize)
+			case UnitSecond:
+				current = current.AddSeconds(stepSize)
+			default:
+				return
+			}
+		}
+	}()
+	return ch
+}
+
 // RangeDays is a convenience method for ranging by days.
 func (p Period) RangeDays(step ...int) <-chan DateTime {
 	return p.Range("days", step...)

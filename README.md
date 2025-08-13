@@ -34,6 +34,7 @@
 - 🧪 **Well-tested** with extensive unit test coverage
 - 🔌 **Serialization-ready**: JSON/Text marshalers and SQL driver integration
 - ⏱️ **Unix helpers**: conversions and constructors for seconds/ms/µs/ns
+ - 🧭 **Utilities**: Truncate/Round to common units; Clamp/Between range helpers; typed units for safe iteration
 
 ## Installation
 
@@ -100,6 +101,8 @@ func main() {
 | **Enhanced Duration** | `NewDuration()`, `NewDurationFromComponents()` | Enhanced duration type with human-readable operations |
 | **Unix Helpers** | `UnixMilli()`, `UnixMicro()`, `UnixNano()`, `FromUnixMilli()`, `FromUnixMicro()`, `FromUnixNano()` | Convert to/from various Unix time resolutions |
 | **Serialization/DB** | `MarshalJSON()`, `UnmarshalJSON()`, `MarshalText()`, `UnmarshalText()`, `Value()`, `Scan()` | Seamless JSON/Text/SQL integration |
+| **Rounding & Range** | `Truncate(unit)`, `Round(unit)`, `Clamp(min,max)`, `Between(a,b,inclusive)`, `RangeByUnit(unit, step...)` | Safer, typed helpers for rounding and iteration |
+| **Parsing** | `ParseStrict()`, `ParseStrictInLocation()`, `ParseISODuration()` | More control and ISO 8601 duration parsing |
 
 ### Duration Operations
 | Method | Description |
@@ -225,6 +228,39 @@ fmt.Println(dt.DaysInYear())        // 365 (2023 is not a leap year)
 ```
 
 ### Fluent API for Complex Operations
+### Rounding and Range Utilities
+
+```go
+// Truncate and round to boundaries
+dt := chronogo.Now()
+fmt.Println(dt.Truncate(chronogo.UnitHour))   // start of current hour
+fmt.Println(dt.Round(chronogo.UnitDay))       // nearest day boundary
+
+// Clamp and Between
+min := chronogo.Today()
+max := min.AddDays(7)
+fmt.Println(dt.Clamp(min, max))
+fmt.Println(dt.Between(min, max, true))
+
+// Typed iteration over a period
+period := chronogo.NewPeriod(min, max)
+for d := range period.RangeByUnit(chronogo.UnitDay, 2) { // every 2 days
+    fmt.Println(d.ToDateString())
+}
+```
+
+### DST and Ambiguity Notes
+### ISO 8601 Duration Parsing
+
+```go
+// Parse durations like P1Y2M3DT4H5M6S, PT15M, P2W
+d, _ := chronogo.ParseISODuration("P1Y2M3DT4H5M6S")
+fmt.Println(d.HumanString())
+```
+
+Notes: years and months use average approximations (1y=365.25d, 1m=30.44d) consistent with `ChronoDuration`.
+
+Local time around DST transitions can be ambiguous or non-existent. Prefer parsing in a known location with `ParseInLocation` or construct with `Date(...)` and a `*time.Location`. For iteration across boundaries, use typed units and calendar-aware helpers like `StartOfWeek()`.
 
 ```go
 now := chronogo.Now()
@@ -356,6 +392,12 @@ This repository includes GitHub Actions CI with a cross-platform, multi-version 
 - Go: 1.21.x, 1.22.x
 
 CI runs vet, unit tests, race tests where CGO is available, and publishes coverage as an artifact.
+
+If you're on Windows with WSL installed, you can run race tests via WSL:
+
+```bash
+wsl env CGO_ENABLED=1 go test -race ./...
+```
 
 ## Contributing
 
