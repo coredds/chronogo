@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -138,6 +139,108 @@ func main() {
 	duration2 := chronogo.NewDurationFromComponents(2, 15, 30)
 	sum := chronoDuration.Add(duration2)
 	fmt.Printf("   Sum with 2h15m30s: %s\n", sum.String())
+	fmt.Println()
+
+	// Business Date Operations (NEW!)
+	fmt.Println("12. Business Date Operations:")
+	
+	// Set up holiday checker
+	holidayChecker := chronogo.NewUSHolidayChecker()
+	
+	// Add custom company holiday
+	companyHoliday := chronogo.Holiday{
+		Name:  "Company Founding Day",
+		Month: time.March,
+		Day:   15,
+	}
+	holidayChecker.AddHoliday(companyHoliday)
+	
+	// Test various dates
+	testDates := []chronogo.DateTime{
+		chronogo.Date(2024, time.January, 15, 0, 0, 0, 0, time.UTC), // MLK Day (Monday)
+		chronogo.Date(2024, time.January, 16, 0, 0, 0, 0, time.UTC), // Tuesday
+		chronogo.Date(2024, time.January, 13, 0, 0, 0, 0, time.UTC), // Saturday
+		chronogo.Date(2024, time.March, 15, 0, 0, 0, 0, time.UTC),   // Custom holiday
+	}
+	
+	for _, date := range testDates {
+		fmt.Printf("   %s (%s): Business day? %t\n", 
+			date.Format("2006-01-02"), date.Weekday(), date.IsBusinessDay(holidayChecker))
+	}
+	
+	// Business day arithmetic
+	startBiz := chronogo.Date(2024, time.January, 8, 0, 0, 0, 0, time.UTC) // Monday
+	fmt.Printf("   Start: %s (%s)\n", startBiz.Format("2006-01-02"), startBiz.Weekday())
+	
+	nextBiz := startBiz.NextBusinessDay(holidayChecker)
+	fmt.Printf("   Next business day: %s (%s)\n", nextBiz.Format("2006-01-02"), nextBiz.Weekday())
+	
+	add5Biz := startBiz.AddBusinessDays(5, holidayChecker)
+	fmt.Printf("   Add 5 business days: %s (%s)\n", add5Biz.Format("2006-01-02"), add5Biz.Weekday())
+	
+	endBiz := chronogo.Date(2024, time.January, 22, 0, 0, 0, 0, time.UTC)
+	bizCount := startBiz.BusinessDaysBetween(endBiz, holidayChecker)
+	fmt.Printf("   Business days between %s and %s: %d\n", 
+		startBiz.Format("01-02"), endBiz.Format("01-02"), bizCount)
+	
+	// Month/year business day counts
+	janDate := chronogo.Date(2024, time.January, 15, 0, 0, 0, 0, time.UTC)
+	fmt.Printf("   Business days in January 2024: %d\n", janDate.BusinessDaysInMonth(holidayChecker))
+	fmt.Printf("   Business days in 2024: %d\n", janDate.BusinessDaysInYear(holidayChecker))
+	
+	// List holidays for the year
+	fmt.Printf("   US Holidays in 2024:\n")
+	holidays2024 := holidayChecker.GetHolidays(2024)
+	for _, holiday := range holidays2024[:5] { // Show first 5
+		fmt.Printf("     %s (%s)\n", holiday.Format("2006-01-02"), holiday.Weekday())
+	}
+	fmt.Printf("     ... and %d more\n", len(holidays2024)-5)
+	fmt.Println()
+
+	// Enhanced Error Handling (NEW!)
+	fmt.Println("13. Enhanced Error Handling:")
+	
+	// Parse error with helpful suggestion
+	_, err := chronogo.Parse("25/12/2023") // Wrong format
+	if err != nil {
+		var chronoErr *chronogo.ChronoError
+		if errors.As(err, &chronoErr) {
+			fmt.Printf("   Parse error with suggestion:\n   %s\n", chronoErr.Error())
+		}
+	}
+	
+	// Timezone error with suggestion
+	_, err = chronogo.LoadLocation("EST") // Ambiguous
+	if err != nil {
+		var chronoErr *chronogo.ChronoError
+		if errors.As(err, &chronoErr) {
+			fmt.Printf("   Timezone error with suggestion:\n   %s\n", chronoErr.Error())
+		}
+	}
+	
+	// Validation error
+	zeroDate := chronogo.DateTime{}
+	if err := zeroDate.Validate(); err != nil {
+		fmt.Printf("   Validation error:\n   %s\n", err.Error())
+	}
+	
+	// Show available timezones (sample)
+	fmt.Printf("   Sample available timezones:\n")
+	timezones := chronogo.AvailableTimezones()
+	for _, tz := range timezones[:5] {
+		fmt.Printf("     %s\n", tz)
+	}
+	fmt.Printf("     ... and %d more\n", len(timezones)-5)
+	fmt.Println()
+
+	// Must functions for constants
+	fmt.Println("14. Must Functions (for constants):")
+	// These would panic if the input was invalid, but are safe for known-good values
+	appLaunchDate := chronogo.MustParse("2024-01-01T00:00:00Z")
+	fmt.Printf("   App launch date: %s\n", appLaunchDate.Format("2006-01-02"))
+	
+	eastCoast := chronogo.MustLoadLocation("America/New_York")
+	fmt.Printf("   East coast timezone: %s\n", eastCoast.String())
 	fmt.Println()
 
 	fmt.Println("=== Demo Complete ===")

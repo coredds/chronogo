@@ -1017,3 +1017,202 @@ func TestClampAndBetween(t *testing.T) {
 		t.Errorf("Between exclusive identical bounds should be false")
 	}
 }
+
+func TestTodayIn(t *testing.T) {
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Skip("Could not load America/New_York timezone")
+	}
+
+	dt := TodayIn(loc)
+	if dt.Location() != loc {
+		t.Errorf("TodayIn() should return today in specified location")
+	}
+
+	if dt.Hour() != 0 || dt.Minute() != 0 || dt.Second() != 0 || dt.Nanosecond() != 0 {
+		t.Errorf("TodayIn() should return time at midnight")
+	}
+}
+
+func TestIsUTCAndIsLocal(t *testing.T) {
+	utcDt := UTC(2023, time.December, 25, 15, 30, 45, 0)
+	localDt := Date(2023, time.December, 25, 15, 30, 45, 0, time.Local)
+
+	if !utcDt.IsUTC() {
+		t.Errorf("UTC datetime should return true for IsUTC()")
+	}
+
+	if utcDt.IsLocal() {
+		t.Errorf("UTC datetime should return false for IsLocal()")
+	}
+
+	if !localDt.IsLocal() {
+		t.Errorf("Local datetime should return true for IsLocal()")
+	}
+
+	if localDt.IsUTC() {
+		t.Errorf("Local datetime should return false for IsUTC()")
+	}
+}
+
+func TestSubtractMethods(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
+
+	// Test SubtractMonths
+	result := dt.SubtractMonths(2)
+	expected := Date(2023, time.October, 25, 15, 30, 45, 0, time.UTC)
+	if !result.Equal(expected) {
+		t.Errorf("SubtractMonths(2) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test SubtractDays
+	result = dt.SubtractDays(10)
+	expected = Date(2023, time.December, 15, 15, 30, 45, 0, time.UTC)
+	if !result.Equal(expected) {
+		t.Errorf("SubtractDays(10) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test SubtractHours
+	result = dt.SubtractHours(5)
+	expected = Date(2023, time.December, 25, 10, 30, 45, 0, time.UTC)
+	if !result.Equal(expected) {
+		t.Errorf("SubtractHours(5) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test SubtractMinutes
+	result = dt.SubtractMinutes(15)
+	expected = Date(2023, time.December, 25, 15, 15, 45, 0, time.UTC)
+	if !result.Equal(expected) {
+		t.Errorf("SubtractMinutes(15) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test SubtractSeconds
+	result = dt.SubtractSeconds(30)
+	expected = Date(2023, time.December, 25, 15, 30, 15, 0, time.UTC)
+	if !result.Equal(expected) {
+		t.Errorf("SubtractSeconds(30) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test Subtract with duration
+	duration := 2*time.Hour + 30*time.Minute
+	result = dt.Subtract(duration)
+	expected = Date(2023, time.December, 25, 13, 0, 45, 0, time.UTC)
+	if !result.Equal(expected) {
+		t.Errorf("Subtract(2h30m) failed: expected %v, got %v", expected, result)
+	}
+}
+
+func TestUnixVariants(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
+
+	// Test UnixMilli
+	milli := dt.UnixMilli()
+	expectedMilli := dt.Unix()*1000 + int64(dt.Nanosecond())/1000000
+	if milli != expectedMilli {
+		t.Errorf("UnixMilli() failed: expected %d, got %d", expectedMilli, milli)
+	}
+
+	// Test UnixMicro
+	micro := dt.UnixMicro()
+	expectedMicro := dt.Unix()*1000000 + int64(dt.Nanosecond())/1000
+	if micro != expectedMicro {
+		t.Errorf("UnixMicro() failed: expected %d, got %d", expectedMicro, micro)
+	}
+
+	// Test UnixNano
+	nano := dt.UnixNano()
+	expectedNano := dt.Time.UnixNano()
+	if nano != expectedNano {
+		t.Errorf("UnixNano() failed: expected %d, got %d", expectedNano, nano)
+	}
+}
+
+func TestFromUnixVariants(t *testing.T) {
+	// Test FromUnixMilli
+	milli := int64(1703520645123)
+	dt := FromUnixMilli(milli, time.UTC)
+	if dt.UnixMilli() != milli {
+		t.Errorf("FromUnixMilli roundtrip failed: expected %d, got %d", milli, dt.UnixMilli())
+	}
+
+	// Test FromUnixMicro
+	micro := int64(1703520645123456)
+	dt = FromUnixMicro(micro, time.UTC)
+	if dt.UnixMicro() != micro {
+		t.Errorf("FromUnixMicro roundtrip failed: expected %d, got %d", micro, dt.UnixMicro())
+	}
+
+	// Test FromUnixNano
+	nano := int64(1703520645123456789)
+	dt = FromUnixNano(nano, time.UTC)
+	if dt.UnixNano() != nano {
+		t.Errorf("FromUnixNano roundtrip failed: expected %d, got %d", nano, dt.UnixNano())
+	}
+}
+
+func TestUnwrap(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
+	unwrapped := dt.Unwrap()
+	
+	if !unwrapped.Equal(dt.Time) {
+		t.Errorf("Unwrap() should return the underlying time.Time")
+	}
+}
+
+func TestSQLDriverInterfaces(t *testing.T) {
+	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
+	
+	// Test Value method (driver.Valuer interface)
+	value, err := dt.Value()
+	if err != nil {
+		t.Errorf("Value() returned error: %v", err)
+	}
+	
+	// Value should be a time.Time
+	timeValue, ok := value.(time.Time)
+	if !ok {
+		t.Errorf("Value() should return time.Time, got %T", value)
+	}
+	
+	if !timeValue.Equal(dt.Time) {
+		t.Errorf("Value() returned different time: expected %v, got %v", dt.Time, timeValue)
+	}
+	
+	// Test Scan method (sql.Scanner interface)
+	var newDt DateTime
+	err = newDt.Scan(dt.Time)
+	if err != nil {
+		t.Errorf("Scan() returned error: %v", err)
+	}
+	
+	if !newDt.Equal(dt) {
+		t.Errorf("Scan() roundtrip failed: expected %v, got %v", dt, newDt)
+	}
+	
+	// Test Scan with string
+	err = newDt.Scan("2023-12-25T15:30:45Z")
+	if err != nil {
+		t.Errorf("Scan() with string returned error: %v", err)
+	}
+	
+	expected := Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
+	if !newDt.Equal(expected) {
+		t.Errorf("Scan() with string failed: expected %v, got %v", expected, newDt)
+	}
+	
+	// Test Scan with nil
+	err = newDt.Scan(nil)
+	if err != nil {
+		t.Errorf("Scan() with nil returned error: %v", err)
+	}
+	
+	if !newDt.IsZero() {
+		t.Errorf("Scan() with nil should result in zero time")
+	}
+	
+	// Test Scan with invalid type
+	err = newDt.Scan(123)
+	if err == nil {
+		t.Error("Scan() with invalid type should return error")
+	}
+}

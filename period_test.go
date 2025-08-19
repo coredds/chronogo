@@ -414,3 +414,37 @@ func TestPeriodRangeByUnit(t *testing.T) {
 		t.Fatalf("Expected at least one iteration")
 	}
 }
+
+func TestPeriodMinutesAndSeconds(t *testing.T) {
+	start := Date(2023, time.January, 1, 10, 30, 45, 0, time.UTC)
+	end := Date(2023, time.January, 1, 11, 32, 50, 0, time.UTC) // 1h 2m 5s later
+
+	period := NewPeriod(start, end)
+
+	// Test Minutes method
+	minutes := period.Minutes()
+	if minutes < 62 || minutes > 63 {
+		t.Errorf("Minutes(): expected around %d, got %d", 62, minutes)
+	}
+
+	// Test Seconds method
+	seconds := period.Seconds()
+	expectedSeconds := 3725 // 1h 2m 5s = 3725 seconds
+	if seconds != expectedSeconds {
+		t.Errorf("Seconds(): expected %d, got %d", expectedSeconds, seconds)
+	}
+
+	// Test InMinutes method
+	inMinutes := period.InMinutes()
+	expectedMinutesFloat := 62.0 + 5.0/60.0 // 1h 2m 5s = 62.083... minutes
+	if inMinutes < 62.0 || inMinutes > 63.0 {
+		t.Errorf("InMinutes(): expected around %f, got %f", expectedMinutesFloat, inMinutes)
+	}
+
+	// Test InSeconds method
+	inSeconds := period.InSeconds()
+	expectedInSeconds := 3725.0 // 1h 2m 5s = 3725 seconds
+	if inSeconds != expectedInSeconds {
+		t.Errorf("InSeconds(): expected %f, got %f", expectedInSeconds, inSeconds)
+	}
+}

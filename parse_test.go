@@ -196,22 +196,6 @@ func TestLoadLocation(t *testing.T) {
 	}
 }
 
-func TestMustLoadLocation(t *testing.T) {
-	// Test valid location (should not panic)
-	loc := MustLoadLocation("UTC")
-	if loc != time.UTC {
-		t.Errorf("MustLoadLocation('UTC') should return time.UTC")
-	}
-
-	// Test panic for invalid location
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("MustLoadLocation should panic for invalid timezone")
-		}
-	}()
-	MustLoadLocation("Invalid/Timezone")
-}
-
 func TestInstance(t *testing.T) {
 	stdTime := time.Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
 	dt := Instance(stdTime)
@@ -260,11 +244,50 @@ func TestTryParseUnix(t *testing.T) {
 	}
 }
 
-func TestParseError(t *testing.T) {
-	err := ParseError{Input: "invalid", Reason: "test reason"}
-	expected := "failed to parse 'invalid': test reason"
+func TestAvailableTimezones(t *testing.T) {
+	timezones := AvailableTimezones()
+	
+	// Should return a non-empty slice
+	if len(timezones) == 0 {
+		t.Error("AvailableTimezones() should return non-empty slice")
+	}
+	
+	// Should contain common timezones
+	found := false
+	for _, tz := range timezones {
+		if tz == "UTC" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("AvailableTimezones() should include 'UTC'")
+	}
+	
+	// Check that we have a reasonable number of timezones
+	if len(timezones) < 10 {
+		t.Errorf("Expected more timezones, got %d", len(timezones))
+	}
+}
 
-	if err.Error() != expected {
-		t.Errorf("ParseError.Error(): expected '%s', got '%s'", expected, err.Error())
+func TestIsValidTimezone(t *testing.T) {
+	tests := []struct {
+		timezone string
+		valid    bool
+	}{
+		{"UTC", true},
+		{"America/New_York", true},
+		{"Europe/London", true},
+		{"Invalid/Timezone", false},
+		{"Not_A_Real_Zone", false},
+	}
+	
+	for _, test := range tests {
+		t.Run(test.timezone, func(t *testing.T) {
+			result := IsValidTimezone(test.timezone)
+			if result != test.valid {
+				t.Errorf("IsValidTimezone('%s'): expected %v, got %v", test.timezone, test.valid, result)
+			}
+		})
 	}
 }

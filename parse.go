@@ -2,7 +2,6 @@ package chronogo
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,16 +34,6 @@ var (
 	}
 )
 
-// ParseError represents an error that occurred during parsing.
-type ParseError struct {
-	Input  string
-	Reason string
-}
-
-func (e ParseError) Error() string {
-	return fmt.Sprintf("failed to parse '%s': %s", e.Input, e.Reason)
-}
-
 // Parse parses a datetime string using common formats (lenient by default) in UTC.
 func Parse(value string) (DateTime, error) {
 	return ParseInLocation(value, time.UTC)
@@ -56,7 +45,7 @@ func ParseInLocation(value string, loc *time.Location) (DateTime, error) {
 	value = strings.TrimSpace(value)
 
 	if value == "" {
-		return DateTime{}, ParseError{Input: value, Reason: "empty string"}
+		return DateTime{}, ParseError(value, errors.New("empty string"))
 	}
 
 	// Try each common layout (lenient set)
@@ -66,10 +55,7 @@ func ParseInLocation(value string, loc *time.Location) (DateTime, error) {
 		}
 	}
 
-	return DateTime{}, ParseError{
-		Input:  value,
-		Reason: "no matching format found",
-	}
+	return DateTime{}, ParseError(value, errors.New("no matching format found"))
 }
 
 // ParseStrict parses using a stricter set of layouts (RFC3339 and ISO8601 variants only).
@@ -81,7 +67,7 @@ func ParseStrict(value string) (DateTime, error) {
 func ParseStrictInLocation(value string, loc *time.Location) (DateTime, error) {
 	value = strings.TrimSpace(value)
 	if value == "" {
-		return DateTime{}, ParseError{Input: value, Reason: "empty string"}
+		return DateTime{}, ParseError(value, errors.New("empty string"))
 	}
 	strictLayouts := []string{
 		time.RFC3339,
@@ -94,13 +80,13 @@ func ParseStrictInLocation(value string, loc *time.Location) (DateTime, error) {
 			return DateTime{t}, nil
 		}
 	}
-	return DateTime{}, ParseError{Input: value, Reason: "no matching strict format found"}
+	return DateTime{}, ParseError(value, errors.New("no matching strict format found"))
 }
 
 // ParseISO8601 parses an ISO 8601 formatted datetime string.
 func ParseISO8601(value string) (DateTime, error) {
 	if !iso8601Pattern.MatchString(value) {
-		return DateTime{}, ParseError{Input: value, Reason: "invalid ISO 8601 format"}
+		return DateTime{}, ParseError(value, errors.New("invalid ISO 8601 format"))
 	}
 
 	t, err := time.Parse(time.RFC3339, value)
@@ -108,7 +94,7 @@ func ParseISO8601(value string) (DateTime, error) {
 		// Try with nanoseconds
 		t, err = time.Parse(time.RFC3339Nano, value)
 		if err != nil {
-			return DateTime{}, ParseError{Input: value, Reason: err.Error()}
+			return DateTime{}, ParseError(value, err)
 		}
 	}
 
@@ -119,7 +105,7 @@ func ParseISO8601(value string) (DateTime, error) {
 func ParseRFC3339(value string) (DateTime, error) {
 	t, err := time.Parse(time.RFC3339, value)
 	if err != nil {
-		return DateTime{}, ParseError{Input: value, Reason: err.Error()}
+		return DateTime{}, ParseError(value, err)
 	}
 	return DateTime{t}, nil
 }
@@ -134,7 +120,7 @@ func FromFormat(value, layout string) (DateTime, error) {
 func FromFormatInLocation(value, layout string, loc *time.Location) (DateTime, error) {
 	t, err := time.ParseInLocation(layout, value, loc)
 	if err != nil {
-		return DateTime{}, ParseError{Input: value, Reason: err.Error()}
+		return DateTime{}, FormatError(layout, err)
 	}
 	return DateTime{t}, nil
 }
@@ -145,16 +131,11 @@ func LoadLocation(name string) (*time.Location, error) {
 	if name == "local" {
 		return time.Local, nil
 	}
-	return time.LoadLocation(name)
-}
-
-// MustLoadLocation loads a timezone by name and panics if it fails.
-func MustLoadLocation(name string) *time.Location {
-	loc, err := LoadLocation(name)
+	loc, err := time.LoadLocation(name)
 	if err != nil {
-		panic(fmt.Sprintf("failed to load location '%s': %v", name, err))
+		return nil, TimezoneError(name, err)
 	}
-	return loc
+	return loc, nil
 }
 
 // Instance creates a DateTime from a standard time.Time.
@@ -166,7 +147,7 @@ func Instance(t time.Time) DateTime {
 func parseUnixTimestamp(value string) (DateTime, error) {
 	s := strings.TrimSpace(value)
 	if s == "" {
-		return DateTime{}, errors.New("invalid Unix timestamp")
+		return DateTime{}, ParseError(value, errors.New("invalid Unix timestamp"))
 	}
 
 	// Detect length ignoring leading sign
@@ -178,7 +159,7 @@ func parseUnixTimestamp(value string) (DateTime, error) {
 	// Parse as int64
 	ts, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
-		return DateTime{}, errors.New("invalid Unix timestamp")
+		return DateTime{}, ParseError(value, errors.New("invalid Unix timestamp"))
 	}
 
 	switch l := len(signless); l {
@@ -191,11 +172,66 @@ func parseUnixTimestamp(value string) (DateTime, error) {
 	case 19: // nanoseconds
 		return DateTime{time.Unix(0, ts).UTC()}, nil
 	default:
-		return DateTime{}, errors.New("invalid Unix timestamp length")
+		return DateTime{}, ParseError(value, errors.New("invalid Unix timestamp length"))
 	}
 }
 
 // TryParseUnix attempts to parse a string as a Unix timestamp.
 func TryParseUnix(value string) (DateTime, error) {
 	return parseUnixTimestamp(value)
+}
+
+// AvailableTimezones returns a list of commonly used timezone names.
+// This is helpful for error suggestions and validation.
+func AvailableTimezones() []string {
+	return []string{
+		"UTC",
+		"Local",
+		// Americas
+		"America/New_York",
+		"America/Chicago",
+		"America/Denver", 
+		"America/Los_Angeles",
+		"America/Toronto",
+		"America/Vancouver",
+		"America/Mexico_City",
+		"America/Sao_Paulo",
+		"America/Argentina/Buenos_Aires",
+		// Europe
+		"Europe/London",
+		"Europe/Paris",
+		"Europe/Berlin",
+		"Europe/Rome",
+		"Europe/Madrid",
+		"Europe/Amsterdam",
+		"Europe/Stockholm",
+		"Europe/Moscow",
+		// Asia
+		"Asia/Tokyo",
+		"Asia/Shanghai",
+		"Asia/Hong_Kong",
+		"Asia/Singapore",
+		"Asia/Bangkok",
+		"Asia/Jakarta",
+		"Asia/Manila",
+		"Asia/Seoul",
+		"Asia/Kolkata",
+		"Asia/Dubai",
+		// Australia/Pacific
+		"Australia/Sydney",
+		"Australia/Melbourne",
+		"Australia/Perth",
+		"Pacific/Auckland",
+		"Pacific/Honolulu",
+		// Africa
+		"Africa/Cairo",
+		"Africa/Johannesburg",
+		"Africa/Lagos",
+	}
+}
+
+// IsValidTimezone checks if a timezone name is valid.
+func IsValidTimezone(name string) bool {
+	_, err := time.LoadLocation(name)
+	return err == nil
 }

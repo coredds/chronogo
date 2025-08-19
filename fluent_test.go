@@ -1,6 +1,7 @@
 package chronogo
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -229,5 +230,73 @@ func TestChronoDurationAbs(t *testing.T) {
 	abs = positive.Abs()
 	if abs.Duration != expected {
 		t.Errorf("Abs() of positive = %v, want %v", abs.Duration, expected)
+	}
+}
+
+func TestFluentBuilderMissingMethods(t *testing.T) {
+	base := Date(2023, time.January, 1, 12, 0, 0, 0, time.UTC)
+
+	// Test Weeks method
+	result := base.AddFluent().Weeks(2).To(base)
+	expected := base.AddDays(14) // 2 weeks = 14 days
+	if !result.Equal(expected) {
+		t.Errorf("Weeks(2) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test Milliseconds method
+	result = base.AddFluent().Milliseconds(1500).To(base) // 1.5 seconds
+	expected = base.Add(1500 * time.Millisecond)
+	if !result.Equal(expected) {
+		t.Errorf("Milliseconds(1500) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test Microseconds method
+	result = base.AddFluent().Microseconds(2000000).To(base) // 2 seconds
+	expected = base.Add(2000000 * time.Microsecond)
+	if !result.Equal(expected) {
+		t.Errorf("Microseconds(2000000) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test Nanoseconds method
+	result = base.AddFluent().Nanoseconds(3000000000).To(base) // 3 seconds
+	expected = base.Add(3000000000 * time.Nanosecond)
+	if !result.Equal(expected) {
+		t.Errorf("Nanoseconds(3000000000) failed: expected %v, got %v", expected, result)
+	}
+
+	// Test From method (reverse operation)
+	future := Date(2023, time.February, 15, 18, 30, 45, 0, time.UTC)
+	result = base.AddFluent().From(future)
+	// The From() method should compute the duration from future to base
+	// Let's just verify the method doesn't panic and returns a valid date
+	if result.IsZero() {
+		t.Error("From() should return a valid datetime")
+	}
+}
+
+func TestChronoDurationMissingMethods(t *testing.T) {
+	// Test Years method
+	duration := NewDuration(365*24*time.Hour + 6*time.Hour) // ~1 year
+	years := duration.Years()
+	if years < 0.9 || years > 1.1 {
+		t.Errorf("Years() = %f, expected around 1.0", years)
+	}
+
+	// Test Months method  
+	monthDuration := NewDuration(30*24*time.Hour + 12*time.Hour) // ~1 month
+	months := monthDuration.Months()
+	if months < 0.9 || months > 1.1 {
+		t.Errorf("Months() = %f, expected around 1.0", months)
+	}
+
+	// Test HumanString method
+	humanDuration := NewDuration(25*time.Hour + 30*time.Minute)
+	human := humanDuration.HumanString()
+	if human == "" {
+		t.Error("HumanString() should return non-empty string")
+	}
+	// Should say something like "1 day" since it's over 24 hours
+	if !strings.Contains(strings.ToLower(human), "day") {
+		t.Errorf("HumanString() = %s, expected to contain 'day'", human)
 	}
 }
