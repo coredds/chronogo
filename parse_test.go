@@ -115,7 +115,6 @@ func TestParseISO8601(t *testing.T) {
 func TestParseRFC3339(t *testing.T) {
 	input := "2023-12-25T15:30:45Z"
 	dt, err := ParseRFC3339(input)
-
 	if err != nil {
 		t.Fatalf("ParseRFC3339 failed: %v", err)
 	}
@@ -246,12 +245,12 @@ func TestTryParseUnix(t *testing.T) {
 
 func TestAvailableTimezones(t *testing.T) {
 	timezones := AvailableTimezones()
-	
+
 	// Should return a non-empty slice
 	if len(timezones) == 0 {
 		t.Error("AvailableTimezones() should return non-empty slice")
 	}
-	
+
 	// Should contain common timezones
 	found := false
 	for _, tz := range timezones {
@@ -263,7 +262,7 @@ func TestAvailableTimezones(t *testing.T) {
 	if !found {
 		t.Error("AvailableTimezones() should include 'UTC'")
 	}
-	
+
 	// Check that we have a reasonable number of timezones
 	if len(timezones) < 10 {
 		t.Errorf("Expected more timezones, got %d", len(timezones))
@@ -281,7 +280,7 @@ func TestIsValidTimezone(t *testing.T) {
 		{"Invalid/Timezone", false},
 		{"Not_A_Real_Zone", false},
 	}
-	
+
 	for _, test := range tests {
 		t.Run(test.timezone, func(t *testing.T) {
 			result := IsValidTimezone(test.timezone)

@@ -190,7 +190,7 @@ func AvailableTimezones() []string {
 		// Americas
 		"America/New_York",
 		"America/Chicago",
-		"America/Denver", 
+		"America/Denver",
 		"America/Los_Angeles",
 		"America/Toronto",
 		"America/Vancouver",

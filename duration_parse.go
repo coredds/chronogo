@@ -17,7 +17,7 @@ import (
 //   - A leading minus sign is supported for negative durations.
 func ParseISODuration(s string) (ChronoDuration, error) {
 	// ^([+-])?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$
-	var isoDurRe = regexp.MustCompile(`^([+-])?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
+	isoDurRe := regexp.MustCompile(`^([+-])?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
 	m := isoDurRe.FindStringSubmatch(s)
 	if m == nil {
 		return ChronoDuration{}, errors.New("invalid ISO 8601 duration")

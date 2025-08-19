@@ -1153,7 +1153,7 @@ func TestFromUnixVariants(t *testing.T) {
 func TestUnwrap(t *testing.T) {
 	dt := Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
 	unwrapped := dt.Unwrap()
-	
+
 	if !unwrapped.Equal(dt.Time) {
 		t.Errorf("Unwrap() should return the underlying time.Time")
 	}
@@ -1161,55 +1161,55 @@ func TestUnwrap(t *testing.T) {
 
 func TestSQLDriverInterfaces(t *testing.T) {
 	dt := Date(2023, time.December, 25, 15, 30, 45, 123456789, time.UTC)
-	
+
 	// Test Value method (driver.Valuer interface)
 	value, err := dt.Value()
 	if err != nil {
 		t.Errorf("Value() returned error: %v", err)
 	}
-	
+
 	// Value should be a time.Time
 	timeValue, ok := value.(time.Time)
 	if !ok {
 		t.Errorf("Value() should return time.Time, got %T", value)
 	}
-	
+
 	if !timeValue.Equal(dt.Time) {
 		t.Errorf("Value() returned different time: expected %v, got %v", dt.Time, timeValue)
 	}
-	
+
 	// Test Scan method (sql.Scanner interface)
 	var newDt DateTime
 	err = newDt.Scan(dt.Time)
 	if err != nil {
 		t.Errorf("Scan() returned error: %v", err)
 	}
-	
+
 	if !newDt.Equal(dt) {
 		t.Errorf("Scan() roundtrip failed: expected %v, got %v", dt, newDt)
 	}
-	
+
 	// Test Scan with string
 	err = newDt.Scan("2023-12-25T15:30:45Z")
 	if err != nil {
 		t.Errorf("Scan() with string returned error: %v", err)
 	}
-	
+
 	expected := Date(2023, time.December, 25, 15, 30, 45, 0, time.UTC)
 	if !newDt.Equal(expected) {
 		t.Errorf("Scan() with string failed: expected %v, got %v", expected, newDt)
 	}
-	
+
 	// Test Scan with nil
 	err = newDt.Scan(nil)
 	if err != nil {
 		t.Errorf("Scan() with nil returned error: %v", err)
 	}
-	
+
 	if !newDt.IsZero() {
 		t.Errorf("Scan() with nil should result in zero time")
 	}
-	
+
 	// Test Scan with invalid type
 	err = newDt.Scan(123)
 	if err == nil {

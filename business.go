@@ -12,12 +12,12 @@ type HolidayChecker interface {
 
 // Holiday represents a specific holiday with optional recurring rules.
 type Holiday struct {
-	Name     string
-	Month    time.Month
-	Day      int
-	Year     *int // nil for recurring holiday
-	WeekDay  *time.Weekday // for holidays like "first Monday of September"
-	WeekNum  *int // which week of the month (1-5, -1 for last)
+	Name    string
+	Month   time.Month
+	Day     int
+	Year    *int          // nil for recurring holiday
+	WeekDay *time.Weekday // for holidays like "first Monday of September"
+	WeekNum *int          // which week of the month (1-5, -1 for last)
 }
 
 // DefaultHolidayChecker provides common holidays for different regions.
@@ -85,7 +85,7 @@ func (hc *DefaultHolidayChecker) isHolidayMatch(dt DateTime, holiday Holiday) bo
 
 	// Calculate which occurrence of the weekday this is
 	weekNum := hc.getWeekOfMonth(dt, *holiday.WeekDay)
-	
+
 	// Handle "last occurrence" (-1)
 	if *holiday.WeekNum == -1 {
 		return hc.isLastOccurrenceOfWeekday(dt, *holiday.WeekDay)
@@ -102,11 +102,11 @@ func (hc *DefaultHolidayChecker) getWeekOfMonth(dt DateTime, weekday time.Weekda
 		daysDiff += 7
 	}
 	firstOccurrence := firstOfMonth.AddDays(daysDiff)
-	
+
 	if dt.Before(firstOccurrence) {
 		return 0 // This shouldn't happen if weekdays match
 	}
-	
+
 	weeksDiff := int(dt.Sub(firstOccurrence).Hours() / (24 * 7))
 	return weeksDiff + 1
 }
@@ -126,12 +126,12 @@ func (hc *DefaultHolidayChecker) AddHoliday(holiday Holiday) {
 // GetHolidays returns all holidays for a given year.
 func (hc *DefaultHolidayChecker) GetHolidays(year int) []DateTime {
 	var holidays []DateTime
-	
+
 	for _, holiday := range hc.holidays {
 		if holiday.Year != nil && *holiday.Year != year {
 			continue
 		}
-		
+
 		if holiday.WeekDay == nil {
 			// Fixed date holiday
 			dt := Date(year, holiday.Month, holiday.Day, 0, 0, 0, 0, time.UTC)
@@ -144,14 +144,14 @@ func (hc *DefaultHolidayChecker) GetHolidays(year int) []DateTime {
 			}
 		}
 	}
-	
+
 	return holidays
 }
 
 // findWeekdayOccurrence finds the nth occurrence of a weekday in a given month/year.
 func (hc *DefaultHolidayChecker) findWeekdayOccurrence(year int, month time.Month, weekday time.Weekday, occurrence int) DateTime {
 	firstOfMonth := Date(year, month, 1, 0, 0, 0, 0, time.UTC)
-	
+
 	if occurrence == -1 {
 		// Last occurrence - start from end of month and work backwards
 		lastOfMonth := firstOfMonth.EndOfMonth()
@@ -162,22 +162,22 @@ func (hc *DefaultHolidayChecker) findWeekdayOccurrence(year int, month time.Mont
 		}
 		return DateTime{} // Not found
 	}
-	
+
 	// Find first occurrence
 	daysDiff := int(weekday - firstOfMonth.Weekday())
 	if daysDiff < 0 {
 		daysDiff += 7
 	}
 	firstOccurrence := firstOfMonth.AddDays(daysDiff)
-	
+
 	// Add weeks to get the nth occurrence
 	target := firstOccurrence.AddDays((occurrence - 1) * 7)
-	
+
 	// Make sure it's still in the same month
 	if target.Month() != month {
 		return DateTime{} // Not found
 	}
-	
+
 	return target
 }
 
@@ -188,11 +188,11 @@ func (dt DateTime) IsBusinessDay(holidayChecker ...HolidayChecker) bool {
 	if dt.IsWeekend() {
 		return false
 	}
-	
+
 	if len(holidayChecker) > 0 && holidayChecker[0] != nil {
 		return !holidayChecker[0].IsHoliday(dt)
 	}
-	
+
 	return true
 }
 
@@ -219,23 +219,23 @@ func (dt DateTime) AddBusinessDays(days int, holidayChecker ...HolidayChecker) D
 	if days == 0 {
 		return dt
 	}
-	
+
 	current := dt
 	remaining := days
 	direction := 1
-	
+
 	if days < 0 {
 		direction = -1
 		remaining = -days
 	}
-	
+
 	for remaining > 0 {
 		current = current.AddDays(direction)
 		if current.IsBusinessDay(holidayChecker...) {
 			remaining--
 		}
 	}
-	
+
 	return current
 }
 
@@ -248,21 +248,21 @@ func (dt DateTime) SubtractBusinessDays(days int, holidayChecker ...HolidayCheck
 func (dt DateTime) BusinessDaysBetween(other DateTime, holidayChecker ...HolidayChecker) int {
 	start := dt
 	end := other
-	
+
 	if start.After(end) {
 		start, end = end, start
 	}
-	
+
 	count := 0
 	current := start
-	
+
 	for current.Before(end) {
 		if current.IsBusinessDay(holidayChecker...) {
 			count++
 		}
 		current = current.AddDays(1)
 	}
-	
+
 	return count
 }
 
@@ -278,17 +278,17 @@ func (dt DateTime) IsHoliday(holidayChecker HolidayChecker) bool {
 func (dt DateTime) BusinessDaysInMonth(holidayChecker ...HolidayChecker) int {
 	start := dt.StartOfMonth()
 	end := dt.EndOfMonth()
-	
+
 	count := 0
 	current := start
-	
+
 	for !current.After(end) {
 		if current.IsBusinessDay(holidayChecker...) {
 			count++
 		}
 		current = current.AddDays(1)
 	}
-	
+
 	return count
 }
 
@@ -296,16 +296,16 @@ func (dt DateTime) BusinessDaysInMonth(holidayChecker ...HolidayChecker) int {
 func (dt DateTime) BusinessDaysInYear(holidayChecker ...HolidayChecker) int {
 	start := dt.StartOfYear()
 	end := dt.EndOfYear()
-	
+
 	count := 0
 	current := start
-	
+
 	for !current.After(end) {
 		if current.IsBusinessDay(holidayChecker...) {
 			count++
 		}
 		current = current.AddDays(1)
 	}
-	
+
 	return count
 }

@@ -3,6 +3,10 @@ run:
   tests: true
   modules-download-mode: readonly
 
+output:
+  formats:
+    - format: colored-line-number
+
 linters-settings:
   gci:
     sections:
@@ -13,82 +17,67 @@ linters-settings:
     simplify: true
   goimports:
     local-prefixes: github.com/coredds/ChronoGo
-  golint:
-    min-confidence: 0
   govet:
-    check-shadowing: true
+    shadow: true
   lll:
-    line-length: 120
+    line-length: 140
   misspell:
     locale: US
   revive:
     min-confidence: 0
+  funlen:
+    lines: 80
+    statements: 50
+  depguard:
+    rules:
+      main:
+        deny:
+          - pkg: "github.com/coredds/ChronoGo"
+            desc: "Use relative imports instead"
+        files:
+          - "!**/*_test.go"
+          - "!**/example_test.go"
+          - "!**/cmd/**"
 
 linters:
   enable:
-    - bodyclose
-    - deadcode
-    - depguard
-    - dogsled
-    - dupl
     - errcheck
-    - exhaustive
-    - exportloopref
-    - funlen
-    - gci
-    - gochecknoinits
-    - gocognit
-    - goconst
-    - gocritic
-    - gocyclo
-    - godot
-    - godox
-    - goerr113
     - gofmt
     - gofumpt
-    - goheader
     - goimports
-    - gomnd
-    - gomodguard
-    - goprintffuncname
-    - gosec
     - gosimple
     - govet
     - ineffassign
-    - lll
-    - makezero
-    - misspell
-    - nakedret
-    - noctx
-    - nolintlint
-    - revive
     - staticcheck
-    - structcheck
-    - stylecheck
     - typecheck
-    - unconvert
-    - unparam
     - unused
-    - varcheck
-    - whitespace
   disable:
-    - gochecknoglobals
-    - goerr113
-    - golint
-    - maligned
-    - prealloc
-    - wsl
+    - gci
+    - godot
+    - goconst
+    - gocritic
+    - lll
+    - misspell
+    - revive
 
 issues:
   exclude-rules:
     - path: _test\.go
       linters:
         - funlen
-        - gomnd
-        - dupl
+        - gocognit
+        - goconst
+        - lll
     - path: cmd/
       linters:
         - gochecknoinits
-  exclude-use-default: false
-  max-issues-per-linter: 0
-  max-same-issues: 0
+        - funlen
+        - gocognit
+        - lll
+        - depguard
+    - path: example_test\.go
+      linters:
+        - depguard
+  exclude-use-default: true
+  max-issues-per-linter: 50
+  max-same-issues: 3

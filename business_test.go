@@ -7,7 +7,7 @@ import (
 
 func TestNewUSHolidayChecker(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	// Test some known US holidays in 2024
 	testCases := []struct {
 		name     string
@@ -25,7 +25,7 @@ func TestNewUSHolidayChecker(t *testing.T) {
 		{"Random Tuesday", Date(2024, time.March, 12, 0, 0, 0, 0, time.UTC), false},
 		{"Christmas Eve", Date(2024, time.December, 24, 0, 0, 0, 0, time.UTC), false},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := checker.IsHoliday(tc.date)
@@ -38,7 +38,7 @@ func TestNewUSHolidayChecker(t *testing.T) {
 
 func TestIsBusinessDay(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	testCases := []struct {
 		name     string
 		date     DateTime
@@ -54,7 +54,7 @@ func TestIsBusinessDay(t *testing.T) {
 		{"New Year's Day (Holiday)", Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC), false},
 		{"Christmas (Holiday)", Date(2024, time.December, 25, 0, 0, 0, 0, time.UTC), false},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.date.IsBusinessDay(checker)
@@ -67,7 +67,7 @@ func TestIsBusinessDay(t *testing.T) {
 
 func TestNextBusinessDay(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	testCases := []struct {
 		name     string
 		date     DateTime
@@ -89,7 +89,7 @@ func TestNextBusinessDay(t *testing.T) {
 			Date(2024, time.January, 2, 0, 0, 0, 0, time.UTC),   // Tuesday (skips weekend and holiday)
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.date.NextBusinessDay(checker)
@@ -102,7 +102,7 @@ func TestNextBusinessDay(t *testing.T) {
 
 func TestPreviousBusinessDay(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	testCases := []struct {
 		name     string
 		date     DateTime
@@ -119,7 +119,7 @@ func TestPreviousBusinessDay(t *testing.T) {
 			Date(2023, time.December, 29, 0, 0, 0, 0, time.UTC), // Friday (skips weekend and holiday)
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.date.PreviousBusinessDay(checker)
@@ -132,7 +132,7 @@ func TestPreviousBusinessDay(t *testing.T) {
 
 func TestAddBusinessDays(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	testCases := []struct {
 		name     string
 		date     DateTime
@@ -170,7 +170,7 @@ func TestAddBusinessDays(t *testing.T) {
 			Date(2024, time.January, 5, 0, 0, 0, 0, time.UTC), // Friday
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.date.AddBusinessDays(tc.days, checker)
@@ -183,7 +183,7 @@ func TestAddBusinessDays(t *testing.T) {
 
 func TestBusinessDaysBetween(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	testCases := []struct {
 		name     string
 		start    DateTime
@@ -215,15 +215,15 @@ func TestBusinessDaysBetween(t *testing.T) {
 			9, // 10 business days minus MLK Day
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.start.BusinessDaysBetween(tc.end, checker)
 			if result != tc.expected {
-				t.Errorf("Expected %d business days between %s and %s, got %d", 
+				t.Errorf("Expected %d business days between %s and %s, got %d",
 					tc.expected, tc.start.Format("2006-01-02"), tc.end.Format("2006-01-02"), result)
 			}
-			
+
 			// Test reverse order should give same result
 			reverseResult := tc.end.BusinessDaysBetween(tc.start, checker)
 			if reverseResult != tc.expected {
@@ -235,7 +235,7 @@ func TestBusinessDaysBetween(t *testing.T) {
 
 func TestBusinessDaysInMonth(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	testCases := []struct {
 		name     string
 		date     DateTime
@@ -257,12 +257,12 @@ func TestBusinessDaysInMonth(t *testing.T) {
 			21, // 31 days - 10 weekend days
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.date.BusinessDaysInMonth(checker)
 			if result != tc.expected {
-				t.Errorf("Expected %d business days in %s %d, got %d", 
+				t.Errorf("Expected %d business days in %s %d, got %d",
 					tc.expected, tc.date.Month(), tc.date.Year(), result)
 			}
 		})
@@ -271,7 +271,7 @@ func TestBusinessDaysInMonth(t *testing.T) {
 
 func TestCustomHoliday(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	// Add a custom holiday
 	customHoliday := Holiday{
 		Name:  "Company Founding Day",
@@ -279,13 +279,13 @@ func TestCustomHoliday(t *testing.T) {
 		Day:   15,
 	}
 	checker.AddHoliday(customHoliday)
-	
+
 	// Test that the custom holiday is recognized
 	companyDay := Date(2024, time.March, 15, 0, 0, 0, 0, time.UTC)
 	if !checker.IsHoliday(companyDay) {
 		t.Error("Custom holiday should be recognized")
 	}
-	
+
 	if companyDay.IsBusinessDay(checker) {
 		t.Error("Custom holiday should not be a business day")
 	}
@@ -293,26 +293,26 @@ func TestCustomHoliday(t *testing.T) {
 
 func TestGetHolidays(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	holidays2024 := checker.GetHolidays(2024)
-	
+
 	// Should have at least the major holidays
 	if len(holidays2024) < 8 {
 		t.Errorf("Expected at least 8 holidays for 2024, got %d", len(holidays2024))
 	}
-	
+
 	// Check for specific holidays
 	holidayDates := make(map[string]bool)
 	for _, h := range holidays2024 {
 		holidayDates[h.Format("01-02")] = true
 	}
-	
+
 	expectedHolidays := []string{
 		"01-01", // New Year's Day
 		"07-04", // Independence Day
 		"12-25", // Christmas
 	}
-	
+
 	for _, expected := range expectedHolidays {
 		if !holidayDates[expected] {
 			t.Errorf("Expected holiday on %s not found", expected)
@@ -325,16 +325,16 @@ func TestHolidayWithoutChecker(t *testing.T) {
 	monday := Date(2024, time.January, 8, 0, 0, 0, 0, time.UTC)
 	saturday := Date(2024, time.January, 6, 0, 0, 0, 0, time.UTC)
 	newYear := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC) // Monday but holiday
-	
+
 	// Without checker, only weekends matter
 	if !monday.IsBusinessDay() {
 		t.Error("Monday should be business day without holiday checker")
 	}
-	
+
 	if saturday.IsBusinessDay() {
 		t.Error("Saturday should not be business day")
 	}
-	
+
 	// New Year's Day should be business day without checker (since it's Monday)
 	if !newYear.IsBusinessDay() {
 		t.Error("New Year's Day should be business day without holiday checker")
@@ -344,7 +344,7 @@ func TestHolidayWithoutChecker(t *testing.T) {
 func BenchmarkIsBusinessDay(b *testing.B) {
 	checker := NewUSHolidayChecker()
 	dt := Date(2024, time.January, 15, 0, 0, 0, 0, time.UTC)
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		dt.IsBusinessDay(checker)
@@ -354,7 +354,7 @@ func BenchmarkIsBusinessDay(b *testing.B) {
 func BenchmarkAddBusinessDays(b *testing.B) {
 	checker := NewUSHolidayChecker()
 	dt := Date(2024, time.January, 8, 0, 0, 0, 0, time.UTC)
-	
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		dt.AddBusinessDays(5, checker)
@@ -363,24 +363,24 @@ func BenchmarkAddBusinessDays(b *testing.B) {
 
 func TestSubtractBusinessDays(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	// Start on a Wednesday (Jan 10, 2024)
 	startDate := Date(2024, time.January, 10, 9, 0, 0, 0, time.UTC)
-	
+
 	// Subtract 1 business day should go to Tuesday
 	result := startDate.SubtractBusinessDays(1, checker)
 	expected := Date(2024, time.January, 9, 9, 0, 0, 0, time.UTC)
 	if !result.Equal(expected) {
 		t.Errorf("Should subtract 1 business day correctly: expected %v, got %v", expected, result)
 	}
-	
+
 	// Subtract 5 business days
 	result = startDate.SubtractBusinessDays(5, checker)
 	expected = Date(2024, time.January, 3, 9, 0, 0, 0, time.UTC) // Skip weekend and New Year's Day
 	if !result.Equal(expected) {
 		t.Errorf("Should subtract 5 business days correctly: expected %v, got %v", expected, result)
 	}
-	
+
 	// Subtract 0 business days
 	result = startDate.SubtractBusinessDays(0, checker)
 	if !result.Equal(startDate) {
@@ -390,19 +390,19 @@ func TestSubtractBusinessDays(t *testing.T) {
 
 func TestDateTimeIsHoliday(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	// Test New Year's Day
 	newYears := Date(2024, time.January, 1, 9, 0, 0, 0, time.UTC)
 	if !newYears.IsHoliday(checker) {
 		t.Error("New Year's Day should be a holiday")
 	}
-	
+
 	// Test non-holiday
 	regularDay := Date(2024, time.January, 2, 9, 0, 0, 0, time.UTC)
 	if regularDay.IsHoliday(checker) {
 		t.Error("Regular day should not be a holiday")
 	}
-	
+
 	// Test with nil checker
 	if newYears.IsHoliday(nil) {
 		t.Error("Should return false when no checker provided")
@@ -411,21 +411,21 @@ func TestDateTimeIsHoliday(t *testing.T) {
 
 func TestBusinessDaysInYear(t *testing.T) {
 	checker := NewUSHolidayChecker()
-	
+
 	// Test 2024 (leap year)
 	dt2024 := Date(2024, time.January, 1, 9, 0, 0, 0, time.UTC)
 	businessDays2024 := dt2024.BusinessDaysInYear(checker)
-	
+
 	// 2024 has 366 days total, 104 weekend days (52 weeks), 10 US holidays = 252 business days
-	expected := 253  // Adjusted based on actual calculation
+	expected := 253 // Adjusted based on actual calculation
 	if businessDays2024 != expected {
 		t.Errorf("2024 should have %d business days, got %d", expected, businessDays2024)
 	}
-	
+
 	// Test 2023 (non-leap year)
 	dt2023 := Date(2023, time.January, 1, 9, 0, 0, 0, time.UTC)
 	businessDays2023 := dt2023.BusinessDaysInYear(checker)
-	
+
 	// 2023 has 365 days total, 104 weekend days, ~10 holidays = 251 business days
 	if businessDays2023 < 250 || businessDays2023 > 252 {
 		t.Errorf("2023 should have approximately 251 business days, got %d", businessDays2023)

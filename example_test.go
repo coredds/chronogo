@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/coredds/ChronoGo"
+	chronogo "github.com/coredds/ChronoGo"
 )
 
 // Example demonstrates basic usage of ChronoGo similar to the PRD sample.

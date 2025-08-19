@@ -282,7 +282,7 @@ func TestChronoDurationMissingMethods(t *testing.T) {
 		t.Errorf("Years() = %f, expected around 1.0", years)
 	}
 
-	// Test Months method  
+	// Test Months method
 	monthDuration := NewDuration(30*24*time.Hour + 12*time.Hour) // ~1 month
 	months := monthDuration.Months()
 	if months < 0.9 || months > 1.1 {
