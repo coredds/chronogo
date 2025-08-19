@@ -23,19 +23,19 @@
 
 ## Features
 
-- 🕒 **Drop-in enhancement** of Go's `time.Time` with extended functionality
-- 🌍 **Robust timezone support** with proper DST handling
-- 🔗 **Fluent API** with method chaining for intuitive date/time manipulation
-- 📝 **Human-readable** time differences ("2 hours ago", "in 3 days")
-- 🔄 **Immutable** datetime operations (methods return new instances)
-- 📋 **Period and Duration** types for time intervals with iteration support
-- 🎯 **Comprehensive parsing** for common datetime formats
-- ✅ **Thread-safe** operations
-- 🧪 **Well-tested** with extensive unit test coverage
-- 🔌 **Serialization-ready**: JSON/Text marshalers and SQL driver integration
-- ⏱️ **Unix helpers**: conversions and constructors for seconds/ms/µs/ns
-- 🧭 **Utilities**: Truncate/Round to common units; Clamp/Between range helpers; typed units for safe iteration
-- 💼 **Business date operations**: Holiday checking, business day calculations, working day arithmetic
+- **Drop-in enhancement** of Go's `time.Time` with extended functionality
+- **Robust timezone support** with proper DST handling
+- **Fluent API** with method chaining for intuitive date/time manipulation
+- **Human-readable** time differences ("2 hours ago", "in 3 days")
+- **Immutable** datetime operations (methods return new instances)
+- **Period and Duration** types for time intervals with iteration support
+- **Comprehensive parsing** for common datetime formats
+- **Thread-safe** operations
+- **Well-tested** with extensive unit test coverage
+- **Serialization-ready**: JSON/Text marshalers and SQL driver integration
+- **Unix helpers**: conversions and constructors for seconds/ms/µs/ns
+- **Utilities**: Truncate/Round to common units; Clamp/Between range helpers; typed units for safe iteration
+- **Business date operations**: Holiday checking, business day calculations, working day arithmetic
 
 ## Installation
 
