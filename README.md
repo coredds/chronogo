@@ -15,11 +15,11 @@
 - [Quick Start](#quick-start)
 - [API Reference](#api-reference)
 - [Advanced Usage](#advanced-usage)
-- [API Compatibility](#api-compatibility)
-- [Error Handling](#error-handling)
 - [Testing](#testing)
 - [Contributing](#contributing)
-- [License & Related Projects](#license--related-projects)
+- [License](#license)
+- [Roadmap](#roadmap)
+- [Changelog](#changelog)
 
 ## Features
 
@@ -134,25 +134,12 @@ We welcome contributions! Please follow these steps:
 4. Ensure all tests pass.
 5. Submit a pull request.
 
-## License & Related Projects
+## License
 
-ChronoGo is licensed under the MIT License. Check out related projects:
-- [Pendulum](https://pendulum.eustace.io/) (Python)
-- [Moment.js](https://momentjs.com/) (JavaScript)
-
-### License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Inspiration
-ChronoGo is inspired by Python's [Pendulum](https://pendulum.eustace.io/) library, which provides an excellent API for datetime manipulation. We've adapted its concepts to Go's type system and idioms while maintaining the intuitive and powerful interface that makes Pendulum so popular.
-
-### Related Projects
-- [Pendulum](https://pendulum.eustace.io/) - The original Python library that inspired ChronoGo
-- [Carbon](https://github.com/golang-module/carbon) - Another Go datetime library
-- [Now](https://github.com/jinzhu/now) - Go package for time manipulation
-
-### Roadmap
-**Completed in v0.2.0+ ✅**
+## Roadmap
+**Completed in v0.2.0+**
 - Enhanced utility methods (StartOfDay, EndOfDay, etc.)
 - Weekend and weekday detection  
 - Quarter operations and ISO week support
@@ -160,7 +147,7 @@ ChronoGo is inspired by Python's [Pendulum](https://pendulum.eustace.io/) librar
 - Enhanced duration type with human-readable operations
 - Additional date utility methods (v0.2.2)
 
-**Completed in v0.3.0+ ✅**
+**Completed in v0.3.0+**
 - Business day calculations and holiday support
 - Enhanced error handling with helpful suggestions
 - Must functions for constants
@@ -175,5 +162,5 @@ ChronoGo is inspired by Python's [Pendulum](https://pendulum.eustace.io/) librar
 - Performance optimizations
 - Benchmark tests and performance profiling
 
-### Changelog
+## Changelog
 See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
