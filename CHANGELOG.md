@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-08-19
+
 ### Added
+- GitHub Actions workflows for CI, linting, and automated releases
+- Comprehensive linting configuration with golangci-lint
+- Dependabot configuration for automated dependency updates
+- Enhanced test coverage to 90.7%
+- Business date operations with holiday checking
+- Error handling improvements with helpful suggestions
 - JSON/Text marshalers and SQL `driver.Valuer`/`sql.Scanner` for `DateTime`
 - Unix time helpers: `UnixMilli/UnixMicro/UnixNano` and `FromUnixMilli/Micro/Nano`
 - Week-of-month helpers: `WeekOfMonthISO()` and `WeekOfMonthWithStart(start)`
-- GitHub Actions CI matrix across OS and Go versions; coverage artifact upload
 - Makefile with common developer tasks
 - Rounding and range utilities: `Truncate(unit)`, `Round(unit)`, `Clamp(min,max)`, `Between(a,b,inclusive)`; typed iteration `RangeByUnit(unit, step...)`
 - Parsing: `ParseStrict`, `ParseStrictInLocation`, and ISO 8601 duration parsing via `ParseISODuration`
@@ -19,11 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - `IsDST()` now determines standard offset via minimum offset observed in the year for the location (robust across hemispheres)
 - README updates: CI badge, Go Reference badge, Unix helpers, serialization/DB docs, examples section, Makefile usage
- - README docs for rounding/range utilities and DST notes
- - README docs for strict parsing and ISO 8601 duration parsing
+- README docs for rounding/range utilities and DST notes
+- README docs for strict parsing and ISO 8601 duration parsing
+- Improved README cohesion and organization
 
 ### Fixed
 - Repository hygiene: added `.gitignore` for binaries/coverage; removed committed demo binary
+- Removed unnecessary debug files and improved code organization
 
 ## [0.2.2] - 2025-01-08
 
@@ -153,5 +162,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial project setup and structure
 
 ---
+
+[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/coredds/ChronoGo/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/coredds/ChronoGo/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/coredds/ChronoGo/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/coredds/ChronoGo/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/coredds/ChronoGo/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/coredds/ChronoGo/releases/tag/v0.1.0
 
 **Note**: This changelog will be updated as new versions are released.

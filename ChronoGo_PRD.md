@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-## ChronoGo v0.1.1 - A Go Implementation of Pendulum — A Powerful and Easy-to-Use Datetime and Timezone Library
+## ChronoGo v0.4.0 - A Go Implementation of Pendulum — A Powerful and Easy-to-Use Datetime and Timezone Library
 
 ## Purpose
 
