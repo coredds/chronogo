@@ -90,6 +90,13 @@ func TestPeriodAbs(t *testing.T) {
 	if !abs.Start.Equal(end) || !abs.End.Equal(start) {
 		t.Errorf("Abs() should swap start and end for negative periods")
 	}
+
+	// Test Abs() on already positive period
+	positivePeriod := NewPeriod(end, start) // end before start makes it positive
+	absPositive := positivePeriod.Abs()
+	if !absPositive.Start.Equal(positivePeriod.Start) || !absPositive.End.Equal(positivePeriod.End) {
+		t.Errorf("Abs() should return same period when already positive")
+	}
 }
 
 func TestPeriodYears(t *testing.T) {
@@ -153,6 +160,15 @@ func TestPeriodMonths(t *testing.T) {
 				test.start.ToDateString(), test.end.ToDateString(), test.expected, result)
 		}
 	}
+
+	// Test negative period months
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.March, 1, 0, 0, 0, 0, time.UTC)
+	negativePeriod := NewPeriod(end, start)
+	negativeMonths := negativePeriod.Months()
+	if negativeMonths != -2 {
+		t.Errorf("Expected -2 months for negative period, got %d", negativeMonths)
+	}
 }
 
 func TestPeriodDays(t *testing.T) {
@@ -165,6 +181,13 @@ func TestPeriodDays(t *testing.T) {
 	if days != 3 {
 		t.Errorf("Expected 3 days, got %d", days)
 	}
+
+	// Test negative period days
+	negativePeriod := NewPeriod(end, start)
+	negativeDays := negativePeriod.Days()
+	if negativeDays != -3 {
+		t.Errorf("Expected -3 days for negative period, got %d", negativeDays)
+	}
 }
 
 func TestPeriodHours(t *testing.T) {
@@ -176,6 +199,13 @@ func TestPeriodHours(t *testing.T) {
 
 	if hours != 5 {
 		t.Errorf("Expected 5 hours, got %d", hours)
+	}
+
+	// Test negative period hours
+	negativePeriod := NewPeriod(end, start)
+	negativeHours := negativePeriod.Hours()
+	if negativeHours != -5 {
+		t.Errorf("Expected -5 hours for negative period, got %d", negativeHours)
 	}
 }
 
@@ -222,6 +252,25 @@ func TestPeriodString(t *testing.T) {
 			t.Errorf("Duration %v: expected '%s', got '%s'", test.duration, test.expected, result)
 		}
 	}
+
+	// Test negative period string
+	start := Date(2023, time.January, 2, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	negativePeriod := NewPeriod(start, end)
+	negativeString := negativePeriod.String()
+	if negativeString != "-1 day" {
+		t.Errorf("Expected '-1 day' for negative period, got '%s'", negativeString)
+	}
+
+	// Test complex duration string with multiple parts
+	start = Date(2023, time.January, 1, 10, 30, 45, 0, time.UTC)
+	end = Date(2023, time.January, 3, 12, 32, 50, 0, time.UTC) // 2 days, 2 hours, 2 minutes, 5 seconds
+	complexPeriod := NewPeriod(start, end)
+	complexString := complexPeriod.String()
+	expectedComplex := "2 days, 2 hours, 2 minutes and 5 seconds"
+	if complexString != expectedComplex {
+		t.Errorf("Expected '%s' for complex period, got '%s'", expectedComplex, complexString)
+	}
 }
 
 func TestPeriodRange(t *testing.T) {
@@ -250,6 +299,15 @@ func TestPeriodRange(t *testing.T) {
 	expected = 2 // Jan 1, 3
 	if len(dates) != expected {
 		t.Errorf("With step 2, expected %d dates, got %d", expected, len(dates))
+	}
+
+	// Test invalid unit
+	dates = nil
+	for dt := range period.Range("invalid", 1) {
+		dates = append(dates, dt)
+	}
+	if len(dates) != 1 {
+		t.Errorf("Expected 1 date for invalid unit (start date only), got %d", len(dates))
 	}
 }
 
@@ -447,4 +505,112 @@ func TestPeriodMinutesAndSeconds(t *testing.T) {
 	if inSeconds != expectedInSeconds {
 		t.Errorf("InSeconds(): expected %f, got %f", expectedInSeconds, inSeconds)
 	}
+
+	// Test negative period minutes and seconds
+	negativePeriod := NewPeriod(end, start)
+
+	negativeMinutes := negativePeriod.Minutes()
+	if negativeMinutes != -minutes {
+		t.Errorf("Expected -%d minutes for negative period, got %d", minutes, negativeMinutes)
+	}
+
+	negativeSeconds := negativePeriod.Seconds()
+	if negativeSeconds != -seconds {
+		t.Errorf("Expected -%d seconds for negative period, got %d", seconds, negativeSeconds)
+	}
+}
+
+// TestPeriodRangeByUnitWithContext tests the typed unit range method with context cancellation
+func TestPeriodRangeByUnitWithContext(t *testing.T) {
+	t.Run("Context cancellation stops iteration", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 10, 0, 0, 0, 0, time.UTC)
+		period := NewPeriod(start, end)
+
+		ctx, cancel := context.WithCancel(context.Background())
+
+		// Start iteration with typed unit
+		ch := period.RangeByUnitWithContext(ctx, UnitDay, 1)
+
+		received := 0
+		done := make(chan bool)
+
+		go func() {
+			defer func() { done <- true }()
+			for range ch {
+				received++
+				if received == 3 {
+					cancel() // Cancel after receiving 3 items
+					return
+				}
+			}
+		}()
+
+		<-done
+
+		if received != 3 {
+			t.Errorf("Expected to receive 3 items before cancellation, got %d", received)
+		}
+	})
+
+	t.Run("All typed units work correctly", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 1, 2, 0, 0, 0, time.UTC) // 2 hours
+		period := NewPeriod(start, end)
+
+		// Test hour unit
+		ctx := context.Background()
+		ch := period.RangeByUnitWithContext(ctx, UnitHour, 1)
+		count := 0
+		for range ch {
+			count++
+		}
+		if count != 3 { // 0, 1, 2 hours = 3 items
+			t.Errorf("Expected 3 hours, got %d", count)
+		}
+
+		// Test minute unit
+		ch = period.RangeByUnitWithContext(ctx, UnitMinute, 30)
+		count = 0
+		for range ch {
+			count++
+		}
+		if count != 5 { // 0, 30, 60, 90, 120 minutes = 5 items
+			t.Errorf("Expected 5 30-minute intervals, got %d", count)
+		}
+	})
+
+	t.Run("Invalid unit stops iteration", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 2, 0, 0, 0, 0, time.UTC)
+		period := NewPeriod(start, end)
+
+		ctx := context.Background()
+		// Use an invalid unit value
+		ch := period.RangeByUnitWithContext(ctx, Unit(999), 1)
+
+		count := 0
+		for range ch {
+			count++
+		}
+		if count != 1 {
+			t.Errorf("Expected 1 item for invalid unit (start date only), got %d", count)
+		}
+	})
+
+	t.Run("Week unit works correctly", func(t *testing.T) {
+		start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := Date(2023, time.January, 22, 0, 0, 0, 0, time.UTC) // 3 weeks
+		period := NewPeriod(start, end)
+
+		ctx := context.Background()
+		ch := period.RangeByUnitWithContext(ctx, UnitWeek, 1)
+		count := 0
+		for range ch {
+			count++
+		}
+		if count != 4 { // 0, 7, 14, 21 days = 4 items
+			t.Errorf("Expected 4 weeks, got %d", count)
+		}
+	})
 }
