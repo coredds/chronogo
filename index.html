@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoGo - Go DateTime Library Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .live-demo {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .live-demo h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .demo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .demo-input {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .demo-arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .demo-output {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: white;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section:nth-child(even) {
+            background: var(--surface);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Playground Styles */
+        .playground-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .demo-card {
+            background: var(--card);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .demo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--surface), white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-header p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .demo-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .before, .after {
+            padding: 1.5rem;
+        }
+
+        .before {
+            background: #fef2f2;
+            border-right: 1px solid var(--border);
+        }
+
+        .after {
+            background: #f0fdf4;
+        }
+
+        .before h4 {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .after h4 {
+            color: #16a34a;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .demo-showcase {
+            padding: 1.5rem;
+        }
+
+        .demo-showcase pre {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .demo-showcase .output {
+            display: block;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #065f46;
+            color: #6ee7b7;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+
+        /* Installation Section */
+        .install-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .install-step {
+            text-align: center;
+            padding: 2rem;
+            background: var(--card);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin: 0 auto 1rem;
+        }
+
+        .install-step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .install-command {
+            background: var(--code-bg);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .code-snippet pre {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 0;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-examples {
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .quick-examples h3 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
+        .examples-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .quick-example {
+            padding: 1.5rem;
+            background: var(--surface);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .quick-example h4 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-example code {
+            display: block;
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-example .result {
+            color: var(--success);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        footer {
+            background: var(--text);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .playground-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .demo-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .before {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .demo-container {
+                flex-direction: column;
+            }
+
+            .demo-input, .demo-output {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .cta-buttons, .examples-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="hero">
+                <h1>ChronoGo</h1>
+                <p>Experience the magic of intuitive datetime manipulation</p>
+                
+                <!-- Live Demo Section -->
+                <div class="live-demo">
+                    <h3>🚀 Try it live:</h3>
+                    <div class="demo-container">
+                        <div class="demo-input">
+                            <code>ChronoGo.Parse("2025-01-01").AddDays(100).DiffForHumans()</code>
+                        </div>
+                        <div class="demo-arrow">→</div>
+                        <div class="demo-output">
+                            <strong>"in 14 weeks"</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="badges">
+                    <span class="badge">🔥 v0.4.3</span>
+                    <span class="badge">⚡ 91.7% Coverage</span>
+                    <span class="badge">🛡️ Thread Safe</span>
+                    <span class="badge">💼 Business Ready</span>
+                </div>
+                <div class="cta-buttons">
+                    <a href="#playground" class="btn btn-primary">🎮 Interactive Playground</a>
+                    <a href="https://github.com/coredds/ChronoGo" class="btn btn-secondary" target="_blank">📚 GitHub</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="playground" class="section">
+        <div class="container">
+            <h2 class="section-title">🎮 Interactive Playground</h2>
+            <p class="section-subtitle">See ChronoGo's power in action with live, interactive examples</p>
+            
+            <div class="playground-grid">
+                <!-- Demo 1: Human Readable Times -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🕐 Human Readable Times</h3>
+                        <p>Turn timestamps into natural language</p>
+                    </div>
+                    <div class="demo-comparison">
+                        <div class="before">
+                            <h4>❌ Standard Go</h4>
+                            <pre><code>// Complex manual calculation
+now := time.Now()
+diff := future.Sub(now)
+days := int(diff.Hours() / 24)
+fmt.Sprintf("in %d days", days)</code></pre>
+                        </div>
+                        <div class="after">
+                            <h4>✅ ChronoGo Magic</h4>
+                            <pre><code>// One line of beauty
+future.DiffForHumans()
+// → "in 2 weeks"
+// → "3 hours ago"
+// → "next month"</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo 2: Timezone Mastery -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🌍 Timezone Wizardry</h3>
+                        <p>Effortless timezone conversions</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>meeting := ChronoGo.Parse("2025-01-15 14:00")
+  .InTimezone("America/New_York")
+
+// Show in multiple timezones
+fmt.Println("NYC:", meeting.Format("15:04"))
+fmt.Println("Tokyo:", meeting.InTimezone("Asia/Tokyo").Format("15:04"))
+fmt.Println("London:", meeting.InTimezone("Europe/London").Format("15:04"))
+
+<span class="output">
+NYC: 14:00
+Tokyo: 04:00 (next day)
+London: 19:00
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 3: Business Days -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>💼 Business Date Magic</h3>
+                        <p>Skip weekends and holidays automatically</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Project deadline in 10 business days
+deadline := ChronoGo.Today().AddBusinessDays(10)
+
+// Check if it's a holiday
+isHoliday := deadline.IsHoliday()
+
+// Get next business day if needed
+nextWorkday := deadline.NextBusinessDay()
+
+<span class="output">
+✅ Automatically skips weekends
+✅ Handles US holidays 
+✅ Custom holiday support
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 4: Fluent Chaining -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>⛓️ Fluent API Power</h3>
+                        <p>Chain operations naturally</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Complex date manipulation in one line
+result := ChronoGo.Now()
+  .StartOfMonth()
+  .AddDays(15)
+  .SetHour(14)
+  .SetMinute(30)
+  .InTimezone("Europe/Paris")
+  .Format("2006-01-02 15:04 MST")
+
+<span class="output">
+2025-01-16 14:30 CET
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 5: Period Iteration -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🔄 Smart Iteration</h3>
+                        <p>Loop through time periods effortlessly</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Generate a week's schedule
+start := ChronoGo.Date(2025, 1, 13) // Monday
+end := start.AddDays(7)
+period := ChronoGo.NewPeriod(start, end)
+
+// Every 6 hours for a week
+for _, time := range period.RangeByUnitSlice(ChronoGo.Hour, 6) {
+    fmt.Println(time.Format("Mon 15:04"))
+}
+
+<span class="output">
+Mon 00:00, Mon 06:00, Mon 12:00, Mon 18:00
+Tue 00:00, Tue 06:00, Tue 12:00, Tue 18:00
+... (automatic iteration)
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 6: Parsing Power -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🧠 Intelligent Parsing</h3>
+                        <p>Parse any format automatically</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// All of these work automatically:
+dates := []string{
+    "2025-01-15T14:30:00Z",
+    "Jan 15, 2025 2:30 PM",
+    "15/01/2025 14:30",
+    "1737470400", // Unix timestamp
+    "tomorrow at 3pm",
+}
+
+for _, dateStr := range dates {
+    dt, _ := ChronoGo.Parse(dateStr)
+    fmt.Println(dt.Format("2006-01-02 15:04"))
+}
+
+<span class="output">
+✅ ISO 8601
+✅ Natural language  
+✅ Regional formats
+✅ Unix timestamps
+✅ Smart detection
+</span></code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="installation" class="section">
+        <div class="container">
+            <h2 class="section-title">🚀 Get Started in Seconds</h2>
+            <p class="section-subtitle">Add ChronoGo to your project and start building amazing datetime experiences</p>
+            
+            <div class="install-flow">
+                <div class="install-step">
+                    <div class="step-number">1</div>
+                    <h3>Install</h3>
+                    <div class="install-command">
+                        <code>go get github.com/coredds/ChronoGo</code>
+                        <button class="copy-btn" onclick="copyToClipboard('go get github.com/coredds/ChronoGo')">📋</button>
+                    </div>
+                </div>
+                
+                <div class="install-step">
+                    <div class="step-number">2</div>
+                    <h3>Import</h3>
+                    <div class="code-snippet">
+                        <pre><code class="language-go">import "github.com/coredds/ChronoGo"</code></pre>
+                    </div>
+                </div>
+                
+                <div class="install-step">
+                    <div class="step-number">3</div>
+                    <h3>Use</h3>
+                    <div class="code-snippet">
+                        <pre><code class="language-go">dt := ChronoGo.Now().AddDays(30)
+fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-examples">
+                <h3>⚡ Quick Examples</h3>
+                <div class="examples-row">
+                    <div class="quick-example">
+                        <h4>Parse & Format</h4>
+                        <code>ChronoGo.Parse("2025-01-15").Format("Jan 2, 2006")</code>
+                        <span class="result">→ "Jan 15, 2025"</span>
+                    </div>
+                    <div class="quick-example">
+                        <h4>Business Days</h4>
+                        <code>ChronoGo.Today().AddBusinessDays(5)</code>
+                        <span class="result">→ Next Friday (skips weekends)</span>
+                    </div>
+                    <div class="quick-example">
+                        <h4>Human Time</h4>
+                        <code>someTime.DiffForHumans()</code>
+                        <span class="result">→ "2 hours ago"</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <a href="https://pkg.go.dev/github.com/coredds/ChronoGo" class="btn btn-primary" target="_blank">📖 Full Documentation</a>
+                <a href="https://github.com/coredds/ChronoGo/blob/main/example_test.go" class="btn btn-secondary" target="_blank">🔬 More Examples</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/coredds/ChronoGo" target="_blank">GitHub</a>
+                <a href="https://pkg.go.dev/github.com/coredds/ChronoGo" target="_blank">Documentation</a>
+                <a href="https://github.com/coredds/ChronoGo/blob/main/LICENSE" target="_blank">License</a>
+            </div>
+            <p>&copy; 2025 ChronoGo. Built with ❤️ for Go developers.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show feedback
+                event.target.textContent = '✅';
+                setTimeout(() => {
+                    event.target.textContent = '📋';
+                }, 1000);
+            });
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
