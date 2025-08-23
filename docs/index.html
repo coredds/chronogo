@@ -8,19 +8,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
+            --primary: #22c55e;
+            --primary-dark: #16a34a;
+            --secondary: #65a30d;
+            --success: #22c55e;
+            --warning: #84cc16;
             --error: #ef4444;
             --background: #ffffff;
-            --surface: #f8fafc;
+            --surface: #f0fdf4;
             --card: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --code-bg: #1e293b;
+            --text: #14532d;
+            --text-light: #4d7c0f;
+            --border: #bbf7d0;
+            --code-bg: #14532d;
+            --classical: #166534;
+            --adaptive: #86efac;
+            --shaping: #22c55e;
+            --visionary: #bbf7d0;
+            --renewal: #15803d;
         }
 
         * {
@@ -107,7 +112,7 @@
         }
 
         .demo-output {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, var(--success), var(--primary-dark));
             padding: 1rem 1.5rem;
             border-radius: 0.5rem;
             font-family: 'JetBrains Mono', monospace;
@@ -254,7 +259,7 @@
         }
 
         .after {
-            background: #f0fdf4;
+            background: var(--surface);
         }
 
         .before h4 {
@@ -265,7 +270,7 @@
         }
 
         .after h4 {
-            color: #16a34a;
+            color: var(--primary-dark);
             font-size: 0.875rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -291,8 +296,8 @@
             display: block;
             margin-top: 1rem;
             padding: 1rem;
-            background: #065f46;
-            color: #6ee7b7;
+            background: var(--classical);
+            color: var(--adaptive);
             border-radius: 0.375rem;
             font-weight: 500;
         }
@@ -381,7 +386,7 @@
         }
 
         .quick-example h4 {
-            color: var(--primary);
+            color: var(--primary-dark);
             font-size: 1rem;
             margin-bottom: 0.75rem;
         }
@@ -427,7 +432,7 @@
         }
 
         footer {
-            background: var(--text);
+            background: var(--classical);
             color: white;
             text-align: center;
             padding: 3rem 0;
@@ -497,11 +502,11 @@
         <div class="container">
             <div class="hero">
                 <h1>ChronoGo</h1>
-                <p>Experience the magic of intuitive datetime manipulation</p>
+                <p>Experience the magic of intuitive datetime manipulation in Go</p>
                 
                 <!-- Live Demo Section -->
                 <div class="live-demo">
-                    <h3>🚀 Try it live:</h3>
+                    <h3>🚀 See it in action:</h3>
                     <div class="demo-container">
                         <div class="demo-input">
                             <code>ChronoGo.Parse("2025-01-01").AddDays(100).DiffForHumans()</code>
@@ -520,7 +525,7 @@
                     <span class="badge">💼 Business Ready</span>
                 </div>
                 <div class="cta-buttons">
-                    <a href="#playground" class="btn btn-primary">🎮 Interactive Playground</a>
+                    <a href="#playground" class="btn btn-primary">🎮 See Examples</a>
                     <a href="https://github.com/coredds/ChronoGo" class="btn btn-secondary" target="_blank">📚 GitHub</a>
                 </div>
             </div>
@@ -529,15 +534,15 @@
 
     <section id="playground" class="section">
         <div class="container">
-            <h2 class="section-title">🎮 Interactive Playground</h2>
-            <p class="section-subtitle">See ChronoGo's power in action with live, interactive examples</p>
+            <h2 class="section-title">🎮 Code Examples</h2>
+            <p class="section-subtitle">See ChronoGo's power in action with these example code demonstrations</p>
             
             <div class="playground-grid">
                 <!-- Demo 1: Human Readable Times -->
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>🕐 Human Readable Times</h3>
-                        <p>Turn timestamps into natural language</p>
+                        <p>Transform timestamps into natural language expressions</p>
                     </div>
                     <div class="demo-comparison">
                         <div class="before">
@@ -563,7 +568,7 @@ future.DiffForHumans()
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>🌍 Timezone Wizardry</h3>
-                        <p>Effortless timezone conversions</p>
+                        <p>Seamless timezone conversions and management</p>
                     </div>
                     <div class="demo-showcase">
                         <pre><code>meeting := ChronoGo.Parse("2025-01-15 14:00")
@@ -680,6 +685,100 @@ for _, dateStr := range dates {
 ✅ Regional formats
 ✅ Unix timestamps
 ✅ Smart detection
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 7: Age Calculations -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🎂 Age & Duration Magic</h3>
+                        <p>Calculate ages, anniversaries, and precise durations</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Calculate someone's exact age
+birthday := ChronoGo.Date(1990, 5, 15)
+age := birthday.Age()
+fmt.Printf("Age: %d years, %d months, %d days\n", 
+    age.Years, age.Months, age.Days)
+
+// Days until next birthday
+nextBirthday := birthday.NextAnniversary()
+daysUntil := ChronoGo.Now().DiffInDays(nextBirthday)
+
+// Work anniversary
+startDate := ChronoGo.Date(2020, 3, 1)
+tenure := startDate.DiffForHumans()
+
+<span class="output">
+Age: 35 years, 3 months, 8 days
+Next birthday: in 264 days
+Work tenure: 5 years ago
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 8: Time Comparisons -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>⚖️ Smart Time Comparisons</h3>
+                        <p>Intuitive date comparisons and validations</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Event planning made easy
+eventDate := ChronoGo.Parse("2025-12-25")
+now := ChronoGo.Now()
+
+// Multiple comparison methods
+isUpcoming := eventDate.IsFuture()
+isPast := eventDate.IsPast()
+isToday := eventDate.IsToday()
+isWeekend := eventDate.IsWeekend()
+isThisYear := eventDate.IsCurrentYear()
+
+// Relative comparisons
+isInDecember := eventDate.IsInMonth(12)
+isSoon := eventDate.IsBetween(now, now.AddDays(30))
+
+<span class="output">
+✅ Future event: true
+✅ This year: true  
+✅ Weekend: false
+✅ Coming soon: false
+✅ In December: true
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 9: Calendar Operations -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>📅 Calendar Intelligence</h3>
+                        <p>Navigate months, quarters, and calendar periods</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Financial quarters and reporting
+today := ChronoGo.Today()
+quarter := today.Quarter()
+quarterStart := today.StartOfQuarter()
+quarterEnd := today.EndOfQuarter()
+
+// Get all Mondays in current month
+firstMonday := today.StartOfMonth().NextWeekday(time.Monday)
+var mondays []ChronoGo.DateTime
+for monday := firstMonday; monday.Month() == today.Month(); monday = monday.AddDays(7) {
+    mondays = append(mondays, monday)
+}
+
+// Fiscal year calculations
+fiscalYearStart := today.StartOfFiscalYear(4) // April start
+
+<span class="output">
+Current Quarter: Q3
+Q3 Start: 2025-07-01
+Q3 End: 2025-09-30
+Mondays in Aug: [Aug 4, Aug 11, Aug 18, Aug 25]
+Fiscal Year: 2025-04-01
 </span></code></pre>
                     </div>
                 </div>
