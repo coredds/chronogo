@@ -614,3 +614,209 @@ func TestPeriodRangeByUnitWithContext(t *testing.T) {
 		}
 	})
 }
+
+func TestRangeByUnitSlice(t *testing.T) {
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 5, 0, 0, 0, 0, time.UTC)
+	period := NewPeriod(start, end)
+
+	tests := []struct {
+		name     string
+		unit     Unit
+		step     []int
+		expected int
+	}{
+		{"Daily step 1", UnitDay, []int{1}, 5}, // Jan 1, 2, 3, 4, 5
+		{"Daily step 2", UnitDay, []int{2}, 3}, // Jan 1, 3, 5
+		{"Default step", UnitDay, nil, 5},      // Default step should be 1
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var result []DateTime
+			if test.step == nil {
+				result = period.RangeByUnitSlice(test.unit)
+			} else {
+				result = period.RangeByUnitSlice(test.unit, test.step[0])
+			}
+
+			if len(result) != test.expected {
+				t.Errorf("RangeByUnitSlice %s: expected %d items, got %d", test.name, test.expected, len(result))
+			}
+
+			// Verify first and last elements
+			if len(result) > 0 {
+				if !result[0].Equal(period.Start) {
+					t.Errorf("First element should equal period start")
+				}
+				// Check if the last element is within the period
+				if result[len(result)-1].After(period.End) {
+					t.Errorf("Last element should not exceed period end")
+				}
+			}
+
+			// Verify slice is properly ordered
+			for i := 1; i < len(result); i++ {
+				if !result[i].After(result[i-1]) {
+					t.Errorf("RangeByUnitSlice should return chronologically ordered slice")
+				}
+			}
+		})
+	}
+}
+
+// Test with smaller time ranges to avoid memory issues
+func TestRangeByUnitSliceHourly(t *testing.T) {
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 1, 6, 0, 0, 0, time.UTC) // Just 6 hours
+	period := NewPeriod(start, end)
+
+	result := period.RangeByUnitSlice(UnitHour, 1)
+	expected := 7 // 0, 1, 2, 3, 4, 5, 6 hours
+
+	if len(result) != expected {
+		t.Errorf("Hourly RangeByUnitSlice: expected %d items, got %d", expected, len(result))
+	}
+}
+
+func TestRangeByUnitSliceComparison(t *testing.T) {
+	// Compare RangeByUnitSlice with RangeByUnit to ensure same results
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 8, 0, 0, 0, 0, time.UTC)
+	period := NewPeriod(start, end)
+
+	// Get results from both methods
+	slice := period.RangeByUnitSlice(UnitDay, 1)
+
+	var iterator []DateTime
+	for dt := range period.RangeByUnit(UnitDay, 1) {
+		iterator = append(iterator, dt)
+	}
+
+	if len(slice) != len(iterator) {
+		t.Errorf("RangeByUnitSlice and RangeByUnit should return same number of items: slice=%d, iterator=%d",
+			len(slice), len(iterator))
+	}
+
+	// Compare each element
+	for i := 0; i < len(slice) && i < len(iterator); i++ {
+		if !slice[i].Equal(iterator[i]) {
+			t.Errorf("Element %d differs: slice=%v, iterator=%v", i, slice[i], iterator[i])
+		}
+	}
+}
+
+func TestFastRangeDays(t *testing.T) {
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 5, 0, 0, 0, 0, time.UTC)
+	period := NewPeriod(start, end)
+
+	tests := []struct {
+		name     string
+		step     []int
+		expected int
+	}{
+		{"Step 1", []int{1}, 5},  // Jan 1, 2, 3, 4, 5
+		{"Step 2", []int{2}, 3},  // Jan 1, 3, 5
+		{"Step 3", []int{3}, 2},  // Jan 1, 4
+		{"Default step", nil, 5}, // Default step should be 1
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var result []DateTime
+			if test.step == nil {
+				result = period.FastRangeDays()
+			} else {
+				result = period.FastRangeDays(test.step[0])
+			}
+
+			if len(result) != test.expected {
+				t.Errorf("FastRangeDays %s: expected %d items, got %d", test.name, test.expected, len(result))
+			}
+
+			// Verify first and last elements
+			if len(result) > 0 {
+				if !result[0].Equal(period.Start) {
+					t.Errorf("First element should equal period start")
+				}
+				// Check that the last element doesn't exceed the period end
+				if result[len(result)-1].After(period.End) {
+					t.Errorf("Last element should not exceed period end")
+				}
+			}
+
+			// Verify all elements are at midnight (start of day)
+			for i, dt := range result {
+				if dt.Hour() != 0 || dt.Minute() != 0 || dt.Second() != 0 || dt.Nanosecond() != 0 {
+					t.Errorf("Element %d should be at midnight: %v", i, dt)
+				}
+			}
+
+			// Verify step size
+			if len(result) > 1 && test.step != nil {
+				step := test.step[0]
+				for i := 1; i < len(result); i++ {
+					diff := result[i].Sub(result[i-1]).Hours() / 24 // days
+					if int(diff) != step {
+						t.Errorf("Step size should be %d days, got %f", step, diff)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestFastRangeDaysComparison(t *testing.T) {
+	// Compare FastRangeDays with RangeDays to ensure same results
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 10, 0, 0, 0, 0, time.UTC)
+	period := NewPeriod(start, end)
+
+	// Get results from both methods
+	fast := period.FastRangeDays(1)
+
+	var standard []DateTime
+	for dt := range period.RangeDays() {
+		standard = append(standard, dt)
+	}
+
+	if len(fast) != len(standard) {
+		t.Errorf("FastRangeDays and RangeDays should return same number of items: fast=%d, standard=%d",
+			len(fast), len(standard))
+	}
+
+	// Compare each element
+	for i := 0; i < len(fast) && i < len(standard); i++ {
+		if !fast[i].Equal(standard[i]) {
+			t.Errorf("Element %d differs: fast=%v, standard=%v", i, fast[i], standard[i])
+		}
+	}
+}
+
+func TestRangeByUnitSliceInvalidUnit(t *testing.T) {
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 5, 0, 0, 0, 0, time.UTC)
+	period := NewPeriod(start, end)
+
+	// Test with invalid unit (use a Unit value that doesn't exist)
+	invalidUnit := Unit(999) // Not defined in the enum
+	result := period.RangeByUnitSlice(invalidUnit)
+	if len(result) != 0 {
+		t.Errorf("Invalid unit should return empty slice, got %d items", len(result))
+	}
+}
+
+func TestRangeByUnitSliceZeroStep(t *testing.T) {
+	start := Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2023, time.January, 5, 0, 0, 0, 0, time.UTC)
+	period := NewPeriod(start, end)
+
+	// Test with zero step (should default to 1)
+	result := period.RangeByUnitSlice(UnitDay, 0)
+	expected := 5 // Should behave like step=1
+
+	if len(result) != expected {
+		t.Errorf("Zero step should default to 1: expected %d items, got %d", expected, len(result))
+	}
+}

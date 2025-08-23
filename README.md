@@ -1,42 +1,26 @@
 # ChronoGo
 
-[![Version](https://img.shields.io/badge/version-v0.4.2-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.4.3-green.svg)](https://github.com/coredds/ChronoGo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/coredds/ChronoGo/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/ChronoGo)
 [![Go Reference](https://pkg.go.dev/badge/github.com/coredds/ChronoGo.svg)](https://pkg.go.dev/github.com/coredds/ChronoGo)
 
-**ChronoGo** is a Go implementation inspired by Python's [Pendulum](https://pendulum.eustace.io/) library. It provides a powerful and easy-to-use datetime and timezone library that enhances Go's standard `time` package with a fluent API, better timezone handling, and human-friendly datetime operations.
+ChronoGo is a comprehensive Go datetime library inspired by Python's Pendulum. It provides a powerful, fluent API that enhances Go's standard time package with better timezone handling, human-friendly operations, and extensive business date functionality.
 
-## Table of Contents
+## Key Features
 
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [API Reference](#api-reference)
-- [Advanced Usage](#advanced-usage)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
-- [Roadmap](#roadmap)
-- [Changelog](#changelog)
-
-## Features
-
-- **Drop-in enhancement** of Go's `time.Time` with extended functionality
-- **Robust timezone support** with proper DST handling
-- **Fluent API** with method chaining for intuitive date/time manipulation
-- **Human-readable** time differences ("2 hours ago", "in 3 days")
-- **Immutable** datetime operations (methods return new instances)
-- **Period and Duration** types for time intervals with iteration support
-- **Comprehensive parsing** for common datetime formats
-- **Thread-safe** operations
-- **Well-tested** with extensive unit test coverage
-- **Serialization-ready**: JSON/Text marshalers and SQL driver integration
-- **Unix helpers**: conversions and constructors for seconds/ms/µs/ns
-- **Utilities**: Truncate/Round to common units; Clamp/Between range helpers; typed units for safe iteration
-- **Business date operations**: Holiday checking, business day calculations, working day arithmetic
+- **Enhanced DateTime Type**: Drop-in enhancement of Go's time.Time with extended functionality
+- **Robust Timezone Support**: Proper DST handling with optimized timezone operations
+- **Fluent API**: Method chaining for intuitive date/time manipulation
+- **Human-Readable Output**: Time differences like "2 hours ago" and "in 3 days"
+- **Immutable Operations**: All methods return new instances for thread safety
+- **Period and Duration Types**: Time intervals with powerful iteration capabilities
+- **Comprehensive Parsing**: Support for common datetime formats with intelligent detection
+- **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic
+- **Serialization Support**: Built-in JSON/Text marshalers and SQL driver integration
+- **High Performance**: Optimized operations with extensive test coverage (91.7%)
 
 ## Installation
 
@@ -50,124 +34,84 @@ go get github.com/coredds/ChronoGo
 package main
 
 import (
-	"fmt"
-	"github.com/coredds/ChronoGo"
+    "fmt"
+    "github.com/coredds/ChronoGo"
 )
 
 func main() {
-	// Create a new datetime instance
-	dt := ChronoGo.Now().AddDays(3).InTimezone("America/New_York")
-	fmt.Println(dt.HumanString()) // Output: "in 3 days"
+    // Create and manipulate datetime instances
+    dt := ChronoGo.Now().AddDays(3).InTimezone("America/New_York")
+    fmt.Println(dt.HumanString()) // "in 3 days"
+    
+    // Business date calculations
+    workday := ChronoGo.Today().AddBusinessDays(5)
+    fmt.Println(workday.Format("2006-01-02"))
+    
+    // Period iteration
+    period := ChronoGo.NewPeriod(ChronoGo.Now(), ChronoGo.Now().AddDays(7))
+    for _, day := range period.Days() {
+        fmt.Println(day.Format("Monday, January 2"))
+    }
 }
 ```
 
-## API Reference
+## Core Components
 
-Refer to the [Go Reference Documentation](https://pkg.go.dev/github.com/coredds/ChronoGo) for detailed API descriptions and examples.
+### DateTime Operations
+- **Creation**: Now(), Today(), Date(), FromUnix(), Parse()
+- **Manipulation**: Add/Subtract time units with fluent API
+- **Formatting**: Standard Go layouts plus human-readable output
+- **Timezone**: Convert between timezones with proper DST handling
+- **Comparison**: Before(), After(), Between(), Equal() methods
 
-## Advanced Usage
+### Business Date Support
+- **Holiday Management**: US holidays with custom holiday support
+- **Business Days**: Calculate working days excluding weekends and holidays
+- **Working Day Arithmetic**: Add/subtract business days with holiday awareness
 
-### Business Date Operations
-```go
-package main
+### Period and Duration
+- **Period Type**: Represents time intervals between two datetime instances
+- **Range Operations**: Iterate over periods by day, hour, or custom units
+- **Duration Extensions**: Human-readable duration formatting and calculations
 
-import (
-	"fmt"
-	"github.com/coredds/ChronoGo"
-)
+### Parsing and Serialization
+- **Intelligent Parsing**: Automatic format detection for common datetime patterns
+- **Multiple Formats**: ISO8601, RFC3339, Unix timestamps, and custom formats
+- **JSON/SQL Support**: Built-in marshaling for database and API integration
 
-func main() {
-	// Subtract business days
-	dt := ChronoGo.Today().SubtractBusinessDays(5)
-	fmt.Println(dt) // Output: Date 5 business days ago
-}
-```
+## Documentation
 
-### Serialization
-ChronoGo supports JSON and SQL serialization:
-```go
-package main
-
-import (
-	"encoding/json"
-	"fmt"
-	"github.com/coredds/ChronoGo"
-)
-
-func main() {
-	dt := ChronoGo.Now()
-	jsonData, _ := json.Marshal(dt)
-	fmt.Println(string(jsonData)) // Output: JSON representation of datetime
-}
-```
-
-### Period Iteration
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/coredds/ChronoGo"
-)
-
-func main() {
-	period := ChronoGo.NewPeriod(ChronoGo.Now(), ChronoGo.Now().AddDays(10))
-	for _, day := range period.Days() {
-		fmt.Println(day)
-	}
-}
-```
+For detailed API documentation and examples, visit [pkg.go.dev/github.com/coredds/ChronoGo](https://pkg.go.dev/github.com/coredds/ChronoGo).
 
 ## Testing
 
-Run tests and check coverage:
+Run the test suite with coverage:
 ```bash
-go test ./... -cover
+go test -cover ./...
 ```
+
+Current test coverage: 91.7% with comprehensive safety checks and edge case handling.
 
 ## Contributing
 
-We welcome contributions! Please follow these steps:
+Contributions are welcome! Please:
 
-1. Fork the repository.
-2. Create a new branch for your feature or bugfix.
-3. Write tests for your changes.
-4. Ensure all tests pass.
-5. Submit a pull request.
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass and linting is clean
+5. Submit a pull request
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Roadmap
-**Completed in v0.2.0+**
-- Enhanced utility methods (StartOfDay, EndOfDay, etc.)
-- Weekend and weekday detection  
-- Quarter operations and ISO week support
-- Fluent API for method chaining
-- Enhanced duration type with human-readable operations
-- Additional date utility methods (v0.2.2)
+## Version History
 
-**Completed in v0.3.0+**
-- Business day calculations and holiday support
-- Enhanced error handling with helpful suggestions
-- Must functions for constants
-- Comprehensive developer documentation
+- **v0.4.3**: Enhanced test coverage (91.7%), improved safety checks, optimized DST handling
+- **v0.4.2**: GitHub Actions CI/CD, comprehensive linting, automated dependency management
+- **v0.4.0**: Business day operations, enhanced error handling, developer documentation
+- **v0.3.0**: Holiday support, must functions, comprehensive validation
+- **v0.2.0**: Fluent API, enhanced utilities, duration improvements
 
-**Completed in v0.4.0+**
-- GitHub Actions CI/CD pipeline with automated testing and releases
-- Comprehensive linting and code quality checks
-- Enhanced test coverage (90.7%)
-- Automated dependency management with Dependabot
-
-**Planned Features**
-- Localization support for human-readable strings
-- Recurrence rules (RRULE support)
-- More international holiday sets
-- Duration parsing from strings
-- More comprehensive DST transition handling
-- Performance optimizations
-- Benchmark tests and performance profiling
-
-## Changelog
-See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.

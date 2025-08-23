@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] - 2025-08-23
+
+### Added
+- Comprehensive optimization function tests with 91.7% total coverage
+- Safety mechanisms for RangeByUnitSlice and FastRangeDays functions
+- DST optimization with IsDSTOptimized and related caching functions
+- Parse optimization with ParseOptimized and detectLayout functions
+- Enhanced error handling for edge cases and invalid inputs
+
+### Fixed
+- TestRangeByUnitSlice crash prevention with iteration and capacity limits
+- DST detection logic for proper daylight saving time identification
+- Compact date format parsing (e.g., "20231225") prioritization
+- Layout detection for space-separated datetime formats
+- Empty string handling in utility functions
+
+### Changed
+- Improved README structure and cohesion without redundant information
+- Enhanced code formatting and lint compliance
+- Optimized timezone operations with caching mechanisms
+
+### Security
+- Added comprehensive safety checks to prevent infinite loops and memory exhaustion
+- Implemented iteration limits (max 1000) and capacity constraints
+- Enhanced input validation for all optimization functions
+
 ## [0.4.2] - 2025-08-20
 
 ### Added
@@ -188,7 +214,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.4.2...HEAD
+[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/coredds/ChronoGo/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/coredds/ChronoGo/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/coredds/ChronoGo/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/coredds/ChronoGo/compare/v0.3.0...v0.4.0

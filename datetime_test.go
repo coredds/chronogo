@@ -1216,3 +1216,143 @@ func TestSQLDriverInterfaces(t *testing.T) {
 		t.Error("Scan() with invalid type should return error")
 	}
 }
+
+func TestIsDSTOptimized(t *testing.T) {
+	// Clear cache before testing
+	ClearDSTCache()
+
+	tests := []struct {
+		name     string
+		location string
+		datetime string
+		expected bool
+	}{
+		{"New York summer (DST)", "America/New_York", "2023-07-15 15:30:45", true},
+		{"New York winter (no DST)", "America/New_York", "2023-01-15 15:30:45", false},
+		{"London summer (BST)", "Europe/London", "2023-07-15 15:30:45", true},
+		{"London winter (GMT)", "Europe/London", "2023-01-15 15:30:45", false},
+		{"UTC (never DST)", "UTC", "2023-07-15 15:30:45", false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			loc, err := time.LoadLocation(test.location)
+			if err != nil {
+				t.Skipf("Could not load location %s: %v", test.location, err)
+			}
+
+			dt, err := ParseInLocation(test.datetime, loc)
+			if err != nil {
+				t.Fatalf("Could not parse datetime %s: %v", test.datetime, err)
+			}
+
+			result := dt.IsDSTOptimized()
+			if result != test.expected {
+				t.Errorf("IsDSTOptimized() for %s: expected %v, got %v", test.name, test.expected, result)
+			}
+
+			// Test that cached result is the same
+			cachedResult := dt.IsDSTOptimized()
+			if cachedResult != result {
+				t.Errorf("Cached IsDSTOptimized() result differs: expected %v, got %v", result, cachedResult)
+			}
+
+			// Compare with original IsDST method
+			originalResult := dt.IsDST()
+			if result != originalResult {
+				t.Errorf("IsDSTOptimized() differs from IsDST(): optimized=%v, original=%v", result, originalResult)
+			}
+		})
+	}
+}
+
+func TestIsDSTOptimizedUTCFastPath(t *testing.T) {
+	// Test UTC fast path
+	utcTime := NowUTC()
+	result := utcTime.IsDSTOptimized()
+	if result {
+		t.Error("UTC time should never be in DST")
+	}
+}
+
+func TestIsDSTOptimizedCaching(t *testing.T) {
+	ClearDSTCache()
+
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Skip("Could not load America/New_York timezone")
+	}
+
+	// Test caching across different dates in same year
+	summer1 := Date(2023, 7, 15, 12, 0, 0, 0, loc)
+	summer2 := Date(2023, 8, 15, 12, 0, 0, 0, loc)
+
+	result1 := summer1.IsDSTOptimized()
+	result2 := summer2.IsDSTOptimized()
+
+	if result1 != result2 {
+		t.Error("DST results should be same for dates in same year with same DST status")
+	}
+
+	// Test different years
+	summer2024 := Date(2024, 7, 15, 12, 0, 0, 0, loc)
+	result2024 := summer2024.IsDSTOptimized()
+
+	// Should still work correctly (caching per year)
+	if !result2024 {
+		t.Error("Summer 2024 should be in DST in New York")
+	}
+}
+
+func TestClearDSTCache(t *testing.T) {
+	// Add some entries to cache
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Skip("Could not load America/New_York timezone")
+	}
+
+	dt := Date(2023, 7, 15, 12, 0, 0, 0, loc)
+	_ = dt.IsDSTOptimized() // This should populate the cache
+
+	// Clear cache
+	ClearDSTCache()
+
+	// This should work without issues after clearing
+	result := dt.IsDSTOptimized()
+	if !result {
+		t.Error("IsDSTOptimized should still work after cache clear")
+	}
+}
+
+func TestGetStandardOffsetOptimized(t *testing.T) {
+	tests := []struct {
+		location string
+		year     int
+	}{
+		{"America/New_York", 2023},
+		{"Europe/London", 2023},
+		{"UTC", 2023},
+		{"America/New_York", 2024},
+	}
+
+	for _, test := range tests {
+		t.Run(test.location, func(t *testing.T) {
+			loc, err := time.LoadLocation(test.location)
+			if err != nil {
+				t.Skipf("Could not load location %s: %v", test.location, err)
+			}
+
+			offset := getStandardOffsetOptimized(loc, test.year)
+
+			// Basic sanity check - offset should be reasonable
+			if offset < -43200 || offset > 43200 { // -12 to +12 hours in seconds
+				t.Errorf("getStandardOffsetOptimized returned unreasonable offset: %d", offset)
+			}
+
+			// For UTC, offset should be 0
+			if test.location == "UTC" && offset != 0 {
+				t.Errorf("UTC standard offset should be 0, got %d", offset)
+			}
+		})
+	}
+}

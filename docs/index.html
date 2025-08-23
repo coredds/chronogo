@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoGo - Go DateTime Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--surface);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: var(--surface);
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section:nth-child(even) {
+            background: var(--surface);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .example-card {
+            background: var(--card);
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .example-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .example-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .example-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .code-block {
+            position: relative;
+            background: var(--code-bg);
+            margin: 0;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.75rem;
+        }
+
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .feature-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .install-section {
+            background: linear-gradient(135deg, var(--surface), white);
+            text-align: center;
+        }
+
+        .install-command {
+            background: var(--code-bg);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.125rem;
+            display: inline-block;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        footer {
+            background: var(--text);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.05));
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="hero">
+                <h1>ChronoGo</h1>
+                <p>A powerful and elegant Go datetime library inspired by Python's Pendulum</p>
+                <div class="badges">
+                    <span class="badge">Go 1.21+</span>
+                    <span class="badge">91.7% Test Coverage</span>
+                    <span class="badge">Thread Safe</span>
+                    <span class="badge">MIT License</span>
+                </div>
+                <div class="cta-buttons">
+                    <a href="#installation" class="btn btn-primary">Get Started</a>
+                    <a href="https://pkg.go.dev/github.com/coredds/ChronoGo" class="btn btn-secondary" target="_blank">Documentation</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="https://github.com/coredds/ChronoGo" target="_blank">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="section-title">Why Choose ChronoGo?</h2>
+            <p class="section-subtitle">Built for developers who need reliable, intuitive datetime handling in Go</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🕒</div>
+                    <h3 class="feature-title">Fluent API</h3>
+                    <p class="feature-description">Chain methods naturally for intuitive date manipulation. Create readable code that expresses your intent clearly.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Timezone Mastery</h3>
+                    <p class="feature-description">Robust timezone support with proper DST handling. Convert between timezones with confidence and accuracy.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3 class="feature-title">Human Friendly</h3>
+                    <p class="feature-description">Generate human-readable time differences like "2 hours ago" and "in 3 days" for better user experiences.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Thread Safe</h3>
+                    <p class="feature-description">Immutable operations ensure thread safety. All methods return new instances, preventing race conditions.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <h3 class="feature-title">Business Ready</h3>
+                    <p class="feature-description">Built-in support for business days, holidays, and working day calculations for enterprise applications.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">High Performance</h3>
+                    <p class="feature-description">Optimized operations with caching and smart parsing. Designed for production workloads.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="examples" class="section">
+        <div class="container">
+            <h2 class="section-title">See ChronoGo in Action</h2>
+            <p class="section-subtitle">Explore real-world examples showcasing ChronoGo's powerful features</p>
+            
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="example-header">
+                        <h3 class="example-title">Basic Operations</h3>
+                        <p class="example-description">Create, manipulate, and format datetime instances with ease</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "github.com/coredds/ChronoGo"
+)
+
+func main() {
+    // Create datetime instances
+    now := ChronoGo.Now()
+    today := ChronoGo.Today()
+    
+    // Fluent API for date manipulation
+    future := now.AddDays(7).AddHours(3).AddMinutes(30)
+    
+    // Format output
+    fmt.Println("Now:", now.Format("2006-01-02 15:04:05"))
+    fmt.Println("Future:", future.Format("Monday, January 2, 2006"))
+    fmt.Println("Human:", future.DiffForHumans(now))
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-header">
+                        <h3 class="example-title">Timezone Conversions</h3>
+                        <p class="example-description">Handle multiple timezones with proper DST support</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "github.com/coredds/ChronoGo"
+)
+
+func main() {
+    // Create in UTC
+    utc := ChronoGo.UTC(2023, 12, 25, 15, 30, 0)
+    
+    // Convert to different timezones
+    ny := utc.InTimezone("America/New_York")
+    tokyo := utc.InTimezone("Asia/Tokyo")
+    london := utc.InTimezone("Europe/London")
+    
+    fmt.Println("UTC:    ", utc.Format("15:04 MST"))
+    fmt.Println("New York:", ny.Format("15:04 MST"))
+    fmt.Println("Tokyo:  ", tokyo.Format("15:04 MST"))
+    fmt.Println("London: ", london.Format("15:04 MST"))
+    
+    // Check if DST is active
+    fmt.Println("DST in NY:", ny.IsDST())
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-header">
+                        <h3 class="example-title">Business Date Operations</h3>
+                        <p class="example-description">Calculate business days and handle holidays effortlessly</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "github.com/coredds/ChronoGo"
+)
+
+func main() {
+    today := ChronoGo.Today()
+    
+    // Business day calculations
+    workday := today.AddBusinessDays(5)
+    deadline := today.SubtractBusinessDays(3)
+    
+    // Holiday checking
+    christmas := ChronoGo.Date(2023, 12, 25)
+    isHoliday := christmas.IsHoliday()
+    
+    // Count business days in range
+    start := ChronoGo.Date(2023, 12, 1)
+    end := ChronoGo.Date(2023, 12, 31)
+    businessDays := start.BusinessDaysBetween(end)
+    
+    fmt.Println("Next workday:", workday.Format("Monday, Jan 2"))
+    fmt.Println("Deadline:", deadline.Format("2006-01-02"))
+    fmt.Println("Christmas is holiday:", isHoliday)
+    fmt.Println("Business days in Dec:", businessDays)
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-header">
+                        <h3 class="example-title">Period Iteration</h3>
+                        <p class="example-description">Iterate over time periods with flexible step sizes</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "github.com/coredds/ChronoGo"
+)
+
+func main() {
+    start := ChronoGo.Now()
+    end := start.AddDays(7)
+    
+    // Create a period
+    period := ChronoGo.NewPeriod(start, end)
+    
+    // Iterate by days
+    fmt.Println("Daily schedule:")
+    for _, day := range period.Days() {
+        fmt.Printf("  %s\n", day.Format("Monday, Jan 2"))
+    }
+    
+    // Iterate by hours with step
+    fmt.Println("\nHourly (every 6 hours):")
+    for _, hour := range period.RangeByUnitSlice(ChronoGo.Hour, 6) {
+        fmt.Printf("  %s\n", hour.Format("Jan 2 15:04"))
+    }
+    
+    // Fast range for large periods
+    dates := period.FastRangeDays(1)
+    fmt.Printf("Generated %d dates\n", len(dates))
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-header">
+                        <h3 class="example-title">Parsing and Serialization</h3>
+                        <p class="example-description">Parse various formats and integrate with JSON/SQL</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-go">package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "github.com/coredds/ChronoGo"
+)
+
+func main() {
+    // Parse various formats
+    dt1, _ := ChronoGo.Parse("2023-12-25T15:30:45Z")
+    dt2, _ := ChronoGo.Parse("2023/12/25 15:30")
+    dt3, _ := ChronoGo.Parse("20231225")
+    
+    // Optimized parsing
+    dt4, _ := ChronoGo.ParseOptimized("1640995200")
+    
+    fmt.Println("ISO:", dt1.Format("2006-01-02T15:04:05Z"))
+    fmt.Println("Slash:", dt2.Format("2006-01-02 15:04"))
+    fmt.Println("Compact:", dt3.Format("2006-01-02"))
+    fmt.Println("Unix:", dt4.Format("2006-01-02 15:04:05"))
+    
+    // JSON serialization
+    data, _ := json.Marshal(dt1)
+    fmt.Println("JSON:", string(data))
+    
+    // Parse from JSON
+    var parsed ChronoGo.DateTime
+    json.Unmarshal(data, &parsed)
+    fmt.Println("Parsed:", parsed.Format("2006-01-02"))
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-header">
+                        <h3 class="example-title">Human-Readable Output</h3>
+                        <p class="example-description">Generate user-friendly time descriptions</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "github.com/coredds/ChronoGo"
+)
+
+func main() {
+    now := ChronoGo.Now()
+    
+    // Different time references
+    past := now.SubtractHours(2)
+    future := now.AddDays(3)
+    yesterday := now.SubtractDays(1)
+    
+    // Human-readable differences
+    fmt.Println("2 hours ago:", past.DiffForHumans(now))
+    fmt.Println("In 3 days:", future.DiffForHumans(now))
+    fmt.Println("Yesterday:", yesterday.DiffForHumans(now))
+    
+    // Age calculations
+    birthday := ChronoGo.Date(1990, 5, 15)
+    age := birthday.Age()
+    fmt.Printf("Age: %d years\n", age)
+    
+    // Time from now
+    fmt.Println("Time from now:", future.TimeFromNow())
+    fmt.Println("Time ago:", past.TimeAgo())
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="installation" class="section install-section">
+        <div class="container">
+            <h2 class="section-title">Get Started in Seconds</h2>
+            <p class="section-subtitle">Add ChronoGo to your Go project with a single command</p>
+            
+            <div class="install-command">
+                go get github.com/coredds/ChronoGo
+                <button class="copy-btn" onclick="copyInstall(this)" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);">Copy</button>
+            </div>
+            
+            <p style="margin-top: 2rem; color: var(--text-light);">
+                Requires Go 1.21 or later. <span class="highlight">Zero dependencies</span> beyond the standard library.
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/coredds/ChronoGo" target="_blank">GitHub Repository</a>
+                <a href="https://pkg.go.dev/github.com/coredds/ChronoGo" target="_blank">Documentation</a>
+                <a href="https://github.com/coredds/ChronoGo/issues" target="_blank">Report Issues</a>
+                <a href="https://github.com/coredds/ChronoGo/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
+            </div>
+            <p>&copy; 2025 ChronoGo. Released under the MIT License.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling.querySelector('code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'rgba(16, 185, 129, 0.3)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(255, 255, 255, 0.1)';
+                }, 2000);
+            });
+        }
+        
+        function copyInstall(button) {
+            const text = 'go get github.com/coredds/ChronoGo';
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'rgba(16, 185, 129, 0.3)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(255, 255, 255, 0.1)';
+                }, 2000);
+            });
+        }
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add intersection observer for navigation highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.style.color = 'var(--text)';
+                        link.style.background = 'transparent';
+                    });
+                    
+                    const activeLink = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+                    if (activeLink) {
+                        activeLink.style.color = 'var(--primary)';
+                        activeLink.style.background = 'var(--surface)';
+                    }
+                }
+            });
+        }, {
+            threshold: 0.3,
+            rootMargin: '-50px 0px'
+        });
+        
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

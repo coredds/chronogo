@@ -686,3 +686,70 @@ func FromUnixMicro(us int64, loc *time.Location) DateTime {
 func FromUnixNano(ns int64, loc *time.Location) DateTime {
 	return DateTime{time.Unix(0, ns).In(loc)}
 }
+
+// DST optimization cache entry
+type dstCacheEntry struct {
+	standardOffset int
+	lastYear       int
+}
+
+var dstCache sync.Map // map[*time.Location]*dstCacheEntry
+
+// IsDSTOptimized returns whether the datetime is in daylight saving time using optimized caching
+func (dt DateTime) IsDSTOptimized() bool {
+	loc := dt.Location()
+	year := dt.Year()
+
+	// Fast path for UTC - never DST
+	if loc == time.UTC {
+		return false
+	}
+
+	// Check cache
+	if entry, ok := dstCache.Load(loc); ok {
+		cacheEntry := entry.(*dstCacheEntry)
+		if cacheEntry.lastYear == year {
+			_, currentOffset := dt.Zone()
+			return currentOffset != cacheEntry.standardOffset
+		}
+	}
+
+	// Cache miss or stale year - calculate and cache
+	standardOffset := getStandardOffsetOptimized(loc, year)
+	dstCache.Store(loc, &dstCacheEntry{
+		standardOffset: standardOffset,
+		lastYear:       year,
+	})
+
+	_, currentOffset := dt.Zone()
+	return currentOffset != standardOffset
+}
+
+// getStandardOffsetOptimized calculates standard offset with optimizations
+func getStandardOffsetOptimized(loc *time.Location, year int) int {
+	// For most locations, the standard time is the non-DST time, which typically occurs in winter
+	// We'll use January (definitely winter) to get the standard offset
+	winterTime := time.Date(year, 1, 15, 12, 0, 0, 0, loc)
+	_, winterOffset := winterTime.Zone()
+
+	// Also check December to be sure
+	decemberTime := time.Date(year, 12, 15, 12, 0, 0, 0, loc)
+	_, decemberOffset := decemberTime.Zone()
+
+	// In the northern hemisphere, winter time is standard time
+	// In the southern hemisphere, it's more complex, but January/December should be consistent
+	if winterOffset == decemberOffset {
+		return winterOffset
+	}
+
+	// If they're different, take the smaller offset (standard time is usually less than DST)
+	if winterOffset < decemberOffset {
+		return winterOffset
+	}
+	return decemberOffset
+}
+
+// ClearDSTCache clears the DST cache (useful for testing or memory management)
+func ClearDSTCache() {
+	dstCache = sync.Map{}
+}

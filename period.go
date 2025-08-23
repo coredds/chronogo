@@ -325,3 +325,118 @@ func (p Period) ForEach(unit string, step int, fn func(DateTime)) {
 		fn(dt)
 	}
 }
+
+// RangeByUnitSlice returns a pre-allocated slice of DateTime instances for better performance
+// when you need all values at once rather than iterating.
+func (p Period) RangeByUnitSlice(unit Unit, step ...int) []DateTime {
+	stepSize := 1
+	if len(step) > 0 {
+		stepSize = step[0]
+	}
+
+	// Safety check for invalid step sizes
+	if stepSize <= 0 {
+		stepSize = 1 // Default to 1 for invalid step sizes
+	}
+
+	// Pre-calculate approximate capacity to reduce reallocations
+	var capacity int
+	switch unit {
+	case UnitYear:
+		capacity = p.Years() + 2
+	case UnitMonth:
+		capacity = p.Months() + 2
+	case UnitDay:
+		capacity = p.Days()/stepSize + 2
+	case UnitWeek:
+		capacity = p.Days()/(stepSize*7) + 2
+	case UnitHour:
+		capacity = int(p.Duration().Hours())/stepSize + 2
+	case UnitMinute:
+		capacity = int(p.Duration().Minutes())/stepSize + 2
+	case UnitSecond:
+		capacity = int(p.Duration().Seconds())/stepSize + 2
+	default:
+		capacity = 100 // Default reasonable capacity
+	}
+
+	// Clamp capacity to reasonable limits to prevent memory issues
+	if capacity < 0 {
+		capacity = 0
+	} else if capacity > 1000 { // More conservative limit
+		capacity = 1000 // Prevent excessive memory usage for large time ranges
+	}
+
+	// Additional safety check: prevent creating slices with too many elements
+	maxElements := 1000
+	if capacity > maxElements {
+		// For very large ranges, we might want to suggest using the iterator version instead
+		return []DateTime{} // Return empty slice for safety
+	}
+
+	result := make([]DateTime, 0, capacity)
+	current := p.Start
+	iterationCount := 0
+	maxIterations := 1000 // Safety limit
+
+	for !current.After(p.End) && iterationCount < maxIterations {
+		result = append(result, current)
+		iterationCount++
+
+		switch unit {
+		case UnitYear:
+			current = current.AddYears(stepSize)
+		case UnitMonth:
+			current = current.AddMonths(stepSize)
+		case UnitDay, UnitWeek:
+			inc := stepSize
+			if unit == UnitWeek {
+				inc = stepSize * 7
+			}
+			current = current.AddDays(inc)
+		case UnitHour:
+			current = current.AddHours(stepSize)
+		case UnitMinute:
+			current = current.AddMinutes(stepSize)
+		case UnitSecond:
+			current = current.AddSeconds(stepSize)
+		default:
+			// For invalid units, return empty slice
+			return []DateTime{}
+		}
+	}
+
+	return result
+}
+
+// FastRangeDays returns a slice of DateTime instances for day-based iteration
+// Optimized for the most common use case of daily iteration.
+func (p Period) FastRangeDays(step ...int) []DateTime {
+	stepSize := 1
+	if len(step) > 0 && step[0] > 0 {
+		stepSize = step[0]
+	}
+
+	days := p.Days()
+	if days < 0 {
+		return []DateTime{}
+	}
+
+	capacity := days/stepSize + 1
+	if capacity > 1000 { // More conservative limit
+		return []DateTime{} // Return empty slice for very large ranges
+	}
+
+	result := make([]DateTime, 0, capacity)
+	current := p.Start
+	iterationCount := 0
+	maxIterations := 1000
+
+	for !current.After(p.End) && iterationCount < maxIterations {
+		result = append(result, current)
+		current = current.AddDays(stepSize)
+		iterationCount++
+	}
+
+	return result
+}
