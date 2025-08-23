@@ -1,0 +1,6 @@
+theme: jekyll-theme-minimal
+title: ChronoGo
+description: A powerful and elegant Go datetime library inspired by Python's Pendulum
+show_downloads: true
+github:
+  repository_url: https://github.com/coredds/ChronoGo
