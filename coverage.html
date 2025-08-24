@@ -1,0 +1,3650 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>ChronoGo: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/coredds/ChronoGo/business.go (0.0%)</option>
+				
+				<option value="file1">github.com/coredds/ChronoGo/datetime.go (1.9%)</option>
+				
+				<option value="file2">github.com/coredds/ChronoGo/duration_parse.go (0.0%)</option>
+				
+				<option value="file3">github.com/coredds/ChronoGo/errors.go (95.4%)</option>
+				
+				<option value="file4">github.com/coredds/ChronoGo/fluent.go (0.0%)</option>
+				
+				<option value="file5">github.com/coredds/ChronoGo/human.go (0.0%)</option>
+				
+				<option value="file6">github.com/coredds/ChronoGo/localization.go (17.1%)</option>
+				
+				<option value="file7">github.com/coredds/ChronoGo/parse.go (11.9%)</option>
+				
+				<option value="file8">github.com/coredds/ChronoGo/period.go (0.0%)</option>
+				
+				<option value="file9">github.com/coredds/ChronoGo/testing.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package chronogo
+
+import (
+        "time"
+)
+
+// HolidayChecker is an interface for checking if a date is a holiday.
+// Users can implement this interface to provide custom holiday logic.
+type HolidayChecker interface {
+        IsHoliday(dt DateTime) bool
+}
+
+// Holiday represents a specific holiday with optional recurring rules.
+type Holiday struct {
+        Name    string
+        Month   time.Month
+        Day     int
+        Year    *int          // nil for recurring holiday
+        WeekDay *time.Weekday // for holidays like "first Monday of September"
+        WeekNum *int          // which week of the month (1-5, -1 for last)
+}
+
+// DefaultHolidayChecker provides common holidays for different regions.
+type DefaultHolidayChecker struct {
+        holidays []Holiday
+        region   string
+}
+
+// NewUSHolidayChecker creates a holiday checker with common US federal holidays.
+func NewUSHolidayChecker() *DefaultHolidayChecker <span class="cov0" title="0">{
+        holidays := []Holiday{
+                {Name: "New Year's Day", Month: time.January, Day: 1},
+                {Name: "Independence Day", Month: time.July, Day: 4},
+                {Name: "Christmas Day", Month: time.December, Day: 25},
+                // Martin Luther King Jr. Day - third Monday in January
+                {Name: "Martin Luther King Jr. Day", Month: time.January, WeekDay: &amp;[]time.Weekday{time.Monday}[0], WeekNum: &amp;[]int{3}[0]},
+                // Presidents Day - third Monday in February
+                {Name: "Presidents Day", Month: time.February, WeekDay: &amp;[]time.Weekday{time.Monday}[0], WeekNum: &amp;[]int{3}[0]},
+                // Memorial Day - last Monday in May
+                {Name: "Memorial Day", Month: time.May, WeekDay: &amp;[]time.Weekday{time.Monday}[0], WeekNum: &amp;[]int{-1}[0]},
+                // Labor Day - first Monday in September
+                {Name: "Labor Day", Month: time.September, WeekDay: &amp;[]time.Weekday{time.Monday}[0], WeekNum: &amp;[]int{1}[0]},
+                // Columbus Day - second Monday in October
+                {Name: "Columbus Day", Month: time.October, WeekDay: &amp;[]time.Weekday{time.Monday}[0], WeekNum: &amp;[]int{2}[0]},
+                // Thanksgiving - fourth Thursday in November
+                {Name: "Thanksgiving", Month: time.November, WeekDay: &amp;[]time.Weekday{time.Thursday}[0], WeekNum: &amp;[]int{4}[0]},
+        }
+        return &amp;DefaultHolidayChecker{
+                holidays: holidays,
+                region:   "US",
+        }
+}</span>
+
+// IsHoliday checks if the given date is a holiday.
+func (hc *DefaultHolidayChecker) IsHoliday(dt DateTime) bool <span class="cov0" title="0">{
+        for _, holiday := range hc.holidays </span><span class="cov0" title="0">{
+                if hc.isHolidayMatch(dt, holiday) </span><span class="cov0" title="0">{
+                        return true
+                }</span>
+        }
+        <span class="cov0" title="0">return false</span>
+}
+
+// isHolidayMatch checks if a DateTime matches a specific holiday definition.
+func (hc *DefaultHolidayChecker) isHolidayMatch(dt DateTime, holiday Holiday) bool <span class="cov0" title="0">{
+        // Check if year matches (if specified)
+        if holiday.Year != nil &amp;&amp; dt.Year() != *holiday.Year </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        // Check month
+        <span class="cov0" title="0">if dt.Month() != holiday.Month </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        // Fixed date holiday
+        <span class="cov0" title="0">if holiday.WeekDay == nil </span><span class="cov0" title="0">{
+                return dt.Day() == holiday.Day
+        }</span>
+
+        // Weekday-based holiday
+        <span class="cov0" title="0">if dt.Weekday() != *holiday.WeekDay </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        // Calculate which occurrence of the weekday this is
+        <span class="cov0" title="0">weekNum := hc.getWeekOfMonth(dt, *holiday.WeekDay)
+
+        // Handle "last occurrence" (-1)
+        if *holiday.WeekNum == -1 </span><span class="cov0" title="0">{
+                return hc.isLastOccurrenceOfWeekday(dt, *holiday.WeekDay)
+        }</span>
+
+        <span class="cov0" title="0">return weekNum == *holiday.WeekNum</span>
+}
+
+// getWeekOfMonth returns which occurrence of a weekday this date represents (1-5).
+func (hc *DefaultHolidayChecker) getWeekOfMonth(dt DateTime, weekday time.Weekday) int <span class="cov0" title="0">{
+        firstOfMonth := dt.StartOfMonth()
+        daysDiff := int(dt.Weekday() - firstOfMonth.Weekday())
+        if daysDiff &lt; 0 </span><span class="cov0" title="0">{
+                daysDiff += 7
+        }</span>
+        <span class="cov0" title="0">firstOccurrence := firstOfMonth.AddDays(daysDiff)
+
+        if dt.Before(firstOccurrence) </span><span class="cov0" title="0">{
+                return 0 // This shouldn't happen if weekdays match
+        }</span>
+
+        <span class="cov0" title="0">weeksDiff := int(dt.Sub(firstOccurrence).Hours() / (24 * 7))
+        return weeksDiff + 1</span>
+}
+
+// isLastOccurrenceOfWeekday checks if this is the last occurrence of the weekday in the month.
+func (hc *DefaultHolidayChecker) isLastOccurrenceOfWeekday(dt DateTime, weekday time.Weekday) bool <span class="cov0" title="0">{
+        // Check if adding 7 days would put us in the next month
+        nextWeek := dt.AddDays(7)
+        return nextWeek.Month() != dt.Month()
+}</span>
+
+// AddHoliday adds a custom holiday to the checker.
+func (hc *DefaultHolidayChecker) AddHoliday(holiday Holiday) <span class="cov0" title="0">{
+        hc.holidays = append(hc.holidays, holiday)
+}</span>
+
+// GetHolidays returns all holidays for a given year.
+func (hc *DefaultHolidayChecker) GetHolidays(year int) []DateTime <span class="cov0" title="0">{
+        var holidays []DateTime
+
+        for _, holiday := range hc.holidays </span><span class="cov0" title="0">{
+                if holiday.Year != nil &amp;&amp; *holiday.Year != year </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">if holiday.WeekDay == nil </span><span class="cov0" title="0">{
+                        // Fixed date holiday
+                        dt := Date(year, holiday.Month, holiday.Day, 0, 0, 0, 0, time.UTC)
+                        holidays = append(holidays, dt)
+                }</span> else<span class="cov0" title="0"> {
+                        // Weekday-based holiday
+                        dt := hc.findWeekdayOccurrence(year, holiday.Month, *holiday.WeekDay, *holiday.WeekNum)
+                        if !dt.IsZero() </span><span class="cov0" title="0">{
+                                holidays = append(holidays, dt)
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">return holidays</span>
+}
+
+// findWeekdayOccurrence finds the nth occurrence of a weekday in a given month/year.
+func (hc *DefaultHolidayChecker) findWeekdayOccurrence(year int, month time.Month, weekday time.Weekday, occurrence int) DateTime <span class="cov0" title="0">{
+        firstOfMonth := Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+
+        if occurrence == -1 </span><span class="cov0" title="0">{
+                // Last occurrence - start from end of month and work backwards
+                lastOfMonth := firstOfMonth.EndOfMonth()
+                for d := lastOfMonth; d.Month() == month; d = d.AddDays(-1) </span><span class="cov0" title="0">{
+                        if d.Weekday() == weekday </span><span class="cov0" title="0">{
+                                return d
+                        }</span>
+                }
+                <span class="cov0" title="0">return DateTime{}</span> // Not found
+        }
+
+        // Find first occurrence
+        <span class="cov0" title="0">daysDiff := int(weekday - firstOfMonth.Weekday())
+        if daysDiff &lt; 0 </span><span class="cov0" title="0">{
+                daysDiff += 7
+        }</span>
+        <span class="cov0" title="0">firstOccurrence := firstOfMonth.AddDays(daysDiff)
+
+        // Add weeks to get the nth occurrence
+        target := firstOccurrence.AddDays((occurrence - 1) * 7)
+
+        // Make sure it's still in the same month
+        if target.Month() != month </span><span class="cov0" title="0">{
+                return DateTime{} // Not found
+        }</span>
+
+        <span class="cov0" title="0">return target</span>
+}
+
+// Business date operations for DateTime
+
+// IsBusinessDay returns true if the date is a business day (Monday-Friday and not a holiday).
+func (dt DateTime) IsBusinessDay(holidayChecker ...HolidayChecker) bool <span class="cov0" title="0">{
+        if dt.IsWeekend() </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov0" title="0">if len(holidayChecker) &gt; 0 &amp;&amp; holidayChecker[0] != nil </span><span class="cov0" title="0">{
+                return !holidayChecker[0].IsHoliday(dt)
+        }</span>
+
+        <span class="cov0" title="0">return true</span>
+}
+
+// NextBusinessDay returns the next business day.
+func (dt DateTime) NextBusinessDay(holidayChecker ...HolidayChecker) DateTime <span class="cov0" title="0">{
+        next := dt.AddDays(1)
+        for !next.IsBusinessDay(holidayChecker...) </span><span class="cov0" title="0">{
+                next = next.AddDays(1)
+        }</span>
+        <span class="cov0" title="0">return next</span>
+}
+
+// PreviousBusinessDay returns the previous business day.
+func (dt DateTime) PreviousBusinessDay(holidayChecker ...HolidayChecker) DateTime <span class="cov0" title="0">{
+        prev := dt.AddDays(-1)
+        for !prev.IsBusinessDay(holidayChecker...) </span><span class="cov0" title="0">{
+                prev = prev.AddDays(-1)
+        }</span>
+        <span class="cov0" title="0">return prev</span>
+}
+
+// AddBusinessDays adds the specified number of business days.
+func (dt DateTime) AddBusinessDays(days int, holidayChecker ...HolidayChecker) DateTime <span class="cov0" title="0">{
+        if days == 0 </span><span class="cov0" title="0">{
+                return dt
+        }</span>
+
+        <span class="cov0" title="0">current := dt
+        remaining := days
+        direction := 1
+
+        if days &lt; 0 </span><span class="cov0" title="0">{
+                direction = -1
+                remaining = -days
+        }</span>
+
+        <span class="cov0" title="0">for remaining &gt; 0 </span><span class="cov0" title="0">{
+                current = current.AddDays(direction)
+                if current.IsBusinessDay(holidayChecker...) </span><span class="cov0" title="0">{
+                        remaining--
+                }</span>
+        }
+
+        <span class="cov0" title="0">return current</span>
+}
+
+// SubtractBusinessDays subtracts the specified number of business days.
+func (dt DateTime) SubtractBusinessDays(days int, holidayChecker ...HolidayChecker) DateTime <span class="cov0" title="0">{
+        return dt.AddBusinessDays(-days, holidayChecker...)
+}</span>
+
+// BusinessDaysBetween returns the number of business days between two dates.
+func (dt DateTime) BusinessDaysBetween(other DateTime, holidayChecker ...HolidayChecker) int <span class="cov0" title="0">{
+        start := dt
+        end := other
+
+        if start.After(end) </span><span class="cov0" title="0">{
+                start, end = end, start
+        }</span>
+
+        <span class="cov0" title="0">count := 0
+        current := start
+
+        for current.Before(end) </span><span class="cov0" title="0">{
+                if current.IsBusinessDay(holidayChecker...) </span><span class="cov0" title="0">{
+                        count++
+                }</span>
+                <span class="cov0" title="0">current = current.AddDays(1)</span>
+        }
+
+        <span class="cov0" title="0">return count</span>
+}
+
+// IsHoliday checks if the date is a holiday using the provided checker.
+func (dt DateTime) IsHoliday(holidayChecker HolidayChecker) bool <span class="cov0" title="0">{
+        if holidayChecker == nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">return holidayChecker.IsHoliday(dt)</span>
+}
+
+// BusinessDaysInMonth returns the number of business days in the month.
+func (dt DateTime) BusinessDaysInMonth(holidayChecker ...HolidayChecker) int <span class="cov0" title="0">{
+        start := dt.StartOfMonth()
+        end := dt.EndOfMonth()
+
+        count := 0
+        current := start
+
+        for !current.After(end) </span><span class="cov0" title="0">{
+                if current.IsBusinessDay(holidayChecker...) </span><span class="cov0" title="0">{
+                        count++
+                }</span>
+                <span class="cov0" title="0">current = current.AddDays(1)</span>
+        }
+
+        <span class="cov0" title="0">return count</span>
+}
+
+// BusinessDaysInYear returns the number of business days in the year.
+func (dt DateTime) BusinessDaysInYear(holidayChecker ...HolidayChecker) int <span class="cov0" title="0">{
+        start := dt.StartOfYear()
+        end := dt.EndOfYear()
+
+        count := 0
+        current := start
+
+        for !current.After(end) </span><span class="cov0" title="0">{
+                if current.IsBusinessDay(holidayChecker...) </span><span class="cov0" title="0">{
+                        count++
+                }</span>
+                <span class="cov0" title="0">current = current.AddDays(1)</span>
+        }
+
+        <span class="cov0" title="0">return count</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">// Package chronogo provides a Go implementation of a powerful datetime library
+// for powerful and easy-to-use datetime and timezone handling.
+package chronogo
+
+import (
+        "database/sql/driver"
+        "fmt"
+        "strconv"
+        "strings"
+        "sync"
+        "time"
+)
+
+// Unit represents a logical time unit used by various helpers.
+type Unit int
+
+const (
+        UnitSecond Unit = iota
+        UnitMinute
+        UnitHour
+        UnitDay
+        UnitWeek
+        UnitMonth
+        UnitQuarter
+        UnitYear
+)
+
+// DateTime wraps Go's time.Time to extend functionality while maintaining compatibility.
+// It provides timezone-aware datetime operations with a fluent API.
+type DateTime struct {
+        time.Time
+}
+
+// cache for standard (non-DST) timezone offsets per (location, year)
+var standardOffsetCache sync.Map // key string -&gt; int (seconds east of UTC)
+
+func standardOffsetKey(loc *time.Location, year int) string <span class="cov0" title="0">{
+        // loc.String() returns IANA name (e.g., "America/New_York") or "Local"
+        return loc.String() + "|" + strconv.Itoa(year)
+}</span>
+
+func getStandardOffset(loc *time.Location, year int) int <span class="cov0" title="0">{
+        key := standardOffsetKey(loc, year)
+        if v, ok := standardOffsetCache.Load(key); ok </span><span class="cov0" title="0">{
+                return v.(int)
+        }</span>
+        // Compute minimum offset observed across the year as standard offset
+        <span class="cov0" title="0">minOffset := int(1&lt;&lt;31 - 1)
+        for month := time.January; month &lt;= time.December; month++ </span><span class="cov0" title="0">{
+                t := time.Date(year, month, 1, 0, 0, 0, 0, loc)
+                _, off := t.Zone()
+                if off &lt; minOffset </span><span class="cov0" title="0">{
+                        minOffset = off
+                }</span>
+        }
+        <span class="cov0" title="0">standardOffsetCache.Store(key, minOffset)
+        return minOffset</span>
+}
+
+// Now returns the current datetime in the local timezone.
+// Respects frozen time when testing mode is enabled.
+func Now() DateTime <span class="cov0" title="0">{
+        if frozen, ok := GetFrozenTime(); ok </span><span class="cov0" title="0">{
+                return DateTime{frozen}
+        }</span>
+        <span class="cov0" title="0">return DateTime{time.Now()}</span>
+}
+
+// NowUTC returns the current datetime in UTC timezone.
+// Respects frozen time when testing mode is enabled.
+func NowUTC() DateTime <span class="cov0" title="0">{
+        if frozen, ok := GetFrozenTime(); ok </span><span class="cov0" title="0">{
+                return DateTime{frozen.UTC()}
+        }</span>
+        <span class="cov0" title="0">return DateTime{time.Now().UTC()}</span>
+}
+
+// NowIn returns the current datetime in the specified timezone.
+// Respects frozen time when testing mode is enabled.
+func NowIn(loc *time.Location) DateTime <span class="cov0" title="0">{
+        if frozen, ok := GetFrozenTime(); ok </span><span class="cov0" title="0">{
+                return DateTime{frozen.In(loc)}
+        }</span>
+        <span class="cov0" title="0">return DateTime{time.Now().In(loc)}</span>
+}
+
+// Today returns today's date at midnight in the local timezone.
+// Respects frozen time when testing mode is enabled.
+func Today() DateTime <span class="cov0" title="0">{
+        return Now().StartOfDay()
+}</span>
+
+// TodayIn returns today's date at midnight in the specified timezone.
+// Respects frozen time when testing mode is enabled.
+func TodayIn(loc *time.Location) DateTime <span class="cov0" title="0">{
+        now := NowIn(loc)
+        return DateTime{time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)}
+}</span>
+
+// Tomorrow returns tomorrow's date at midnight in the local timezone.
+// Respects frozen time when testing mode is enabled.
+func Tomorrow() DateTime <span class="cov0" title="0">{
+        return Now().AddDays(1).StartOfDay()
+}</span>
+
+// Yesterday returns yesterday's date at midnight in the local timezone.
+// Respects frozen time when testing mode is enabled.
+func Yesterday() DateTime <span class="cov0" title="0">{
+        return Now().AddDays(-1).StartOfDay()
+}</span>
+
+// Date creates a DateTime similar to time.Date() but returns our DateTime type.
+func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.Location) DateTime <span class="cov8" title="1">{
+        return DateTime{time.Date(year, month, day, hour, min, sec, nsec, loc)}
+}</span>
+
+// UTC creates a DateTime in UTC timezone.
+func UTC(year int, month time.Month, day, hour, min, sec, nsec int) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(year, month, day, hour, min, sec, nsec, time.UTC)}
+}</span>
+
+// FromUnix creates a DateTime from Unix timestamp.
+func FromUnix(sec int64, nsec int64, loc *time.Location) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Unix(sec, nsec).In(loc)}
+}</span>
+
+// In converts the datetime to the specified timezone.
+func (dt DateTime) In(loc *time.Location) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.In(loc)}
+}</span>
+
+// UTC converts the datetime to UTC timezone.
+func (dt DateTime) UTC() DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.UTC()}
+}</span>
+
+// Local converts the datetime to the local timezone.
+func (dt DateTime) Local() DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.Local()}
+}</span>
+
+// Location returns the current timezone location.
+func (dt DateTime) Location() *time.Location <span class="cov0" title="0">{
+        return dt.Time.Location()
+}</span>
+
+// IsDST returns whether the datetime is in daylight saving time.
+func (dt DateTime) IsDST() bool <span class="cov0" title="0">{
+        // Determine standard (non-DST) offset via cached minimum offset across the year.
+        loc := dt.Location()
+        year := dt.Year()
+        minOffset := getStandardOffset(loc, year)
+        _, currentOffset := dt.Zone()
+        return currentOffset != minOffset
+}</span>
+
+// IsUTC returns whether the datetime is in UTC timezone.
+func (dt DateTime) IsUTC() bool <span class="cov0" title="0">{
+        return dt.Time.Location() == time.UTC
+}</span>
+
+// IsLocal returns whether the datetime is in the local timezone.
+func (dt DateTime) IsLocal() bool <span class="cov0" title="0">{
+        return dt.Time.Location() == time.Local
+}</span>
+
+// IsLeapYear returns whether the datetime's year is a leap year.
+func (dt DateTime) IsLeapYear() bool <span class="cov0" title="0">{
+        year := dt.Year()
+        return year%4 == 0 &amp;&amp; (year%100 != 0 || year%400 == 0)
+}</span>
+
+// IsPast returns whether the datetime is in the past compared to now.
+func (dt DateTime) IsPast() bool <span class="cov0" title="0">{
+        return dt.Time.Before(time.Now())
+}</span>
+
+// IsFuture returns whether the datetime is in the future compared to now.
+func (dt DateTime) IsFuture() bool <span class="cov0" title="0">{
+        return dt.Time.After(time.Now())
+}</span>
+
+// AddYears adds the specified number of years.
+func (dt DateTime) AddYears(years int) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.AddDate(years, 0, 0)}
+}</span>
+
+// AddMonths adds the specified number of months.
+func (dt DateTime) AddMonths(months int) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.AddDate(0, months, 0)}
+}</span>
+
+// AddDays adds the specified number of days.
+func (dt DateTime) AddDays(days int) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.AddDate(0, 0, days)}
+}</span>
+
+// AddHours adds the specified number of hours.
+func (dt DateTime) AddHours(hours int) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.Add(time.Duration(hours) * time.Hour)}
+}</span>
+
+// AddMinutes adds the specified number of minutes.
+func (dt DateTime) AddMinutes(minutes int) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.Add(time.Duration(minutes) * time.Minute)}
+}</span>
+
+// AddSeconds adds the specified number of seconds.
+func (dt DateTime) AddSeconds(seconds int) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.Add(time.Duration(seconds) * time.Second)}
+}</span>
+
+// Add adds a time.Duration to the datetime.
+func (dt DateTime) Add(duration time.Duration) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.Add(duration)}
+}</span>
+
+// SubtractYears subtracts the specified number of years.
+func (dt DateTime) SubtractYears(years int) DateTime <span class="cov0" title="0">{
+        return dt.AddYears(-years)
+}</span>
+
+// SubtractMonths subtracts the specified number of months.
+func (dt DateTime) SubtractMonths(months int) DateTime <span class="cov0" title="0">{
+        return dt.AddMonths(-months)
+}</span>
+
+// SubtractDays subtracts the specified number of days.
+func (dt DateTime) SubtractDays(days int) DateTime <span class="cov0" title="0">{
+        return dt.AddDays(-days)
+}</span>
+
+// SubtractHours subtracts the specified number of hours.
+func (dt DateTime) SubtractHours(hours int) DateTime <span class="cov0" title="0">{
+        return dt.AddHours(-hours)
+}</span>
+
+// SubtractMinutes subtracts the specified number of minutes.
+func (dt DateTime) SubtractMinutes(minutes int) DateTime <span class="cov0" title="0">{
+        return dt.AddMinutes(-minutes)
+}</span>
+
+// SubtractSeconds subtracts the specified number of seconds.
+func (dt DateTime) SubtractSeconds(seconds int) DateTime <span class="cov0" title="0">{
+        return dt.AddSeconds(-seconds)
+}</span>
+
+// Subtract subtracts a time.Duration from the datetime.
+func (dt DateTime) Subtract(duration time.Duration) DateTime <span class="cov0" title="0">{
+        return DateTime{dt.Time.Add(-duration)}
+}</span>
+
+// Sub returns the time.Duration between two DateTime instances.
+func (dt DateTime) Sub(other DateTime) time.Duration <span class="cov0" title="0">{
+        return dt.Time.Sub(other.Time)
+}</span>
+
+// UnixMilli returns t as a Unix time, the number of milliseconds elapsed
+// since January 1, 1970 UTC.
+func (dt DateTime) UnixMilli() int64 <span class="cov0" title="0">{
+        return dt.Time.UnixMilli()
+}</span>
+
+// UnixMicro returns t as a Unix time, the number of microseconds elapsed
+// since January 1, 1970 UTC.
+func (dt DateTime) UnixMicro() int64 <span class="cov0" title="0">{
+        return dt.Time.UnixMicro()
+}</span>
+
+// UnixNano returns t as a Unix time, the number of nanoseconds elapsed
+// since January 1, 1970 UTC.
+func (dt DateTime) UnixNano() int64 <span class="cov0" title="0">{
+        return dt.Time.UnixNano()
+}</span>
+
+// SetYear returns a new DateTime with the year set to the specified value.
+func (dt DateTime) SetYear(year int) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(year, dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), dt.Second(), dt.Nanosecond(), dt.Location())}
+}</span>
+
+// SetMonth returns a new DateTime with the month set to the specified value.
+func (dt DateTime) SetMonth(month time.Month) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), month, dt.Day(), dt.Hour(), dt.Minute(), dt.Second(), dt.Nanosecond(), dt.Location())}
+}</span>
+
+// SetDay returns a new DateTime with the day set to the specified value.
+func (dt DateTime) SetDay(day int) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), day, dt.Hour(), dt.Minute(), dt.Second(), dt.Nanosecond(), dt.Location())}
+}</span>
+
+// SetHour returns a new DateTime with the hour set to the specified value.
+func (dt DateTime) SetHour(hour int) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), hour, dt.Minute(), dt.Second(), dt.Nanosecond(), dt.Location())}
+}</span>
+
+// SetMinute returns a new DateTime with the minute set to the specified value.
+func (dt DateTime) SetMinute(minute int) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), minute, dt.Second(), dt.Nanosecond(), dt.Location())}
+}</span>
+
+// SetSecond returns a new DateTime with the second set to the specified value.
+func (dt DateTime) SetSecond(second int) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), second, dt.Nanosecond(), dt.Location())}
+}</span>
+
+// Before reports whether the datetime is before other.
+func (dt DateTime) Before(other DateTime) bool <span class="cov0" title="0">{
+        return dt.Time.Before(other.Time)
+}</span>
+
+// After reports whether the datetime is after other.
+func (dt DateTime) After(other DateTime) bool <span class="cov8" title="1">{
+        return dt.Time.After(other.Time)
+}</span>
+
+// Equal reports whether the datetime is equal to other.
+func (dt DateTime) Equal(other DateTime) bool <span class="cov8" title="1">{
+        return dt.Time.Equal(other.Time)
+}</span>
+
+// ToDateString returns the date portion as a string (YYYY-MM-DD).
+func (dt DateTime) ToDateString() string <span class="cov0" title="0">{
+        return dt.Time.Format("2006-01-02")
+}</span>
+
+// ToTimeString returns the time portion as a string (HH:MM:SS).
+func (dt DateTime) ToTimeString() string <span class="cov0" title="0">{
+        return dt.Time.Format("15:04:05")
+}</span>
+
+// ToDateTimeString returns the datetime as a string (YYYY-MM-DD HH:MM:SS).
+func (dt DateTime) ToDateTimeString() string <span class="cov0" title="0">{
+        return dt.Time.Format("2006-01-02 15:04:05")
+}</span>
+
+// ToISO8601String returns the datetime in ISO 8601 format.
+func (dt DateTime) ToISO8601String() string <span class="cov0" title="0">{
+        return dt.Time.Format("2006-01-02T15:04:05Z07:00")
+}</span>
+
+// String returns the default string representation (ISO 8601 format).
+func (dt DateTime) String() string <span class="cov0" title="0">{
+        return dt.ToISO8601String()
+}</span>
+
+// Format formats the datetime using Go's time format layout.
+func (dt DateTime) Format(layout string) string <span class="cov8" title="1">{
+        return dt.Time.Format(layout)
+}</span>
+
+// IsZero reports whether the time instant is January 1, year 1, 00:00:00 UTC.
+func (dt DateTime) IsZero() bool <span class="cov8" title="1">{
+        return dt.Time.IsZero()
+}</span>
+
+// Unwrap returns the underlying time.Time value.
+func (dt DateTime) Unwrap() time.Time <span class="cov0" title="0">{
+        return dt.Time
+}</span>
+
+// Truncate returns dt truncated to the start of the given unit.
+// For calendar units (day/week/month/quarter/year) this aligns to the logical
+// start boundary in the current location (e.g., StartOfDay, Monday StartOfWeek).
+func (dt DateTime) Truncate(unit Unit) DateTime <span class="cov0" title="0">{
+        switch unit </span>{
+        case UnitSecond:<span class="cov0" title="0">
+                return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), dt.Second(), 0, dt.Location())}</span>
+        case UnitMinute:<span class="cov0" title="0">
+                return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), 0, 0, dt.Location())}</span>
+        case UnitHour:<span class="cov0" title="0">
+                return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), 0, 0, 0, dt.Location())}</span>
+        case UnitDay:<span class="cov0" title="0">
+                return dt.StartOfDay()</span>
+        case UnitWeek:<span class="cov0" title="0">
+                return dt.StartOfWeek()</span>
+        case UnitMonth:<span class="cov0" title="0">
+                return dt.StartOfMonth()</span>
+        case UnitQuarter:<span class="cov0" title="0">
+                return dt.StartOfQuarter()</span>
+        case UnitYear:<span class="cov0" title="0">
+                return dt.StartOfYear()</span>
+        default:<span class="cov0" title="0">
+                return dt</span>
+        }
+}
+
+// Round returns dt rounded to the nearest boundary of the given unit.
+// Ties are rounded up to the next boundary.
+// Calendar-aware for day/week/month/quarter/year using local timezone boundaries.
+func (dt DateTime) Round(unit Unit) DateTime <span class="cov0" title="0">{
+        start := dt.Truncate(unit)
+
+        var next DateTime
+        switch unit </span>{
+        case UnitSecond:<span class="cov0" title="0">
+                next = start.AddSeconds(1)</span>
+        case UnitMinute:<span class="cov0" title="0">
+                next = start.AddMinutes(1)</span>
+        case UnitHour:<span class="cov0" title="0">
+                next = start.AddHours(1)</span>
+        case UnitDay:<span class="cov0" title="0">
+                next = start.AddDays(1)</span>
+        case UnitWeek:<span class="cov0" title="0">
+                next = start.AddDays(7)</span>
+        case UnitMonth:<span class="cov0" title="0">
+                next = start.AddMonths(1)</span>
+        case UnitQuarter:<span class="cov0" title="0">
+                next = start.AddMonths(3)</span>
+        case UnitYear:<span class="cov0" title="0">
+                next = start.AddYears(1)</span>
+        default:<span class="cov0" title="0">
+                return dt</span>
+        }
+
+        // Use duration between boundaries to decide rounding
+        <span class="cov0" title="0">toStart := dt.Sub(start)
+        boundary := next.Sub(start)
+        if toStart*2 &lt; boundary </span><span class="cov0" title="0">{
+                return start
+        }</span>
+        <span class="cov0" title="0">return next</span>
+}
+
+// Clamp returns dt clamped to the [min, max] range (order-agnostic).
+func (dt DateTime) Clamp(a, b DateTime) DateTime <span class="cov0" title="0">{
+        min := a
+        max := b
+        if b.Before(a) </span><span class="cov0" title="0">{
+                min, max = b, a
+        }</span>
+        <span class="cov0" title="0">if dt.Before(min) </span><span class="cov0" title="0">{
+                return min
+        }</span>
+        <span class="cov0" title="0">if dt.After(max) </span><span class="cov0" title="0">{
+                return max
+        }</span>
+        <span class="cov0" title="0">return dt</span>
+}
+
+// Between reports whether dt is within the range (a, b) or [a, b] depending on inclusive.
+// The order of a and b does not matter.
+func (dt DateTime) Between(a, b DateTime, inclusive bool) bool <span class="cov0" title="0">{
+        min := a
+        max := b
+        if b.Before(a) </span><span class="cov0" title="0">{
+                min, max = b, a
+        }</span>
+        <span class="cov0" title="0">if inclusive </span><span class="cov0" title="0">{
+                return !dt.Before(min) &amp;&amp; !dt.After(max)
+        }</span>
+        <span class="cov0" title="0">return dt.After(min) &amp;&amp; dt.Before(max)</span>
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (dt DateTime) MarshalText() ([]byte, error) <span class="cov0" title="0">{
+        return []byte(dt.ToISO8601String()), nil
+}</span>
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (dt *DateTime) UnmarshalText(data []byte) error <span class="cov0" title="0">{
+        s := strings.TrimSpace(string(data))
+        if s == "" </span><span class="cov0" title="0">{
+                *dt = DateTime{}
+                return nil
+        }</span>
+        <span class="cov0" title="0">parsed, err := Parse(s)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">*dt = parsed
+        return nil</span>
+}
+
+// MarshalJSON implements json.Marshaler.
+func (dt DateTime) MarshalJSON() ([]byte, error) <span class="cov0" title="0">{
+        // Quote the ISO 8601 string
+        return []byte(fmt.Sprintf("\"%s\"", dt.ToISO8601String())), nil
+}</span>
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (dt *DateTime) UnmarshalJSON(data []byte) error <span class="cov0" title="0">{
+        s := strings.TrimSpace(string(data))
+        if s == "null" || s == "" </span><span class="cov0" title="0">{
+                *dt = DateTime{}
+                return nil
+        }</span>
+        // Trim surrounding quotes if present
+        <span class="cov0" title="0">if len(s) &gt;= 2 &amp;&amp; ((s[0] == '"' &amp;&amp; s[len(s)-1] == '"') || (s[0] == '\'' &amp;&amp; s[len(s)-1] == '\'')) </span><span class="cov0" title="0">{
+                s = s[1 : len(s)-1]
+        }</span>
+        <span class="cov0" title="0">parsed, err := Parse(s)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">*dt = parsed
+        return nil</span>
+}
+
+// Value implements the driver.Valuer interface for database serialization.
+func (dt DateTime) Value() (driver.Value, error) <span class="cov0" title="0">{
+        return dt.Time, nil
+}</span>
+
+// Scan implements the sql.Scanner interface for database deserialization.
+func (dt *DateTime) Scan(value any) error <span class="cov0" title="0">{
+        switch v := value.(type) </span>{
+        case time.Time:<span class="cov0" title="0">
+                *dt = DateTime{v}
+                return nil</span>
+        case string:<span class="cov0" title="0">
+                parsed, err := Parse(v)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">*dt = parsed
+                return nil</span>
+        case []byte:<span class="cov0" title="0">
+                parsed, err := Parse(string(v))
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">*dt = parsed
+                return nil</span>
+        case nil:<span class="cov0" title="0">
+                *dt = DateTime{}
+                return nil</span>
+        default:<span class="cov0" title="0">
+                return fmt.Errorf("unsupported Scan type %T", value)</span>
+        }
+}
+
+// StartOfDay returns a new DateTime set to the beginning of the day (00:00:00).
+func (dt DateTime) StartOfDay() DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, dt.Location())}
+}</span>
+
+// EndOfDay returns a new DateTime set to the end of the day (23:59:59.999999999).
+func (dt DateTime) EndOfDay() DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), 23, 59, 59, 999999999, dt.Location())}
+}</span>
+
+// StartOfMonth returns a new DateTime set to the beginning of the month (first day at 00:00:00).
+func (dt DateTime) StartOfMonth() DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, dt.Location())}
+}</span>
+
+// EndOfMonth returns a new DateTime set to the end of the month (last day at 23:59:59.999999999).
+func (dt DateTime) EndOfMonth() DateTime <span class="cov0" title="0">{
+        return dt.StartOfMonth().AddMonths(1).AddDays(-1).EndOfDay()
+}</span>
+
+// StartOfWeek returns a new DateTime set to the beginning of the week (Monday at 00:00:00).
+func (dt DateTime) StartOfWeek() DateTime <span class="cov0" title="0">{
+        weekday := dt.Weekday()
+        // In Go, Sunday = 0, Monday = 1, etc. We want Monday = 0 for ISO 8601
+        daysFromMonday := (int(weekday) + 6) % 7
+        startOfWeek := dt.AddDays(-daysFromMonday).StartOfDay()
+        return startOfWeek
+}</span>
+
+// EndOfWeek returns a new DateTime set to the end of the week (Sunday at 23:59:59.999999999).
+func (dt DateTime) EndOfWeek() DateTime <span class="cov0" title="0">{
+        return dt.StartOfWeek().AddDays(6).EndOfDay()
+}</span>
+
+// StartOfYear returns a new DateTime set to the beginning of the year (January 1st at 00:00:00).
+func (dt DateTime) StartOfYear() DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), time.January, 1, 0, 0, 0, 0, dt.Location())}
+}</span>
+
+// EndOfYear returns a new DateTime set to the end of the year (December 31st at 23:59:59.999999999).
+func (dt DateTime) EndOfYear() DateTime <span class="cov0" title="0">{
+        return DateTime{time.Date(dt.Year(), time.December, 31, 23, 59, 59, 999999999, dt.Location())}
+}</span>
+
+// IsWeekend returns whether the datetime falls on a weekend (Saturday or Sunday).
+func (dt DateTime) IsWeekend() bool <span class="cov0" title="0">{
+        weekday := dt.Weekday()
+        return weekday == time.Saturday || weekday == time.Sunday
+}</span>
+
+// IsWeekday returns whether the datetime falls on a weekday (Monday through Friday).
+func (dt DateTime) IsWeekday() bool <span class="cov0" title="0">{
+        return !dt.IsWeekend()
+}</span>
+
+// Quarter returns the quarter of the year (1-4).
+func (dt DateTime) Quarter() int <span class="cov0" title="0">{
+        month := int(dt.Month())
+        return (month-1)/3 + 1
+}</span>
+
+// StartOfQuarter returns a new DateTime set to the beginning of the quarter.
+func (dt DateTime) StartOfQuarter() DateTime <span class="cov0" title="0">{
+        quarter := dt.Quarter()
+        month := time.Month((quarter-1)*3 + 1)
+        return DateTime{time.Date(dt.Year(), month, 1, 0, 0, 0, 0, dt.Location())}
+}</span>
+
+// EndOfQuarter returns a new DateTime set to the end of the quarter.
+func (dt DateTime) EndOfQuarter() DateTime <span class="cov0" title="0">{
+        return dt.StartOfQuarter().AddMonths(3).AddDays(-1).EndOfDay()
+}</span>
+
+// ISOWeek returns the ISO 8601 year and week number.
+// Week 1 is the first week with at least 4 days in the new year.
+func (dt DateTime) ISOWeek() (year, week int) <span class="cov0" title="0">{
+        return dt.Time.ISOWeek()
+}</span>
+
+// ISOWeekYear returns the ISO 8601 year for the week containing the datetime.
+func (dt DateTime) ISOWeekYear() int <span class="cov0" title="0">{
+        year, _ := dt.Time.ISOWeek()
+        return year
+}</span>
+
+// AddQuarters adds the specified number of quarters to the DateTime.
+func (dt DateTime) AddQuarters(quarters int) DateTime <span class="cov0" title="0">{
+        return dt.AddMonths(quarters * 3)
+}</span>
+
+// SubtractQuarters subtracts the specified number of quarters from the DateTime.
+func (dt DateTime) SubtractQuarters(quarters int) DateTime <span class="cov0" title="0">{
+        return dt.AddQuarters(-quarters)
+}</span>
+
+// IsCurrentQuarter returns true if the DateTime is in the current quarter.
+func (dt DateTime) IsCurrentQuarter() bool <span class="cov0" title="0">{
+        now := Now()
+        return dt.Year() == now.Year() &amp;&amp; dt.Quarter() == now.Quarter()
+}</span>
+
+// NextQuarter returns a new DateTime set to the start of the next quarter.
+func (dt DateTime) NextQuarter() DateTime <span class="cov0" title="0">{
+        return dt.AddQuarters(1).StartOfQuarter()
+}</span>
+
+// PreviousQuarter returns a new DateTime set to the start of the previous quarter.
+func (dt DateTime) PreviousQuarter() DateTime <span class="cov0" title="0">{
+        return dt.SubtractQuarters(1).StartOfQuarter()
+}</span>
+
+// StartOfFiscalYear returns the start of the fiscal year for the given start month.
+// For example, if fiscalStartMonth is 4 (April), it returns April 1st of the appropriate year.
+func (dt DateTime) StartOfFiscalYear(fiscalStartMonth int) DateTime <span class="cov0" title="0">{
+        if fiscalStartMonth &lt; 1 || fiscalStartMonth &gt; 12 </span><span class="cov0" title="0">{
+                fiscalStartMonth = 1 // Default to January if invalid
+        }</span>
+
+        <span class="cov0" title="0">currentYear := dt.Year()
+        currentMonth := int(dt.Month())
+
+        var fiscalYear int
+        if currentMonth &gt;= fiscalStartMonth </span><span class="cov0" title="0">{
+                fiscalYear = currentYear
+        }</span> else<span class="cov0" title="0"> {
+                fiscalYear = currentYear - 1
+        }</span>
+
+        <span class="cov0" title="0">return Date(fiscalYear, time.Month(fiscalStartMonth), 1, 0, 0, 0, 0, dt.Location())</span>
+}
+
+// EndOfFiscalYear returns the end of the fiscal year for the given start month.
+func (dt DateTime) EndOfFiscalYear(fiscalStartMonth int) DateTime <span class="cov0" title="0">{
+        fiscalStart := dt.StartOfFiscalYear(fiscalStartMonth)
+        return fiscalStart.AddYears(1).SubtractDays(1).EndOfDay()
+}</span>
+
+// FiscalQuarter returns the fiscal quarter (1-4) based on the fiscal year start month.
+func (dt DateTime) FiscalQuarter(fiscalStartMonth int) int <span class="cov0" title="0">{
+        fiscalStart := dt.StartOfFiscalYear(fiscalStartMonth)
+        monthsFromStart := dt.DiffInMonths(fiscalStart)
+        return ((monthsFromStart) / 3) + 1
+}</span>
+
+// DiffInMonths returns the difference in months between two DateTime instances.
+func (dt DateTime) DiffInMonths(other DateTime) int <span class="cov0" title="0">{
+        if dt.Before(other) </span><span class="cov0" title="0">{
+                return -other.DiffInMonths(dt)
+        }</span>
+
+        <span class="cov0" title="0">years := dt.Year() - other.Year()
+        months := int(dt.Month()) - int(other.Month())
+
+        totalMonths := years*12 + months
+
+        // Adjust if we haven't reached the day anniversary
+        if dt.Day() &lt; other.Day() </span><span class="cov0" title="0">{
+                totalMonths--
+        }</span>
+
+        <span class="cov0" title="0">return totalMonths</span>
+}
+
+// DiffInQuarters returns the difference in quarters between two DateTime instances.
+func (dt DateTime) DiffInQuarters(other DateTime) int <span class="cov0" title="0">{
+        monthsDiff := dt.DiffInMonths(other)
+        return monthsDiff / 3
+}</span>
+
+// ISOWeekNumber returns the ISO 8601 week number (1-53).
+func (dt DateTime) ISOWeekNumber() int <span class="cov0" title="0">{
+        _, week := dt.Time.ISOWeek()
+        return week
+}</span>
+
+// DayOfYear returns the day of the year (1-366).
+func (dt DateTime) DayOfYear() int <span class="cov0" title="0">{
+        return dt.Time.YearDay()
+}</span>
+
+// IsFirstDayOfMonth returns whether the datetime is the first day of the month.
+func (dt DateTime) IsFirstDayOfMonth() bool <span class="cov0" title="0">{
+        return dt.Day() == 1
+}</span>
+
+// IsLastDayOfMonth returns whether the datetime is the last day of the month.
+func (dt DateTime) IsLastDayOfMonth() bool <span class="cov0" title="0">{
+        return dt.Day() == dt.DaysInMonth()
+}</span>
+
+// IsFirstDayOfYear returns whether the datetime is the first day of the year (January 1st).
+func (dt DateTime) IsFirstDayOfYear() bool <span class="cov0" title="0">{
+        return dt.Month() == time.January &amp;&amp; dt.Day() == 1
+}</span>
+
+// IsLastDayOfYear returns whether the datetime is the last day of the year (December 31st).
+func (dt DateTime) IsLastDayOfYear() bool <span class="cov0" title="0">{
+        return dt.Month() == time.December &amp;&amp; dt.Day() == 31
+}</span>
+
+// WeekOfMonth returns the week number within the month (1-6).
+// The first week of the month is the week containing the first day of the month.
+func (dt DateTime) WeekOfMonth() int <span class="cov0" title="0">{
+        // Simple calculation: (day - 1) / 7 + 1
+        // This ensures that days 1-7 are in week 1, days 8-14 are in week 2, etc.
+        return ((dt.Day() - 1) / 7) + 1
+}</span>
+
+// WeekOfMonthISO returns the ISO-style week of month using Monday as the first day of week
+// and accounting for the weekday of the month's first day.
+func (dt DateTime) WeekOfMonthISO() int <span class="cov0" title="0">{
+        firstOfMonth := Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, dt.Location())
+        // Convert Go's weekday (Sun=0..Sat=6) to ISO (Mon=0..Sun=6)
+        offset := (int(firstOfMonth.Weekday()) + 6) % 7
+        return ((offset + dt.Day() - 1) / 7) + 1
+}</span>
+
+// WeekOfMonthWithStart returns the week of the month using a custom week start day.
+// For example, start = time.Sunday yields Sunday-start weeks.
+func (dt DateTime) WeekOfMonthWithStart(start time.Weekday) int <span class="cov0" title="0">{
+        firstOfMonth := Date(dt.Year(), dt.Month(), 1, 0, 0, 0, 0, dt.Location())
+        // Compute offset from desired start day
+        offset := (int(firstOfMonth.Weekday()) - int(start) + 7) % 7
+        return ((offset + dt.Day() - 1) / 7) + 1
+}</span>
+
+// DaysInMonth returns the number of days in the datetime's month.
+func (dt DateTime) DaysInMonth() int <span class="cov0" title="0">{
+        year, month, _ := dt.Date()
+        // Create the first day of the next month and subtract one day
+        firstOfNextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, dt.Location())
+        lastOfCurrentMonth := firstOfNextMonth.AddDate(0, 0, -1)
+        return lastOfCurrentMonth.Day()
+}</span>
+
+// DaysInYear returns the number of days in the datetime's year (365 or 366 for leap years).
+func (dt DateTime) DaysInYear() int <span class="cov0" title="0">{
+        if dt.IsLeapYear() </span><span class="cov0" title="0">{
+                return 366
+        }</span>
+        <span class="cov0" title="0">return 365</span>
+}
+
+// FromUnixMilli creates a DateTime from a Unix timestamp in milliseconds in the specified location.
+func FromUnixMilli(ms int64, loc *time.Location) DateTime <span class="cov0" title="0">{
+        return DateTime{time.UnixMilli(ms).In(loc)}
+}</span>
+
+// FromUnixMicro creates a DateTime from a Unix timestamp in microseconds in the specified location.
+func FromUnixMicro(us int64, loc *time.Location) DateTime <span class="cov0" title="0">{
+        return DateTime{time.UnixMicro(us).In(loc)}
+}</span>
+
+// FromUnixNano creates a DateTime from a Unix timestamp in nanoseconds in the specified location.
+func FromUnixNano(ns int64, loc *time.Location) DateTime <span class="cov0" title="0">{
+        return DateTime{time.Unix(0, ns).In(loc)}
+}</span>
+
+// DST optimization cache entry
+type dstCacheEntry struct {
+        standardOffset int
+        lastYear       int
+}
+
+var dstCache sync.Map // map[*time.Location]*dstCacheEntry
+
+// IsDSTOptimized returns whether the datetime is in daylight saving time using optimized caching
+func (dt DateTime) IsDSTOptimized() bool <span class="cov0" title="0">{
+        loc := dt.Location()
+        year := dt.Year()
+
+        // Fast path for UTC - never DST
+        if loc == time.UTC </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        // Check cache
+        <span class="cov0" title="0">if entry, ok := dstCache.Load(loc); ok </span><span class="cov0" title="0">{
+                cacheEntry := entry.(*dstCacheEntry)
+                if cacheEntry.lastYear == year </span><span class="cov0" title="0">{
+                        _, currentOffset := dt.Zone()
+                        return currentOffset != cacheEntry.standardOffset
+                }</span>
+        }
+
+        // Cache miss or stale year - calculate and cache
+        <span class="cov0" title="0">standardOffset := getStandardOffsetOptimized(loc, year)
+        dstCache.Store(loc, &amp;dstCacheEntry{
+                standardOffset: standardOffset,
+                lastYear:       year,
+        })
+
+        _, currentOffset := dt.Zone()
+        return currentOffset != standardOffset</span>
+}
+
+// getStandardOffsetOptimized calculates standard offset with optimizations
+func getStandardOffsetOptimized(loc *time.Location, year int) int <span class="cov0" title="0">{
+        // For most locations, the standard time is the non-DST time, which typically occurs in winter
+        // We'll use January (definitely winter) to get the standard offset
+        winterTime := time.Date(year, 1, 15, 12, 0, 0, 0, loc)
+        _, winterOffset := winterTime.Zone()
+
+        // Also check December to be sure
+        decemberTime := time.Date(year, 12, 15, 12, 0, 0, 0, loc)
+        _, decemberOffset := decemberTime.Zone()
+
+        // In the northern hemisphere, winter time is standard time
+        // In the southern hemisphere, it's more complex, but January/December should be consistent
+        if winterOffset == decemberOffset </span><span class="cov0" title="0">{
+                return winterOffset
+        }</span>
+
+        // If they're different, take the smaller offset (standard time is usually less than DST)
+        <span class="cov0" title="0">if winterOffset &lt; decemberOffset </span><span class="cov0" title="0">{
+                return winterOffset
+        }</span>
+        <span class="cov0" title="0">return decemberOffset</span>
+}
+
+// ClearDSTCache clears the DST cache (useful for testing or memory management)
+func ClearDSTCache() <span class="cov0" title="0">{
+        dstCache = sync.Map{}
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package chronogo
+
+import (
+        "errors"
+        "math"
+        "regexp"
+        "strconv"
+        "time"
+)
+
+// ParseISODuration parses an ISO 8601 duration string (e.g., "P1Y2M3DT4H5M6S", "PT15M", "P2W").
+//
+// Notes:
+//   - Years and months are approximated using the same factors as ChronoDuration methods:
+//     1 year = 365.25 days, 1 month = 30.44 days.
+//   - Weeks are converted as 7 days.
+//   - A leading minus sign is supported for negative durations.
+func ParseISODuration(s string) (ChronoDuration, error) <span class="cov0" title="0">{
+        // ^([+-])?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$
+        isoDurRe := regexp.MustCompile(`^([+-])?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
+        m := isoDurRe.FindStringSubmatch(s)
+        if m == nil </span><span class="cov0" title="0">{
+                return ChronoDuration{}, errors.New("invalid ISO 8601 duration")
+        }</span>
+
+        <span class="cov0" title="0">sign := 1.0
+        if m[1] == "-" </span><span class="cov0" title="0">{
+                sign = -1.0
+        }</span>
+
+        <span class="cov0" title="0">parseInt := func(idx int) int64 </span><span class="cov0" title="0">{
+                if idx &gt;= len(m) || m[idx] == "" </span><span class="cov0" title="0">{
+                        return 0
+                }</span>
+                <span class="cov0" title="0">v, _ := strconv.ParseInt(m[idx], 10, 64)
+                return v</span>
+        }
+        <span class="cov0" title="0">parseFloat := func(idx int) float64 </span><span class="cov0" title="0">{
+                if idx &gt;= len(m) || m[idx] == "" </span><span class="cov0" title="0">{
+                        return 0
+                }</span>
+                <span class="cov0" title="0">v, _ := strconv.ParseFloat(m[idx], 64)
+                return v</span>
+        }
+
+        <span class="cov0" title="0">years := parseInt(2)
+        months := parseInt(3)
+        weeks := parseInt(4)
+        days := parseInt(5)
+        hours := parseInt(6)
+        minutes := parseInt(7)
+        seconds := parseFloat(8)
+
+        // Convert everything to time.Duration using approximations for years/months
+        totalSeconds := 0.0
+        totalSeconds += float64(weeks*7*24*3600 + days*24*3600 + hours*3600 + minutes*60)
+        totalSeconds += seconds
+        totalSeconds += float64(months) * 30.44 * 24 * 3600
+        totalSeconds += float64(years) * 365.25 * 24 * 3600
+
+        d := time.Duration(sign * totalSeconds * float64(time.Second))
+        // Normalize to avoid rounding to zero for tiny negatives due to float math
+        if d == 0 &amp;&amp; totalSeconds != 0 </span><span class="cov0" title="0">{
+                if sign &lt; 0 </span><span class="cov0" title="0">{
+                        d = -time.Nanosecond
+                }</span> else<span class="cov0" title="0"> {
+                        d = time.Nanosecond
+                }</span>
+        }
+        // Round to the nearest nanosecond
+        <span class="cov0" title="0">d = time.Duration(math.Round(float64(d)))
+        return ChronoDuration{d}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package chronogo
+
+import (
+        "errors"
+        "fmt"
+        "strings"
+        "time"
+)
+
+// ChronoError represents errors that occur in ChronoGo operations.
+type ChronoError struct {
+        Op         string // Operation that caused the error
+        Path       string // Path or context where error occurred
+        Err        error  // Underlying error
+        Input      string // Input that caused the error (for parsing errors)
+        Suggestion string // Helpful suggestion for fixing the error
+}
+
+// Error implements the error interface.
+func (e *ChronoError) Error() string <span class="cov8" title="1">{
+        var parts []string
+
+        if e.Op != "" </span><span class="cov8" title="1">{
+                parts = append(parts, fmt.Sprintf("chronogo.%s", e.Op))
+        }</span>
+
+        <span class="cov8" title="1">if e.Path != "" </span><span class="cov8" title="1">{
+                parts = append(parts, fmt.Sprintf("(%s)", e.Path))
+        }</span>
+
+        <span class="cov8" title="1">if e.Input != "" </span><span class="cov8" title="1">{
+                parts = append(parts, fmt.Sprintf("input: %q", e.Input))
+        }</span>
+
+        <span class="cov8" title="1">if e.Err != nil </span><span class="cov8" title="1">{
+                parts = append(parts, e.Err.Error())
+        }</span>
+
+        <span class="cov8" title="1">result := strings.Join(parts, ": ")
+
+        if e.Suggestion != "" </span><span class="cov8" title="1">{
+                result += fmt.Sprintf("\nSuggestion: %s", e.Suggestion)
+        }</span>
+
+        <span class="cov8" title="1">return result</span>
+}
+
+// Unwrap returns the underlying error for error wrapping support.
+func (e *ChronoError) Unwrap() error <span class="cov8" title="1">{
+        return e.Err
+}</span>
+
+// Is implements error comparison for errors.Is().
+func (e *ChronoError) Is(target error) bool <span class="cov8" title="1">{
+        if target == nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">if te, ok := target.(*ChronoError); ok </span><span class="cov8" title="1">{
+                return e.Op == te.Op &amp;&amp; e.Path == te.Path
+        }</span>
+
+        <span class="cov8" title="1">return errors.Is(e.Err, target)</span>
+}
+
+// Common error variables for easier error checking
+var (
+        ErrInvalidFormat    = errors.New("invalid datetime format")
+        ErrInvalidTimezone  = errors.New("invalid timezone")
+        ErrInvalidDuration  = errors.New("invalid duration")
+        ErrInvalidRange     = errors.New("invalid range")
+        ErrInvalidOperation = errors.New("invalid operation")
+)
+
+// ParseError creates a ChronoError for parsing operations.
+func ParseError(input string, err error) *ChronoError <span class="cov8" title="1">{
+        suggestion := suggestParseFormat(input)
+        return &amp;ChronoError{
+                Op:         "Parse",
+                Err:        err,
+                Input:      input,
+                Suggestion: suggestion,
+        }
+}</span>
+
+// TimezoneError creates a ChronoError for timezone operations.
+func TimezoneError(timezone string, err error) *ChronoError <span class="cov8" title="1">{
+        suggestion := suggestTimezone(timezone)
+        return &amp;ChronoError{
+                Op:         "LoadLocation",
+                Path:       timezone,
+                Err:        err,
+                Suggestion: suggestion,
+        }
+}</span>
+
+// FormatError creates a ChronoError for formatting operations.
+func FormatError(format string, err error) *ChronoError <span class="cov8" title="1">{
+        suggestion := suggestFormat(format)
+        return &amp;ChronoError{
+                Op:         "Format",
+                Input:      format,
+                Err:        err,
+                Suggestion: suggestion,
+        }
+}</span>
+
+// RangeError creates a ChronoError for range operations.
+func RangeError(start, end DateTime, err error) *ChronoError <span class="cov8" title="1">{
+        return &amp;ChronoError{
+                Op:         "Range",
+                Path:       fmt.Sprintf("%s to %s", start.Format("2006-01-02"), end.Format("2006-01-02")),
+                Err:        err,
+                Suggestion: "Ensure start date is before end date",
+        }
+}</span>
+
+// suggestParseFormat provides helpful suggestions for parse errors.
+func suggestParseFormat(input string) string <span class="cov8" title="1">{
+        if input == "" </span><span class="cov8" title="1">{
+                return "Provide a non-empty datetime string"
+        }</span>
+
+        <span class="cov8" title="1">inputLower := strings.ToLower(input)
+
+        // Detect likely patterns
+        if strings.Contains(input, "T") &amp;&amp; (strings.Contains(input, "Z") || strings.Contains(input, "+")) </span><span class="cov8" title="1">{
+                return "For ISO 8601 format, try: chronogo.ParseISO8601() or chronogo.ParseRFC3339()"
+        }</span>
+
+        <span class="cov8" title="1">if strings.Count(input, "/") == 2 </span><span class="cov8" title="1">{
+                return "For date with slashes, try: chronogo.FromFormat(input, \"01/02/2006\") or \"02/01/2006\""
+        }</span>
+
+        <span class="cov8" title="1">if strings.Count(input, "-") == 2 &amp;&amp; len(input) &gt;= 8 </span><span class="cov8" title="1">{
+                return "For date with dashes, try: chronogo.Parse() which supports ISO format, or chronogo.FromFormat()"
+        }</span>
+
+        <span class="cov8" title="1">if isNumericOnly(input) </span><span class="cov8" title="1">{
+                if len(input) == 10 </span><span class="cov8" title="1">{
+                        return "For Unix timestamp (seconds), try: chronogo.FromUnix(timestamp, time.UTC)"
+                }</span> else<span class="cov8" title="1"> if len(input) == 13 </span><span class="cov8" title="1">{
+                        return "For Unix timestamp (milliseconds), try: chronogo.FromUnixMilli(timestamp, time.UTC)"
+                }</span>
+                <span class="cov0" title="0">return "For numeric timestamps, try: chronogo.FromUnix(), FromUnixMilli(), FromUnixMicro(), or FromUnixNano()"</span>
+        }
+
+        <span class="cov8" title="1">if strings.Contains(inputLower, "ago") || strings.Contains(inputLower, "from now") </span><span class="cov8" title="1">{
+                return "Human-readable relative times are not supported for parsing. Use absolute dates/times."
+        }</span>
+
+        <span class="cov8" title="1">return "Try chronogo.Parse() for common formats, or chronogo.FromFormat() with a custom layout. See Go time package documentation for layout syntax."</span>
+}
+
+// suggestTimezone provides helpful suggestions for timezone errors.
+func suggestTimezone(timezone string) string <span class="cov8" title="1">{
+        if timezone == "" </span><span class="cov8" title="1">{
+                return "Provide a valid IANA timezone name like 'America/New_York' or 'Europe/London'"
+        }</span>
+
+        <span class="cov8" title="1">common := []string{
+                "UTC",
+                "America/New_York",
+                "America/Los_Angeles",
+                "America/Chicago",
+                "Europe/London",
+                "Europe/Paris",
+                "Asia/Tokyo",
+                "Asia/Shanghai",
+                "Australia/Sydney",
+        }
+
+        // Simple similarity check
+        timezoneLower := strings.ToLower(timezone)
+        for _, tz := range common </span><span class="cov8" title="1">{
+                if strings.Contains(strings.ToLower(tz), timezoneLower) ||
+                        strings.Contains(timezoneLower, strings.ToLower(tz)) </span><span class="cov8" title="1">{
+                        return fmt.Sprintf("Did you mean '%s'? Use chronogo.LoadLocation(\"%s\")", tz, tz)
+                }</span>
+        }
+
+        <span class="cov8" title="1">if strings.Contains(timezoneLower, "est") || strings.Contains(timezoneLower, "eastern") </span><span class="cov8" title="1">{
+                return "Try 'America/New_York' for Eastern Time"
+        }</span>
+        <span class="cov8" title="1">if strings.Contains(timezoneLower, "pst") || strings.Contains(timezoneLower, "pacific") </span><span class="cov8" title="1">{
+                return "Try 'America/Los_Angeles' for Pacific Time"
+        }</span>
+        <span class="cov8" title="1">if strings.Contains(timezoneLower, "cst") || strings.Contains(timezoneLower, "central") </span><span class="cov0" title="0">{
+                return "Try 'America/Chicago' for Central Time"
+        }</span>
+        <span class="cov8" title="1">if strings.Contains(timezoneLower, "mst") || strings.Contains(timezoneLower, "mountain") </span><span class="cov0" title="0">{
+                return "Try 'America/Denver' for Mountain Time"
+        }</span>
+
+        <span class="cov8" title="1">return "Use IANA timezone names like 'America/New_York'. List available zones with: chronogo.AvailableTimezones()"</span>
+}
+
+// suggestFormat provides helpful suggestions for format errors.
+func suggestFormat(format string) string <span class="cov8" title="1">{
+        if format == "" </span><span class="cov8" title="1">{
+                return "Provide a format string using Go's reference time: 'Mon Jan 2 15:04:05 MST 2006'"
+        }</span>
+
+        // Common format mistakes and corrections
+        <span class="cov8" title="1">corrections := map[string]string{
+                "YYYY": "2006",
+                "yyyy": "2006",
+                "YY":   "06",
+                "yy":   "06",
+                "MM":   "01",
+                "mm":   "04", // minutes
+                "DD":   "02",
+                "dd":   "02",
+                "HH":   "15",
+                "hh":   "03",
+                "SS":   "05",
+                "ss":   "05",
+        }
+
+        suggestion := "Use Go's reference time format. Common patterns:\n"
+        suggestion += "  Date: '2006-01-02'\n"
+        suggestion += "  Time: '15:04:05'\n"
+        suggestion += "  DateTime: '2006-01-02 15:04:05'\n"
+        suggestion += "  RFC3339: '2006-01-02T15:04:05Z07:00'"
+
+        // Check for common mistakes
+        for wrong, right := range corrections </span><span class="cov8" title="1">{
+                if strings.Contains(format, wrong) </span><span class="cov8" title="1">{
+                        suggestion = fmt.Sprintf("Replace '%s' with '%s'. %s", wrong, right, suggestion)
+                        break</span>
+                }
+        }
+
+        <span class="cov8" title="1">return suggestion</span>
+}
+
+// isNumericOnly checks if a string contains only digits.
+func isNumericOnly(s string) bool <span class="cov8" title="1">{
+        if s == "" </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">for _, r := range s </span><span class="cov8" title="1">{
+                if r &lt; '0' || r &gt; '9' </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+        }
+        <span class="cov8" title="1">return true</span>
+}
+
+// Validation helpers for better developer experience
+
+// Validate checks if a DateTime is valid and returns a helpful error if not.
+func (dt DateTime) Validate() error <span class="cov8" title="1">{
+        if dt.IsZero() </span><span class="cov8" title="1">{
+                return &amp;ChronoError{
+                        Op:         "Validate",
+                        Err:        errors.New("zero DateTime"),
+                        Suggestion: "Initialize DateTime using chronogo.Now(), chronogo.Date(), or chronogo.Parse()",
+                }
+        }</span>
+
+        // Check for reasonable year range
+        <span class="cov8" title="1">year := dt.Year()
+        if year &lt; 1 || year &gt; 9999 </span><span class="cov8" title="1">{
+                return &amp;ChronoError{
+                        Op:         "Validate",
+                        Path:       fmt.Sprintf("year=%d", year),
+                        Err:        errors.New("year out of reasonable range"),
+                        Suggestion: "Use years between 1 and 9999",
+                }
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// ValidateRange checks if a date range is valid.
+func ValidateRange(start, end DateTime) error <span class="cov8" title="1">{
+        if err := start.Validate(); err != nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("invalid start date: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">if err := end.Validate(); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid end date: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">if start.After(end) </span><span class="cov8" title="1">{
+                return RangeError(start, end, ErrInvalidRange)
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// MustParse is like Parse but panics on error. Useful for constants.
+func MustParse(input string) DateTime <span class="cov8" title="1">{
+        dt, err := Parse(input)
+        if err != nil </span><span class="cov8" title="1">{
+                panic(fmt.Sprintf("chronogo.MustParse: %v", err))</span>
+        }
+        <span class="cov8" title="1">return dt</span>
+}
+
+// MustParseInLocation is like ParseInLocation but panics on error.
+func MustParseInLocation(input string, loc *time.Location) DateTime <span class="cov8" title="1">{
+        dt, err := ParseInLocation(input, loc)
+        if err != nil </span><span class="cov8" title="1">{
+                panic(fmt.Sprintf("chronogo.MustParseInLocation: %v", err))</span>
+        }
+        <span class="cov8" title="1">return dt</span>
+}
+
+// MustFromFormat is like FromFormat but panics on error.
+func MustFromFormat(input, layout string) DateTime <span class="cov8" title="1">{
+        dt, err := FromFormat(input, layout)
+        if err != nil </span><span class="cov8" title="1">{
+                panic(fmt.Sprintf("chronogo.MustFromFormat: %v", err))</span>
+        }
+        <span class="cov8" title="1">return dt</span>
+}
+
+// MustLoadLocation is like LoadLocation but panics on error.
+func MustLoadLocation(name string) *time.Location <span class="cov8" title="1">{
+        loc, err := LoadLocation(name)
+        if err != nil </span><span class="cov8" title="1">{
+                panic(fmt.Sprintf("chronogo.MustLoadLocation: %v", err))</span>
+        }
+        <span class="cov8" title="1">return loc</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package chronogo
+
+import (
+        "time"
+)
+
+// FluentDateTime provides a fluent API for building and manipulating DateTime instances.
+// It allows method chaining for more readable and expressive date/time operations.
+type FluentDateTime struct {
+        base DateTime
+}
+
+// FluentDuration provides a fluent API for building durations with human-readable methods.
+// It stores calendar units (years, months) separately from time units for accurate arithmetic.
+// This design ensures that date arithmetic follows Go's time package behavior for calendar operations
+// while maintaining precision for time-based operations.
+type FluentDuration struct {
+        years    int           // Number of years to add/subtract
+        months   int           // Number of months to add/subtract
+        duration time.Duration // Time-based duration (days, hours, minutes, seconds, etc.)
+}
+
+// AddFluent returns a FluentDuration for adding time units to the DateTime.
+func (dt DateTime) AddFluent() *FluentDuration <span class="cov0" title="0">{
+        return &amp;FluentDuration{years: 0, months: 0, duration: 0}
+}</span>
+
+// Set returns a FluentDateTime for setting specific components of the DateTime.
+func (dt DateTime) Set() *FluentDateTime <span class="cov0" title="0">{
+        return &amp;FluentDateTime{base: dt}
+}</span>
+
+// Years adds the specified number of years to the duration.
+func (fd *FluentDuration) Years(years int) *FluentDuration <span class="cov0" title="0">{
+        fd.years += years
+        return fd
+}</span>
+
+// Months adds the specified number of months to the duration.
+func (fd *FluentDuration) Months(months int) *FluentDuration <span class="cov0" title="0">{
+        fd.months += months
+        return fd
+}</span>
+
+// Weeks adds the specified number of weeks to the duration.
+func (fd *FluentDuration) Weeks(weeks int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(weeks) * 7 * 24 * time.Hour
+        return fd
+}</span>
+
+// Days adds the specified number of days to the duration.
+func (fd *FluentDuration) Days(days int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(days) * 24 * time.Hour
+        return fd
+}</span>
+
+// Hours adds the specified number of hours to the duration.
+func (fd *FluentDuration) Hours(hours int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(hours) * time.Hour
+        return fd
+}</span>
+
+// Minutes adds the specified number of minutes to the duration.
+func (fd *FluentDuration) Minutes(minutes int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(minutes) * time.Minute
+        return fd
+}</span>
+
+// Seconds adds the specified number of seconds to the duration.
+func (fd *FluentDuration) Seconds(seconds int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(seconds) * time.Second
+        return fd
+}</span>
+
+// Milliseconds adds the specified number of milliseconds to the duration.
+func (fd *FluentDuration) Milliseconds(milliseconds int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(milliseconds) * time.Millisecond
+        return fd
+}</span>
+
+// Microseconds adds the specified number of microseconds to the duration.
+func (fd *FluentDuration) Microseconds(microseconds int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(microseconds) * time.Microsecond
+        return fd
+}</span>
+
+// Nanoseconds adds the specified number of nanoseconds to the duration.
+func (fd *FluentDuration) Nanoseconds(nanoseconds int) *FluentDuration <span class="cov0" title="0">{
+        fd.duration += time.Duration(nanoseconds) * time.Nanosecond
+        return fd
+}</span>
+
+// To applies the accumulated duration to a DateTime and returns the result.
+func (fd *FluentDuration) To(dt DateTime) DateTime <span class="cov0" title="0">{
+        // Apply calendar-based arithmetic first (years and months)
+        result := dt.AddYears(fd.years).AddMonths(fd.months)
+        // Then apply time-based duration
+        return result.Add(fd.duration)
+}</span>
+
+// From subtracts the accumulated duration from a DateTime and returns the result.
+func (fd *FluentDuration) From(dt DateTime) DateTime <span class="cov0" title="0">{
+        // Apply calendar-based arithmetic first (years and months) in reverse
+        result := dt.AddYears(-fd.years).AddMonths(-fd.months)
+        // Then subtract time-based duration
+        return result.Subtract(fd.duration)
+}</span>
+
+// Year sets the year component.
+func (fdt *FluentDateTime) Year(year int) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.SetYear(year)
+        return fdt
+}</span>
+
+// Month sets the month component.
+func (fdt *FluentDateTime) Month(month time.Month) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.SetMonth(month)
+        return fdt
+}</span>
+
+// Day sets the day component.
+func (fdt *FluentDateTime) Day(day int) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.SetDay(day)
+        return fdt
+}</span>
+
+// Hour sets the hour component.
+func (fdt *FluentDateTime) Hour(hour int) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.SetHour(hour)
+        return fdt
+}</span>
+
+// Minute sets the minute component.
+func (fdt *FluentDateTime) Minute(minute int) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.SetMinute(minute)
+        return fdt
+}</span>
+
+// Second sets the second component.
+func (fdt *FluentDateTime) Second(second int) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.SetSecond(second)
+        return fdt
+}</span>
+
+// Timezone sets the timezone.
+func (fdt *FluentDateTime) Timezone(loc *time.Location) *FluentDateTime <span class="cov0" title="0">{
+        fdt.base = fdt.base.In(loc)
+        return fdt
+}</span>
+
+// Build returns the final DateTime with all modifications applied.
+func (fdt *FluentDateTime) Build() DateTime <span class="cov0" title="0">{
+        return fdt.base
+}</span>
+
+// ChronoDuration extends Go's time.Duration with human-readable formatting and additional operations.
+type ChronoDuration struct {
+        time.Duration
+}
+
+// NewDuration creates a new ChronoDuration from a time.Duration.
+func NewDuration(d time.Duration) ChronoDuration <span class="cov0" title="0">{
+        return ChronoDuration{d}
+}</span>
+
+// NewDurationFromComponents creates a ChronoDuration from individual components.
+func NewDurationFromComponents(hours, minutes, seconds int) ChronoDuration <span class="cov0" title="0">{
+        d := time.Duration(hours)*time.Hour +
+                time.Duration(minutes)*time.Minute +
+                time.Duration(seconds)*time.Second
+        return ChronoDuration{d}
+}</span>
+
+// Years returns the approximate number of years in the duration.
+func (cd ChronoDuration) Years() float64 <span class="cov0" title="0">{
+        return cd.Hours() / (365.25 * 24) // Account for leap years
+}</span>
+
+// Months returns the approximate number of months in the duration.
+func (cd ChronoDuration) Months() float64 <span class="cov0" title="0">{
+        return cd.Hours() / (30.44 * 24) // Average month length
+}</span>
+
+// Weeks returns the number of weeks in the duration.
+func (cd ChronoDuration) Weeks() float64 <span class="cov0" title="0">{
+        return cd.Hours() / (7 * 24)
+}</span>
+
+// Days returns the number of days in the duration.
+func (cd ChronoDuration) Days() float64 <span class="cov0" title="0">{
+        return cd.Hours() / 24
+}</span>
+
+// HumanString returns a human-readable representation of the duration.
+func (cd ChronoDuration) HumanString() string <span class="cov0" title="0">{
+        return Humanize(cd.Duration)
+}</span>
+
+// String returns a string representation of the duration.
+func (cd ChronoDuration) String() string <span class="cov0" title="0">{
+        return cd.Duration.String()
+}</span>
+
+// Add adds another duration to this one.
+func (cd ChronoDuration) Add(other ChronoDuration) ChronoDuration <span class="cov0" title="0">{
+        return ChronoDuration{cd.Duration + other.Duration}
+}</span>
+
+// Subtract subtracts another duration from this one.
+func (cd ChronoDuration) Subtract(other ChronoDuration) ChronoDuration <span class="cov0" title="0">{
+        return ChronoDuration{cd.Duration - other.Duration}
+}</span>
+
+// Multiply multiplies the duration by a factor.
+func (cd ChronoDuration) Multiply(factor float64) ChronoDuration <span class="cov0" title="0">{
+        return ChronoDuration{time.Duration(float64(cd.Duration) * factor)}
+}</span>
+
+// Divide divides the duration by a factor.
+func (cd ChronoDuration) Divide(factor float64) ChronoDuration <span class="cov0" title="0">{
+        return ChronoDuration{time.Duration(float64(cd.Duration) / factor)}
+}</span>
+
+// IsPositive returns true if the duration is positive.
+func (cd ChronoDuration) IsPositive() bool <span class="cov0" title="0">{
+        return cd.Duration &gt; 0
+}</span>
+
+// IsNegative returns true if the duration is negative.
+func (cd ChronoDuration) IsNegative() bool <span class="cov0" title="0">{
+        return cd.Duration &lt; 0
+}</span>
+
+// IsZero returns true if the duration is zero.
+func (cd ChronoDuration) IsZero() bool <span class="cov0" title="0">{
+        return cd.Duration == 0
+}</span>
+
+// Abs returns the absolute value of the duration.
+func (cd ChronoDuration) Abs() ChronoDuration <span class="cov0" title="0">{
+        if cd.Duration &lt; 0 </span><span class="cov0" title="0">{
+                return ChronoDuration{-cd.Duration}
+        }</span>
+        <span class="cov0" title="0">return cd</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package chronogo
+
+import (
+        "fmt"
+        "math"
+        "time"
+)
+
+// DiffForHumans returns a human-readable string describing the difference
+// between this DateTime and another DateTime or the current time.
+func (dt DateTime) DiffForHumans(other ...DateTime) string <span class="cov0" title="0">{
+        var reference DateTime
+        if len(other) &gt; 0 </span><span class="cov0" title="0">{
+                reference = other[0]
+        }</span> else<span class="cov0" title="0"> {
+                reference = Now()
+        }</span>
+
+        <span class="cov0" title="0">return dt.DiffForHumansWithLocale(GetLocale(), reference)</span>
+}
+
+// DiffForHumansWithLocale returns a localized human-readable string describing the difference.
+func (dt DateTime) DiffForHumansWithLocale(localeCode string, other ...DateTime) string <span class="cov0" title="0">{
+        var reference DateTime
+        if len(other) &gt; 0 </span><span class="cov0" title="0">{
+                reference = other[0]
+        }</span> else<span class="cov0" title="0"> {
+                reference = Now()
+        }</span>
+
+        <span class="cov0" title="0">return diffForHumansLocalized(dt, reference, false, localeCode)</span>
+}
+
+// DiffForHumansNow returns a human-readable string describing the difference
+// between this DateTime and the current time.
+func (dt DateTime) DiffForHumansNow() string <span class="cov0" title="0">{
+        return dt.DiffForHumans()
+}</span>
+
+// diffForHumans implements the core logic for human-readable time differences.
+func diffForHumans(dt, reference DateTime, isComparison bool) string <span class="cov0" title="0">{
+        return diffForHumansLocalized(dt, reference, isComparison, GetLocale())
+}</span>
+
+// diffForHumansLocalized implements localized human-readable time differences.
+func diffForHumansLocalized(dt, reference DateTime, isComparison bool, localeCode string) string <span class="cov0" title="0">{
+        duration := dt.Sub(reference)
+        absDuration := time.Duration(math.Abs(float64(duration)))
+
+        // Get locale data
+        locale := getLocaleData(localeCode)
+
+        // Determine if it's past or future
+        isPast := duration &lt; 0
+
+        // Get the appropriate unit and value
+        unit, value := getHumanTimeUnitLocalized(absDuration, locale)
+
+        // Handle special case for very small durations
+        if value == 0 </span><span class="cov0" title="0">{
+                aFew := translate("a_few", locale)
+                seconds := translate("seconds", locale)
+
+                if isComparison </span><span class="cov0" title="0">{
+                        if isPast </span><span class="cov0" title="0">{
+                                return fmt.Sprintf("%s %s %s", aFew, seconds, translate("before", locale))
+                        }</span>
+                        <span class="cov0" title="0">return fmt.Sprintf("%s %s %s", aFew, seconds, translate("after", locale))</span>
+                } else<span class="cov0" title="0"> {
+                        if isPast </span><span class="cov0" title="0">{
+                                return fmt.Sprintf("%s %s %s", aFew, seconds, translate("ago", locale))
+                        }</span>
+                        <span class="cov0" title="0">return fmt.Sprintf("%s %s %s", translate("in", locale), aFew, seconds)</span>
+                }
+        }
+
+        // Format the string based on context and locale
+        <span class="cov0" title="0">if isComparison </span><span class="cov0" title="0">{
+                if isPast </span><span class="cov0" title="0">{
+                        return fmt.Sprintf("%d %s %s", value, unit, translate("before", locale))
+                }</span>
+                <span class="cov0" title="0">return fmt.Sprintf("%d %s %s", value, unit, translate("after", locale))</span>
+        } else<span class="cov0" title="0"> {
+                if isPast </span><span class="cov0" title="0">{
+                        if localeCode == "fr" </span><span class="cov0" title="0">{
+                                // French: "il y a X jours"
+                                return fmt.Sprintf("%s %d %s", translate("ago", locale), value, unit)
+                        }</span> else<span class="cov0" title="0"> if localeCode == "es" </span><span class="cov0" title="0">{
+                                // Spanish: "hace X días"
+                                return fmt.Sprintf("%s %d %s", translate("ago", locale), value, unit)
+                        }</span> else<span class="cov0" title="0"> if localeCode == "de" </span><span class="cov0" title="0">{
+                                // German: "vor X Tagen"
+                                return fmt.Sprintf("%s %d %s", translate("ago", locale), value, unit)
+                        }</span> else<span class="cov0" title="0"> {
+                                // English: "X days ago"
+                                return fmt.Sprintf("%d %s %s", value, unit, translate("ago", locale))
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        if localeCode == "fr" </span><span class="cov0" title="0">{
+                                // French: "dans X jours"
+                                return fmt.Sprintf("%s %d %s", translate("in", locale), value, unit)
+                        }</span> else<span class="cov0" title="0"> if localeCode == "es" </span><span class="cov0" title="0">{
+                                // Spanish: "en X días"
+                                return fmt.Sprintf("%s %d %s", translate("in", locale), value, unit)
+                        }</span> else<span class="cov0" title="0"> if localeCode == "de" </span><span class="cov0" title="0">{
+                                // German: "in X Tagen"
+                                return fmt.Sprintf("%s %d %s", translate("in", locale), value, unit)
+                        }</span> else<span class="cov0" title="0"> {
+                                // English: "in X days"
+                                return fmt.Sprintf("%s %d %s", translate("in", locale), value, unit)
+                        }</span>
+                }
+        }
+}
+
+// getHumanTimeUnit determines the most appropriate unit for human display.
+func getHumanTimeUnit(duration time.Duration) (string, int) <span class="cov0" title="0">{
+        seconds := int(duration.Seconds())
+        minutes := int(duration.Minutes())
+        hours := int(duration.Hours())
+        days := int(duration.Hours() / 24)
+        weeks := days / 7
+        months := days / 30 // Approximate
+        years := days / 365 // Approximate
+
+        switch </span>{
+        case years &gt; 0:<span class="cov0" title="0">
+                unit := "year"
+                if years != 1 </span><span class="cov0" title="0">{
+                        unit = "years"
+                }</span>
+                <span class="cov0" title="0">return unit, years</span>
+
+        case months &gt; 0:<span class="cov0" title="0">
+                unit := "month"
+                if months != 1 </span><span class="cov0" title="0">{
+                        unit = "months"
+                }</span>
+                <span class="cov0" title="0">return unit, months</span>
+
+        case weeks &gt; 0:<span class="cov0" title="0">
+                unit := "week"
+                if weeks != 1 </span><span class="cov0" title="0">{
+                        unit = "weeks"
+                }</span>
+                <span class="cov0" title="0">return unit, weeks</span>
+
+        case days &gt; 0:<span class="cov0" title="0">
+                unit := "day"
+                if days != 1 </span><span class="cov0" title="0">{
+                        unit = "days"
+                }</span>
+                <span class="cov0" title="0">return unit, days</span>
+
+        case hours &gt; 0:<span class="cov0" title="0">
+                unit := "hour"
+                if hours != 1 </span><span class="cov0" title="0">{
+                        unit = "hours"
+                }</span>
+                <span class="cov0" title="0">return unit, hours</span>
+
+        case minutes &gt; 0:<span class="cov0" title="0">
+                unit := "minute"
+                if minutes != 1 </span><span class="cov0" title="0">{
+                        unit = "minutes"
+                }</span>
+                <span class="cov0" title="0">return unit, minutes</span>
+
+        case seconds &gt;= 10:<span class="cov0" title="0">
+                return "seconds", seconds</span>
+
+        default:<span class="cov0" title="0">
+                return "seconds", 0</span> // "a few seconds"
+        }
+}
+
+// getHumanTimeUnitLocalized determines the most appropriate unit for human display with localization.
+func getHumanTimeUnitLocalized(duration time.Duration, locale *Locale) (string, int) <span class="cov0" title="0">{
+        seconds := int(duration.Seconds())
+        minutes := int(duration.Minutes())
+        hours := int(duration.Hours())
+        days := int(duration.Hours() / 24)
+        weeks := days / 7
+        months := days / 30 // Approximate
+        years := days / 365 // Approximate
+
+        switch </span>{
+        case years &gt; 0:<span class="cov0" title="0">
+                unitKey := "year"
+                if years != 1 </span><span class="cov0" title="0">{
+                        unitKey = "years"
+                }</span>
+                <span class="cov0" title="0">return translate(unitKey, locale), years</span>
+
+        case months &gt; 0:<span class="cov0" title="0">
+                unitKey := "month"
+                if months != 1 </span><span class="cov0" title="0">{
+                        unitKey = "months"
+                }</span>
+                <span class="cov0" title="0">return translate(unitKey, locale), months</span>
+
+        case weeks &gt; 0:<span class="cov0" title="0">
+                unitKey := "week"
+                if weeks != 1 </span><span class="cov0" title="0">{
+                        unitKey = "weeks"
+                }</span>
+                <span class="cov0" title="0">return translate(unitKey, locale), weeks</span>
+
+        case days &gt; 0:<span class="cov0" title="0">
+                unitKey := "day"
+                if days != 1 </span><span class="cov0" title="0">{
+                        unitKey = "days"
+                }</span>
+                <span class="cov0" title="0">return translate(unitKey, locale), days</span>
+
+        case hours &gt; 0:<span class="cov0" title="0">
+                unitKey := "hour"
+                if hours != 1 </span><span class="cov0" title="0">{
+                        unitKey = "hours"
+                }</span>
+                <span class="cov0" title="0">return translate(unitKey, locale), hours</span>
+
+        case minutes &gt; 0:<span class="cov0" title="0">
+                unitKey := "minute"
+                if minutes != 1 </span><span class="cov0" title="0">{
+                        unitKey = "minutes"
+                }</span>
+                <span class="cov0" title="0">return translate(unitKey, locale), minutes</span>
+
+        case seconds &gt;= 10:<span class="cov0" title="0">
+                return translate("seconds", locale), seconds</span>
+
+        default:<span class="cov0" title="0">
+                return translate("seconds", locale), 0</span> // "a few seconds"
+        }
+}
+
+// Humanize returns a human-readable representation of a duration.
+func Humanize(duration time.Duration) string <span class="cov0" title="0">{
+        if duration == 0 </span><span class="cov0" title="0">{
+                return "0 seconds"
+        }</span>
+
+        <span class="cov0" title="0">absDuration := time.Duration(math.Abs(float64(duration)))
+        unit, value := getHumanTimeUnit(absDuration)
+
+        if value == 0 </span><span class="cov0" title="0">{
+                if duration &lt; 0 </span><span class="cov0" title="0">{
+                        return "-a few seconds"
+                }</span>
+                <span class="cov0" title="0">return "a few seconds"</span>
+        }
+
+        <span class="cov0" title="0">if duration &lt; 0 </span><span class="cov0" title="0">{
+                return fmt.Sprintf("-%d %s", value, unit)
+        }</span>
+
+        <span class="cov0" title="0">return fmt.Sprintf("%d %s", value, unit)</span>
+}
+
+// Age returns the age of the DateTime compared to now.
+func (dt DateTime) Age() string <span class="cov0" title="0">{
+        now := Now()
+        if dt.After(now) </span><span class="cov0" title="0">{
+                return "not yet born"
+        }</span>
+
+        <span class="cov0" title="0">duration := now.Sub(dt)
+        years := int(duration.Hours() / 24 / 365.25) // More accurate calculation
+
+        if years == 0 </span><span class="cov0" title="0">{
+                months := int(duration.Hours() / 24 / 30.44) // Average month length
+                if months == 0 </span><span class="cov0" title="0">{
+                        days := int(duration.Hours() / 24)
+                        if days == 1 </span><span class="cov0" title="0">{
+                                return "1 day old"
+                        }</span>
+                        <span class="cov0" title="0">return fmt.Sprintf("%d days old", days)</span>
+                }
+                <span class="cov0" title="0">if months == 1 </span><span class="cov0" title="0">{
+                        return "1 month old"
+                }</span>
+                <span class="cov0" title="0">return fmt.Sprintf("%d months old", months)</span>
+        }
+
+        <span class="cov0" title="0">if years == 1 </span><span class="cov0" title="0">{
+                return "1 year old"
+        }</span>
+        <span class="cov0" title="0">return fmt.Sprintf("%d years old", years)</span>
+}
+
+// TimeFromNow returns a human-readable string representing when this DateTime
+// will occur relative to now.
+func (dt DateTime) TimeFromNow() string <span class="cov0" title="0">{
+        now := Now()
+        if dt.Before(now) </span><span class="cov0" title="0">{
+                return dt.DiffForHumans()
+        }</span>
+        <span class="cov0" title="0">return dt.DiffForHumans()</span>
+}
+
+// TimeAgo returns a human-readable string representing how long ago this DateTime occurred.
+func (dt DateTime) TimeAgo() string <span class="cov0" title="0">{
+        return dt.DiffForHumans()
+}</span>
+
+// DiffForHumansComparison returns a human-readable string describing the difference
+// between this DateTime and another using "before/after" format for explicit comparisons.
+func (dt DateTime) DiffForHumansComparison(other DateTime) string <span class="cov0" title="0">{
+        return diffForHumans(dt, other, true) // Use before/after format for explicit comparisons
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package chronogo
+
+import (
+        "fmt"
+        "sync"
+)
+
+// Locale represents a localization configuration
+type Locale struct {
+        Code    string
+        Name    string
+        Phrases map[string]string
+        Plurals map[string]func(int) string
+}
+
+// Global locale management
+var (
+        defaultLocale = "en"
+        currentLocale = "en"
+        locales       = make(map[string]*Locale)
+        localeMutex   sync.RWMutex
+)
+
+// Initialize with English locale
+func init() <span class="cov8" title="1">{
+        RegisterLocale(&amp;Locale{
+                Code: "en",
+                Name: "English",
+                Phrases: map[string]string{
+                        "year":      "year",
+                        "years":     "years",
+                        "month":     "month",
+                        "months":    "months",
+                        "week":      "week",
+                        "weeks":     "weeks",
+                        "day":       "day",
+                        "days":      "days",
+                        "hour":      "hour",
+                        "hours":     "hours",
+                        "minute":    "minute",
+                        "minutes":   "minutes",
+                        "second":    "second",
+                        "seconds":   "seconds",
+                        "ago":       "ago",
+                        "from_now":  "from now",
+                        "in":        "in",
+                        "before":    "before",
+                        "after":     "after",
+                        "a_few":     "a few",
+                        "about":     "about",
+                        "less_than": "less than",
+                        "almost":    "almost",
+                        "over":      "over",
+                        "january":   "January",
+                        "february":  "February",
+                        "march":     "March",
+                        "april":     "April",
+                        "may":       "May",
+                        "june":      "June",
+                        "july":      "July",
+                        "august":    "August",
+                        "september": "September",
+                        "october":   "October",
+                        "november":  "November",
+                        "december":  "December",
+                        "monday":    "Monday",
+                        "tuesday":   "Tuesday",
+                        "wednesday": "Wednesday",
+                        "thursday":  "Thursday",
+                        "friday":    "Friday",
+                        "saturday":  "Saturday",
+                        "sunday":    "Sunday",
+                },
+                Plurals: map[string]func(int) string{
+                        "default": func(n int) string </span><span class="cov0" title="0">{
+                                if n == 1 </span><span class="cov0" title="0">{
+                                        return "singular"
+                                }</span>
+                                <span class="cov0" title="0">return "plural"</span>
+                        },
+                },
+        })
+
+        // German locale
+        <span class="cov8" title="1">RegisterLocale(&amp;Locale{
+                Code: "de",
+                Name: "Deutsch",
+                Phrases: map[string]string{
+                        "year":      "Jahr",
+                        "years":     "Jahre",
+                        "month":     "Monat",
+                        "months":    "Monate",
+                        "week":      "Woche",
+                        "weeks":     "Wochen",
+                        "day":       "Tag",
+                        "days":      "Tage",
+                        "hour":      "Stunde",
+                        "hours":     "Stunden",
+                        "minute":    "Minute",
+                        "minutes":   "Minuten",
+                        "second":    "Sekunde",
+                        "seconds":   "Sekunden",
+                        "ago":       "vor",
+                        "from_now":  "ab jetzt",
+                        "in":        "in",
+                        "before":    "vor",
+                        "after":     "nach",
+                        "a_few":     "ein paar",
+                        "about":     "etwa",
+                        "january":   "Januar",
+                        "february":  "Februar",
+                        "march":     "März",
+                        "april":     "April",
+                        "may":       "Mai",
+                        "june":      "Juni",
+                        "july":      "Juli",
+                        "august":    "August",
+                        "september": "September",
+                        "october":   "Oktober",
+                        "november":  "November",
+                        "december":  "Dezember",
+                        "monday":    "Montag",
+                        "tuesday":   "Dienstag",
+                        "wednesday": "Mittwoch",
+                        "thursday":  "Donnerstag",
+                        "friday":    "Freitag",
+                        "saturday":  "Samstag",
+                        "sunday":    "Sonntag",
+                },
+        })
+
+        // French locale
+        RegisterLocale(&amp;Locale{
+                Code: "fr",
+                Name: "Français",
+                Phrases: map[string]string{
+                        "year":      "année",
+                        "years":     "années",
+                        "month":     "mois",
+                        "months":    "mois",
+                        "week":      "semaine",
+                        "weeks":     "semaines",
+                        "day":       "jour",
+                        "days":      "jours",
+                        "hour":      "heure",
+                        "hours":     "heures",
+                        "minute":    "minute",
+                        "minutes":   "minutes",
+                        "second":    "seconde",
+                        "seconds":   "secondes",
+                        "ago":       "il y a",
+                        "from_now":  "d'ici",
+                        "in":        "dans",
+                        "before":    "avant",
+                        "after":     "après",
+                        "a_few":     "quelques",
+                        "about":     "environ",
+                        "january":   "janvier",
+                        "february":  "février",
+                        "march":     "mars",
+                        "april":     "avril",
+                        "may":       "mai",
+                        "june":      "juin",
+                        "july":      "juillet",
+                        "august":    "août",
+                        "september": "septembre",
+                        "october":   "octobre",
+                        "november":  "novembre",
+                        "december":  "décembre",
+                        "monday":    "lundi",
+                        "tuesday":   "mardi",
+                        "wednesday": "mercredi",
+                        "thursday":  "jeudi",
+                        "friday":    "vendredi",
+                        "saturday":  "samedi",
+                        "sunday":    "dimanche",
+                },
+        })
+
+        // Spanish locale
+        RegisterLocale(&amp;Locale{
+                Code: "es",
+                Name: "Español",
+                Phrases: map[string]string{
+                        "year":      "año",
+                        "years":     "años",
+                        "month":     "mes",
+                        "months":    "meses",
+                        "week":      "semana",
+                        "weeks":     "semanas",
+                        "day":       "día",
+                        "days":      "días",
+                        "hour":      "hora",
+                        "hours":     "horas",
+                        "minute":    "minuto",
+                        "minutes":   "minutos",
+                        "second":    "segundo",
+                        "seconds":   "segundos",
+                        "ago":       "hace",
+                        "from_now":  "desde ahora",
+                        "in":        "en",
+                        "before":    "antes",
+                        "after":     "después",
+                        "a_few":     "unos pocos",
+                        "about":     "aproximadamente",
+                        "january":   "enero",
+                        "february":  "febrero",
+                        "march":     "marzo",
+                        "april":     "abril",
+                        "may":       "mayo",
+                        "june":      "junio",
+                        "july":      "julio",
+                        "august":    "agosto",
+                        "september": "septiembre",
+                        "october":   "octubre",
+                        "november":  "noviembre",
+                        "december":  "diciembre",
+                        "monday":    "lunes",
+                        "tuesday":   "martes",
+                        "wednesday": "miércoles",
+                        "thursday":  "jueves",
+                        "friday":    "viernes",
+                        "saturday":  "sábado",
+                        "sunday":    "domingo",
+                },
+        })</span>
+}
+
+// RegisterLocale registers a new locale
+func RegisterLocale(locale *Locale) <span class="cov8" title="1">{
+        localeMutex.Lock()
+        defer localeMutex.Unlock()
+        locales[locale.Code] = locale
+}</span>
+
+// SetLocale sets the global locale
+func SetLocale(localeCode string) error <span class="cov0" title="0">{
+        localeMutex.RLock()
+        _, exists := locales[localeCode]
+        localeMutex.RUnlock()
+
+        if !exists </span><span class="cov0" title="0">{
+                return fmt.Errorf("locale '%s' not found", localeCode)
+        }</span>
+
+        <span class="cov0" title="0">localeMutex.Lock()
+        currentLocale = localeCode
+        localeMutex.Unlock()
+
+        return nil</span>
+}
+
+// GetLocale returns the current global locale code
+func GetLocale() string <span class="cov0" title="0">{
+        localeMutex.RLock()
+        defer localeMutex.RUnlock()
+        return currentLocale
+}</span>
+
+// GetAvailableLocales returns a list of available locale codes
+func GetAvailableLocales() []string <span class="cov0" title="0">{
+        localeMutex.RLock()
+        defer localeMutex.RUnlock()
+
+        codes := make([]string, 0, len(locales))
+        for code := range locales </span><span class="cov0" title="0">{
+                codes = append(codes, code)
+        }</span>
+        <span class="cov0" title="0">return codes</span>
+}
+
+// getLocaleData returns the locale data for the given code, falling back to default
+func getLocaleData(localeCode string) *Locale <span class="cov0" title="0">{
+        localeMutex.RLock()
+        defer localeMutex.RUnlock()
+
+        if locale, exists := locales[localeCode]; exists </span><span class="cov0" title="0">{
+                return locale
+        }</span>
+
+        // Fallback to default locale
+        <span class="cov0" title="0">if locale, exists := locales[defaultLocale]; exists </span><span class="cov0" title="0">{
+                return locale
+        }</span>
+
+        // Ultimate fallback to English
+        <span class="cov0" title="0">return locales["en"]</span>
+}
+
+// translate translates a key using the given locale
+func translate(key string, locale *Locale) string <span class="cov0" title="0">{
+        if phrase, exists := locale.Phrases[key]; exists </span><span class="cov0" title="0">{
+                return phrase
+        }</span>
+
+        // Fallback to English if translation not found
+        <span class="cov0" title="0">if englishLocale, exists := locales["en"]; exists </span><span class="cov0" title="0">{
+                if phrase, exists := englishLocale.Phrases[key]; exists </span><span class="cov0" title="0">{
+                        return phrase
+                }</span>
+        }
+
+        // Ultimate fallback to the key itself
+        <span class="cov0" title="0">return key</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package chronogo
+
+import (
+        "errors"
+        "regexp"
+        "strconv"
+        "strings"
+        "time"
+)
+
+var (
+        // Common datetime patterns
+        iso8601Pattern = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$`)
+
+        // Common layouts for parsing
+        commonLayouts = []string{
+                // strict RFC/ISO
+                time.RFC3339,
+                time.RFC3339Nano,
+                "2006-01-02T15:04:05Z07:00",
+                // space and naive
+                "2006-01-02 15:04:05",
+                "2006-01-02 15:04",
+                "2006-01-02",
+                // lenient separators and compact
+                "2006/01/02 15:04:05",
+                "2006/01/02",
+                "2006-1-2 15:04:05",
+                "2006-1-2",
+                "20060102",
+                // time-only
+                "15:04:05",
+                "15:04",
+        }
+)
+
+// Parse parses a datetime string using common formats (lenient by default) in UTC.
+func Parse(value string) (DateTime, error) <span class="cov8" title="1">{
+        return ParseInLocation(value, time.UTC)
+}</span>
+
+// ParseInLocation parses a datetime string in the specified location.
+// ParseInLocation parses a datetime string in the specified location using a lenient set of formats.
+func ParseInLocation(value string, loc *time.Location) (DateTime, error) <span class="cov8" title="1">{
+        value = strings.TrimSpace(value)
+
+        if value == "" </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, errors.New("empty string"))
+        }</span>
+
+        // Try each common layout (lenient set)
+        <span class="cov8" title="1">for _, layout := range commonLayouts </span><span class="cov8" title="1">{
+                if t, err := time.ParseInLocation(layout, value, loc); err == nil </span><span class="cov8" title="1">{
+                        return DateTime{t}, nil
+                }</span>
+        }
+
+        <span class="cov8" title="1">return DateTime{}, ParseError(value, errors.New("no matching format found"))</span>
+}
+
+// ParseStrict parses using a stricter set of layouts (RFC3339 and ISO8601 variants only).
+func ParseStrict(value string) (DateTime, error) <span class="cov0" title="0">{
+        return ParseStrictInLocation(value, time.UTC)
+}</span>
+
+// ParseStrictInLocation is the location-aware strict parser.
+func ParseStrictInLocation(value string, loc *time.Location) (DateTime, error) <span class="cov0" title="0">{
+        value = strings.TrimSpace(value)
+        if value == "" </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, errors.New("empty string"))
+        }</span>
+        <span class="cov0" title="0">strictLayouts := []string{
+                time.RFC3339,
+                time.RFC3339Nano,
+                "2006-01-02T15:04:05Z07:00",
+                "2006-01-02T15:04:05",
+        }
+        for _, layout := range strictLayouts </span><span class="cov0" title="0">{
+                if t, err := time.ParseInLocation(layout, value, loc); err == nil </span><span class="cov0" title="0">{
+                        return DateTime{t}, nil
+                }</span>
+        }
+        <span class="cov0" title="0">return DateTime{}, ParseError(value, errors.New("no matching strict format found"))</span>
+}
+
+// ParseISO8601 parses an ISO 8601 formatted datetime string.
+func ParseISO8601(value string) (DateTime, error) <span class="cov0" title="0">{
+        if !iso8601Pattern.MatchString(value) </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, errors.New("invalid ISO 8601 format"))
+        }</span>
+
+        <span class="cov0" title="0">t, err := time.Parse(time.RFC3339, value)
+        if err != nil </span><span class="cov0" title="0">{
+                // Try with nanoseconds
+                t, err = time.Parse(time.RFC3339Nano, value)
+                if err != nil </span><span class="cov0" title="0">{
+                        return DateTime{}, ParseError(value, err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return DateTime{t}, nil</span>
+}
+
+// ParseRFC3339 parses an RFC 3339 formatted datetime string.
+func ParseRFC3339(value string) (DateTime, error) <span class="cov0" title="0">{
+        t, err := time.Parse(time.RFC3339, value)
+        if err != nil </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, err)
+        }</span>
+        <span class="cov0" title="0">return DateTime{t}, nil</span>
+}
+
+// FromFormat parses a datetime string using a custom format layout.
+// This is similar to modern datetime libraries but uses Go's time format syntax.
+func FromFormat(value, layout string) (DateTime, error) <span class="cov8" title="1">{
+        return FromFormatInLocation(value, layout, time.UTC)
+}</span>
+
+// FromFormatInLocation parses a datetime string using a custom format layout in the specified location.
+func FromFormatInLocation(value, layout string, loc *time.Location) (DateTime, error) <span class="cov8" title="1">{
+        t, err := time.ParseInLocation(layout, value, loc)
+        if err != nil </span><span class="cov8" title="1">{
+                return DateTime{}, FormatError(layout, err)
+        }</span>
+        <span class="cov8" title="1">return DateTime{t}, nil</span>
+}
+
+// LoadLocation loads a timezone by name.
+// This is a convenience wrapper around time.LoadLocation.
+func LoadLocation(name string) (*time.Location, error) <span class="cov8" title="1">{
+        if name == "local" </span><span class="cov0" title="0">{
+                return time.Local, nil
+        }</span>
+        <span class="cov8" title="1">loc, err := time.LoadLocation(name)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, TimezoneError(name, err)
+        }</span>
+        <span class="cov8" title="1">return loc, nil</span>
+}
+
+// Instance creates a DateTime from a standard time.Time.
+func Instance(t time.Time) DateTime <span class="cov0" title="0">{
+        return DateTime{t}
+}</span>
+
+// parseUnixTimestamp attempts to parse a Unix timestamp string.
+func parseUnixTimestamp(value string) (DateTime, error) <span class="cov0" title="0">{
+        return parseUnixTimestampInLocation(value, time.UTC)
+}</span>
+
+// parseUnixTimestampInLocation attempts to parse a Unix timestamp string in a specific location.
+func parseUnixTimestampInLocation(value string, loc *time.Location) (DateTime, error) <span class="cov0" title="0">{
+        s := strings.TrimSpace(value)
+        if s == "" </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, errors.New("invalid Unix timestamp"))
+        }</span>
+
+        // Detect length ignoring leading sign
+        <span class="cov0" title="0">signless := s
+        if s[0] == '-' || s[0] == '+' </span><span class="cov0" title="0">{
+                signless = s[1:]
+        }</span>
+
+        // Parse as int64
+        <span class="cov0" title="0">ts, err := strconv.ParseInt(s, 10, 64)
+        if err != nil </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, errors.New("invalid Unix timestamp"))
+        }</span>
+
+        <span class="cov0" title="0">var t time.Time
+        switch l := len(signless); l </span>{
+        case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10:<span class="cov0" title="0"> // seconds (support small absolute values too)
+                t = time.Unix(ts, 0)</span>
+        case 13:<span class="cov0" title="0"> // milliseconds
+                t = time.UnixMilli(ts)</span>
+        case 16:<span class="cov0" title="0"> // microseconds
+                t = time.UnixMicro(ts)</span>
+        case 19:<span class="cov0" title="0"> // nanoseconds
+                t = time.Unix(0, ts)</span>
+        default:<span class="cov0" title="0">
+                return DateTime{}, ParseError(value, errors.New("invalid Unix timestamp length"))</span>
+        }
+
+        // Convert to the specified location
+        <span class="cov0" title="0">return DateTime{t.In(loc)}, nil</span>
+}
+
+// TryParseUnix attempts to parse a string as a Unix timestamp.
+func TryParseUnix(value string) (DateTime, error) <span class="cov0" title="0">{
+        return parseUnixTimestamp(value)
+}</span>
+
+// AvailableTimezones returns a list of commonly used timezone names.
+// This is helpful for error suggestions and validation.
+func AvailableTimezones() []string <span class="cov0" title="0">{
+        return []string{
+                "UTC",
+                "Local",
+                // Americas
+                "America/New_York",
+                "America/Chicago",
+                "America/Denver",
+                "America/Los_Angeles",
+                "America/Toronto",
+                "America/Vancouver",
+                "America/Mexico_City",
+                "America/Sao_Paulo",
+                "America/Argentina/Buenos_Aires",
+                // Europe
+                "Europe/London",
+                "Europe/Paris",
+                "Europe/Berlin",
+                "Europe/Rome",
+                "Europe/Madrid",
+                "Europe/Amsterdam",
+                "Europe/Stockholm",
+                "Europe/Moscow",
+                // Asia
+                "Asia/Tokyo",
+                "Asia/Shanghai",
+                "Asia/Hong_Kong",
+                "Asia/Singapore",
+                "Asia/Bangkok",
+                "Asia/Jakarta",
+                "Asia/Manila",
+                "Asia/Seoul",
+                "Asia/Kolkata",
+                "Asia/Dubai",
+                // Australia/Pacific
+                "Australia/Sydney",
+                "Australia/Melbourne",
+                "Australia/Perth",
+                "Pacific/Auckland",
+                "Pacific/Honolulu",
+                // Africa
+                "Africa/Cairo",
+                "Africa/Johannesburg",
+                "Africa/Lagos",
+        }
+}</span>
+
+// IsValidTimezone checks if a timezone name is valid.
+func IsValidTimezone(name string) bool <span class="cov0" title="0">{
+        _, err := time.LoadLocation(name)
+        return err == nil
+}</span>
+
+// ParseOptimized provides faster parsing by using heuristics to detect the format
+func ParseOptimized(value string) (DateTime, error) <span class="cov0" title="0">{
+        return ParseOptimizedInLocation(value, time.UTC)
+}</span>
+
+// ParseOptimizedInLocation parses with optimized format detection
+func ParseOptimizedInLocation(value string, loc *time.Location) (DateTime, error) <span class="cov0" title="0">{
+        value = strings.TrimSpace(value)
+        if value == "" </span><span class="cov0" title="0">{
+                return DateTime{}, ParseError(value, errors.New("empty string"))
+        }</span>
+
+        // Check for compact date format first (8 digits like 20231225)
+        <span class="cov0" title="0">if len(value) == 8 &amp;&amp; isAllDigits(value) </span><span class="cov0" title="0">{
+                if t, err := time.ParseInLocation("20060102", value, loc); err == nil </span><span class="cov0" title="0">{
+                        return DateTime{t}, nil
+                }</span>
+        }
+
+        // Fast path for numeric-only strings (Unix timestamps) - but not 8-digit dates
+        <span class="cov0" title="0">if isNumericOnly(value) &amp;&amp; len(value) != 8 </span><span class="cov0" title="0">{
+                return parseUnixTimestampInLocation(value, loc)
+        }</span>
+
+        // Detect format based on string characteristics
+        <span class="cov0" title="0">layout := detectLayout(value)
+        if layout != "" </span><span class="cov0" title="0">{
+                if t, err := time.ParseInLocation(layout, value, loc); err == nil </span><span class="cov0" title="0">{
+                        return DateTime{t}, nil
+                }</span>
+        }
+
+        // Fallback to trying common layouts in optimized order
+        <span class="cov0" title="0">return parseWithOptimizedOrder(value, loc)</span>
+}
+
+// detectLayout uses heuristics to detect the likely format
+func detectLayout(value string) string <span class="cov0" title="0">{
+        length := len(value)
+
+        // ISO 8601 / RFC 3339 patterns and space-separated datetime patterns
+        if length &gt;= 16 &amp;&amp; value[4] == '-' &amp;&amp; value[7] == '-' </span><span class="cov0" title="0">{
+                if value[10] == 'T' &amp;&amp; length &gt;= 19 </span><span class="cov0" title="0">{
+                        if strings.HasSuffix(value, "Z") </span><span class="cov0" title="0">{
+                                if length == 20 </span><span class="cov0" title="0">{
+                                        return "2006-01-02T15:04:05Z"
+                                }</span>
+                                <span class="cov0" title="0">return time.RFC3339Nano</span>
+                        }
+                        <span class="cov0" title="0">if length &gt;= 25 &amp;&amp; (value[19] == '+' || value[19] == '-') </span><span class="cov0" title="0">{
+                                return time.RFC3339
+                        }</span>
+                        <span class="cov0" title="0">if length == 19 </span><span class="cov0" title="0">{
+                                return "2006-01-02T15:04:05"
+                        }</span>
+                } else<span class="cov0" title="0"> if length &gt;= 16 &amp;&amp; len(value) &gt; 10 &amp;&amp; value[10] == ' ' </span><span class="cov0" title="0">{
+                        if length == 19 </span><span class="cov0" title="0">{
+                                return "2006-01-02 15:04:05"
+                        }</span>
+                        <span class="cov0" title="0">if length == 16 </span><span class="cov0" title="0">{
+                                return "2006-01-02 15:04"
+                        }</span>
+                }
+        }
+
+        // Date-only patterns
+        <span class="cov0" title="0">if length == 10 &amp;&amp; value[4] == '-' &amp;&amp; value[7] == '-' </span><span class="cov0" title="0">{
+                return "2006-01-02"
+        }</span>
+
+        // Compact date pattern
+        <span class="cov0" title="0">if length == 8 &amp;&amp; isAllDigits(value) </span><span class="cov0" title="0">{
+                return "20060102"
+        }</span>
+
+        // Slash-separated patterns
+        <span class="cov0" title="0">if strings.Contains(value, "/") </span><span class="cov0" title="0">{
+                if length &gt;= 19 &amp;&amp; value[4] == '/' &amp;&amp; value[7] == '/' </span><span class="cov0" title="0">{
+                        return "2006/01/02 15:04:05"
+                }</span>
+                <span class="cov0" title="0">if length == 10 &amp;&amp; value[4] == '/' &amp;&amp; value[7] == '/' </span><span class="cov0" title="0">{
+                        return "2006/01/02"
+                }</span>
+        }
+
+        // Time-only patterns
+        <span class="cov0" title="0">if length &gt;= 5 &amp;&amp; strings.Contains(value, ":") &amp;&amp; !strings.Contains(value, "-") &amp;&amp; !strings.Contains(value, "/") </span><span class="cov0" title="0">{
+                if length == 8 </span><span class="cov0" title="0">{
+                        return "15:04:05"
+                }</span>
+                <span class="cov0" title="0">if length == 5 </span><span class="cov0" title="0">{
+                        return "15:04"
+                }</span>
+        }
+
+        <span class="cov0" title="0">return ""</span>
+}
+
+// parseWithOptimizedOrder tries layouts in order of likelihood
+func parseWithOptimizedOrder(value string, loc *time.Location) (DateTime, error) <span class="cov0" title="0">{
+        // Reorder layouts based on frequency of use in real applications
+        optimizedLayouts := []string{
+                // Most common API formats first
+                time.RFC3339,
+                "2006-01-02T15:04:05Z",
+                "2006-01-02T15:04:05",
+                "2006-01-02 15:04:05",
+                "2006-01-02",
+
+                // Less common but still used
+                time.RFC3339Nano,
+                "2006-01-02T15:04:05Z07:00",
+                "2006-01-02 15:04",
+                "2006/01/02 15:04:05",
+                "2006/01/02",
+
+                // Rare formats last
+                "2006-1-2 15:04:05",
+                "2006-1-2",
+                "20060102",
+                "15:04:05",
+                "15:04",
+        }
+
+        for _, layout := range optimizedLayouts </span><span class="cov0" title="0">{
+                if t, err := time.ParseInLocation(layout, value, loc); err == nil </span><span class="cov0" title="0">{
+                        return DateTime{t}, nil
+                }</span>
+        }
+
+        <span class="cov0" title="0">return DateTime{}, ParseError(value, errors.New("no matching format found"))</span>
+}
+
+// isAllDigits checks if string contains only digits (faster than regex)
+func isAllDigits(s string) bool <span class="cov0" title="0">{
+        if len(s) == 0 </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">for i := 0; i &lt; len(s); i++ </span><span class="cov0" title="0">{
+                if s[i] &lt; '0' || s[i] &gt; '9' </span><span class="cov0" title="0">{
+                        return false
+                }</span>
+        }
+        <span class="cov0" title="0">return true</span>
+}
+
+// ParseBatch parses multiple values efficiently (useful for CSV imports, etc.)
+func ParseBatch(values []string, loc *time.Location) ([]DateTime, []error) <span class="cov0" title="0">{
+        results := make([]DateTime, len(values))
+        parseErrors := make([]error, len(values))
+
+        // Try to detect common format from first few values
+        var detectedLayout string
+        for i := 0; i &lt; min(len(values), 3); i++ </span><span class="cov0" title="0">{
+                if values[i] != "" </span><span class="cov0" title="0">{
+                        detectedLayout = detectLayout(strings.TrimSpace(values[i]))
+                        if detectedLayout != "" </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+                }
+        }
+
+        // Parse all values, using detected layout first if available
+        <span class="cov0" title="0">for i, value := range values </span><span class="cov0" title="0">{
+                value = strings.TrimSpace(value)
+                if value == "" </span><span class="cov0" title="0">{
+                        parseErrors[i] = ParseError(value, errors.New("empty string"))
+                        continue</span>
+                }
+
+                // Try detected layout first
+                <span class="cov0" title="0">if detectedLayout != "" </span><span class="cov0" title="0">{
+                        if t, err := time.ParseInLocation(detectedLayout, value, loc); err == nil </span><span class="cov0" title="0">{
+                                results[i] = DateTime{t}
+                                continue</span>
+                        }
+                }
+
+                // Fallback to optimized parsing
+                <span class="cov0" title="0">if dt, err := ParseOptimizedInLocation(value, loc); err == nil </span><span class="cov0" title="0">{
+                        results[i] = dt
+                }</span> else<span class="cov0" title="0"> {
+                        parseErrors[i] = err
+                }</span>
+        }
+
+        <span class="cov0" title="0">return results, parseErrors</span>
+}
+
+// Helper function (Go 1.21+ has this in stdlib)
+func min(a, b int) int <span class="cov0" title="0">{
+        if a &lt; b </span><span class="cov0" title="0">{
+                return a
+        }</span>
+        <span class="cov0" title="0">return b</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package chronogo
+
+import (
+        "context"
+        "fmt"
+        "time"
+)
+
+// Period represents a time interval between two DateTime instances.
+// It provides iteration capabilities and human-friendly representations.
+type Period struct {
+        Start DateTime
+        End   DateTime
+}
+
+// NewPeriod creates a new Period between two DateTime instances.
+func NewPeriod(start, end DateTime) Period <span class="cov0" title="0">{
+        return Period{Start: start, End: end}
+}</span>
+
+// Duration returns the time.Duration of the period.
+func (p Period) Duration() time.Duration <span class="cov0" title="0">{
+        return p.End.Sub(p.Start)
+}</span>
+
+// Contains checks if a DateTime falls within the period.
+func (p Period) Contains(dt DateTime) bool <span class="cov0" title="0">{
+        return !dt.Before(p.Start) &amp;&amp; !dt.After(p.End)
+}</span>
+
+// IsNegative returns true if the period represents a negative duration (end before start).
+func (p Period) IsNegative() bool <span class="cov0" title="0">{
+        return p.End.Before(p.Start)
+}</span>
+
+// Abs returns a new Period with positive duration.
+func (p Period) Abs() Period <span class="cov0" title="0">{
+        if p.IsNegative() </span><span class="cov0" title="0">{
+                return Period{Start: p.End, End: p.Start}
+        }</span>
+        <span class="cov0" title="0">return p</span>
+}
+
+// Years returns the number of full years in the period.
+func (p Period) Years() int <span class="cov0" title="0">{
+        if p.IsNegative() </span><span class="cov0" title="0">{
+                return -p.Abs().Years()
+        }</span>
+
+        <span class="cov0" title="0">years := p.End.Year() - p.Start.Year()
+
+        // Adjust if we haven't reached the anniversary
+        endMonth := p.End.Month()
+        startMonth := p.Start.Month()
+        endDay := p.End.Day()
+        startDay := p.Start.Day()
+
+        if endMonth &lt; startMonth || (endMonth == startMonth &amp;&amp; endDay &lt; startDay) </span><span class="cov0" title="0">{
+                years--
+        }</span>
+
+        <span class="cov0" title="0">return years</span>
+}
+
+// Months returns the total number of full months in the period.
+func (p Period) Months() int <span class="cov0" title="0">{
+        if p.IsNegative() </span><span class="cov0" title="0">{
+                return -p.Abs().Months()
+        }</span>
+
+        <span class="cov0" title="0">years := p.Years()
+        months := years * 12
+
+        // Add remaining months
+        endMonth := int(p.End.Month())
+        startMonth := int(p.Start.Month())
+        months += endMonth - startMonth
+
+        // Adjust if we haven't reached the day anniversary
+        if p.End.Day() &lt; p.Start.Day() </span><span class="cov0" title="0">{
+                months--
+        }</span>
+
+        <span class="cov0" title="0">return months</span>
+}
+
+// Days returns the number of full days in the period.
+func (p Period) Days() int <span class="cov0" title="0">{
+        duration := p.Duration()
+        if duration &lt; 0 </span><span class="cov0" title="0">{
+                return -int((-duration).Hours() / 24)
+        }</span>
+        <span class="cov0" title="0">return int(duration.Hours() / 24)</span>
+}
+
+// Hours returns the number of full hours in the period.
+func (p Period) Hours() int <span class="cov0" title="0">{
+        duration := p.Duration()
+        if duration &lt; 0 </span><span class="cov0" title="0">{
+                return -int((-duration).Hours())
+        }</span>
+        <span class="cov0" title="0">return int(duration.Hours())</span>
+}
+
+// Minutes returns the number of full minutes in the period.
+func (p Period) Minutes() int <span class="cov0" title="0">{
+        duration := p.Duration()
+        if duration &lt; 0 </span><span class="cov0" title="0">{
+                return -int((-duration).Minutes())
+        }</span>
+        <span class="cov0" title="0">return int(duration.Minutes())</span>
+}
+
+// Seconds returns the number of full seconds in the period.
+func (p Period) Seconds() int <span class="cov0" title="0">{
+        duration := p.Duration()
+        if duration &lt; 0 </span><span class="cov0" title="0">{
+                return -int((-duration).Seconds())
+        }</span>
+        <span class="cov0" title="0">return int(duration.Seconds())</span>
+}
+
+// InDays returns the total period expressed in days as a float.
+func (p Period) InDays() float64 <span class="cov0" title="0">{
+        return p.Duration().Hours() / 24
+}</span>
+
+// InHours returns the total period expressed in hours as a float.
+func (p Period) InHours() float64 <span class="cov0" title="0">{
+        return p.Duration().Hours()
+}</span>
+
+// InMinutes returns the total period expressed in minutes as a float.
+func (p Period) InMinutes() float64 <span class="cov0" title="0">{
+        return p.Duration().Minutes()
+}</span>
+
+// InSeconds returns the total period expressed in seconds as a float.
+func (p Period) InSeconds() float64 <span class="cov0" title="0">{
+        return p.Duration().Seconds()
+}</span>
+
+// String returns a string representation of the period.
+func (p Period) String() string <span class="cov0" title="0">{
+        duration := p.Duration()
+        if duration == 0 </span><span class="cov0" title="0">{
+                return "0 seconds"
+        }</span>
+
+        <span class="cov0" title="0">if p.IsNegative() </span><span class="cov0" title="0">{
+                return fmt.Sprintf("-%s", p.Abs().String())
+        }</span>
+
+        <span class="cov0" title="0">parts := []string{}
+
+        days := int(duration.Hours() / 24)
+        if days &gt; 0 </span><span class="cov0" title="0">{
+                if days == 1 </span><span class="cov0" title="0">{
+                        parts = append(parts, "1 day")
+                }</span> else<span class="cov0" title="0"> {
+                        parts = append(parts, fmt.Sprintf("%d days", days))
+                }</span>
+                <span class="cov0" title="0">duration -= time.Duration(days) * 24 * time.Hour</span>
+        }
+
+        <span class="cov0" title="0">hours := int(duration.Hours())
+        if hours &gt; 0 </span><span class="cov0" title="0">{
+                if hours == 1 </span><span class="cov0" title="0">{
+                        parts = append(parts, "1 hour")
+                }</span> else<span class="cov0" title="0"> {
+                        parts = append(parts, fmt.Sprintf("%d hours", hours))
+                }</span>
+                <span class="cov0" title="0">duration -= time.Duration(hours) * time.Hour</span>
+        }
+
+        <span class="cov0" title="0">minutes := int(duration.Minutes())
+        if minutes &gt; 0 </span><span class="cov0" title="0">{
+                if minutes == 1 </span><span class="cov0" title="0">{
+                        parts = append(parts, "1 minute")
+                }</span> else<span class="cov0" title="0"> {
+                        parts = append(parts, fmt.Sprintf("%d minutes", minutes))
+                }</span>
+                <span class="cov0" title="0">duration -= time.Duration(minutes) * time.Minute</span>
+        }
+
+        <span class="cov0" title="0">seconds := int(duration.Seconds())
+        if seconds &gt; 0 || len(parts) == 0 </span><span class="cov0" title="0">{
+                if seconds == 1 </span><span class="cov0" title="0">{
+                        parts = append(parts, "1 second")
+                }</span> else<span class="cov0" title="0"> {
+                        parts = append(parts, fmt.Sprintf("%d seconds", seconds))
+                }</span>
+        }
+
+        <span class="cov0" title="0">result := ""
+        for i, part := range parts </span><span class="cov0" title="0">{
+                if i == 0 </span><span class="cov0" title="0">{
+                        result = part
+                }</span> else<span class="cov0" title="0"> if i == len(parts)-1 </span><span class="cov0" title="0">{
+                        result += " and " + part
+                }</span> else<span class="cov0" title="0"> {
+                        result += ", " + part
+                }</span>
+        }
+
+        <span class="cov0" title="0">return result</span>
+}
+
+// Range returns a channel that yields DateTime instances within the period.
+// The step parameter determines the unit: "days", "hours", "minutes", "seconds".
+func (p Period) Range(unit string, step ...int) &lt;-chan DateTime <span class="cov0" title="0">{
+        return p.RangeWithContext(context.Background(), unit, step...)
+}</span>
+
+// RangeWithContext returns a channel that yields DateTime instances within the period with context cancellation.
+// The step parameter determines the unit: "years", "months", "days", "hours", "minutes", "seconds".
+// This method provides memory-safe iteration by respecting context cancellation and preventing goroutine leaks.
+func (p Period) RangeWithContext(ctx context.Context, unit string, step ...int) &lt;-chan DateTime <span class="cov0" title="0">{
+        stepSize := 1
+        if len(step) &gt; 0 </span><span class="cov0" title="0">{
+                stepSize = step[0]
+        }</span>
+
+        <span class="cov0" title="0">ch := make(chan DateTime)
+
+        go func() </span><span class="cov0" title="0">{
+                defer close(ch)
+
+                current := p.Start
+
+                for !current.After(p.End) </span><span class="cov0" title="0">{
+                        select </span>{
+                        case &lt;-ctx.Done():<span class="cov0" title="0">
+                                return</span> // Context cancelled, stop iteration
+                        case ch &lt;- current:<span class="cov0" title="0"></span>
+                                // Successfully sent, continue
+                        }
+
+                        <span class="cov0" title="0">switch unit </span>{
+                        case "years":<span class="cov0" title="0">
+                                current = current.AddYears(stepSize)</span>
+                        case "months":<span class="cov0" title="0">
+                                current = current.AddMonths(stepSize)</span>
+                        case "days":<span class="cov0" title="0">
+                                current = current.AddDays(stepSize)</span>
+                        case "hours":<span class="cov0" title="0">
+                                current = current.AddHours(stepSize)</span>
+                        case "minutes":<span class="cov0" title="0">
+                                current = current.AddMinutes(stepSize)</span>
+                        case "seconds":<span class="cov0" title="0">
+                                current = current.AddSeconds(stepSize)</span>
+                        default:<span class="cov0" title="0">
+                                return</span> // Invalid unit
+                        }
+                }
+        }()
+
+        <span class="cov0" title="0">return ch</span>
+}
+
+// RangeByUnit returns a channel that yields DateTime instances within the period using typed units.
+func (p Period) RangeByUnit(unit Unit, step ...int) &lt;-chan DateTime <span class="cov0" title="0">{
+        return p.RangeByUnitWithContext(context.Background(), unit, step...)
+}</span>
+
+// RangeByUnitWithContext returns a channel that yields DateTime instances within the period
+// using typed units with context cancellation support.
+func (p Period) RangeByUnitWithContext(ctx context.Context, unit Unit, step ...int) &lt;-chan DateTime <span class="cov0" title="0">{
+        stepSize := 1
+        if len(step) &gt; 0 </span><span class="cov0" title="0">{
+                stepSize = step[0]
+        }</span>
+
+        <span class="cov0" title="0">ch := make(chan DateTime)
+        go func() </span><span class="cov0" title="0">{
+                defer close(ch)
+
+                current := p.Start
+                for !current.After(p.End) </span><span class="cov0" title="0">{
+                        select </span>{
+                        case &lt;-ctx.Done():<span class="cov0" title="0">
+                                return</span>
+                        case ch &lt;- current:<span class="cov0" title="0"></span>
+                        }
+
+                        <span class="cov0" title="0">switch unit </span>{
+                        case UnitYear:<span class="cov0" title="0">
+                                current = current.AddYears(stepSize)</span>
+                        case UnitMonth:<span class="cov0" title="0">
+                                current = current.AddMonths(stepSize)</span>
+                        case UnitDay, UnitWeek:<span class="cov0" title="0">
+                                // For weeks, step in days by 7*stepSize
+                                inc := stepSize
+                                if unit == UnitWeek </span><span class="cov0" title="0">{
+                                        inc = stepSize * 7
+                                }</span>
+                                <span class="cov0" title="0">current = current.AddDays(inc)</span>
+                        case UnitHour:<span class="cov0" title="0">
+                                current = current.AddHours(stepSize)</span>
+                        case UnitMinute:<span class="cov0" title="0">
+                                current = current.AddMinutes(stepSize)</span>
+                        case UnitSecond:<span class="cov0" title="0">
+                                current = current.AddSeconds(stepSize)</span>
+                        default:<span class="cov0" title="0">
+                                return</span>
+                        }
+                }
+        }()
+        <span class="cov0" title="0">return ch</span>
+}
+
+// RangeDays is a convenience method for ranging by days.
+func (p Period) RangeDays(step ...int) &lt;-chan DateTime <span class="cov0" title="0">{
+        return p.Range("days", step...)
+}</span>
+
+// RangeHours is a convenience method for ranging by hours.
+func (p Period) RangeHours(step ...int) &lt;-chan DateTime <span class="cov0" title="0">{
+        return p.Range("hours", step...)
+}</span>
+
+// ForEach iterates over the period with the given unit and step, calling fn for each DateTime.
+func (p Period) ForEach(unit string, step int, fn func(DateTime)) <span class="cov0" title="0">{
+        for dt := range p.Range(unit, step) </span><span class="cov0" title="0">{
+                fn(dt)
+        }</span>
+}
+
+// RangeByUnitSlice returns a pre-allocated slice of DateTime instances for better performance
+// when you need all values at once rather than iterating.
+func (p Period) RangeByUnitSlice(unit Unit, step ...int) []DateTime <span class="cov0" title="0">{
+        stepSize := 1
+        if len(step) &gt; 0 </span><span class="cov0" title="0">{
+                stepSize = step[0]
+        }</span>
+
+        // Safety check for invalid step sizes
+        <span class="cov0" title="0">if stepSize &lt;= 0 </span><span class="cov0" title="0">{
+                stepSize = 1 // Default to 1 for invalid step sizes
+        }</span>
+
+        // Pre-calculate approximate capacity to reduce reallocations
+        <span class="cov0" title="0">var capacity int
+        switch unit </span>{
+        case UnitYear:<span class="cov0" title="0">
+                capacity = p.Years() + 2</span>
+        case UnitMonth:<span class="cov0" title="0">
+                capacity = p.Months() + 2</span>
+        case UnitDay:<span class="cov0" title="0">
+                capacity = p.Days()/stepSize + 2</span>
+        case UnitWeek:<span class="cov0" title="0">
+                capacity = p.Days()/(stepSize*7) + 2</span>
+        case UnitHour:<span class="cov0" title="0">
+                capacity = int(p.Duration().Hours())/stepSize + 2</span>
+        case UnitMinute:<span class="cov0" title="0">
+                capacity = int(p.Duration().Minutes())/stepSize + 2</span>
+        case UnitSecond:<span class="cov0" title="0">
+                capacity = int(p.Duration().Seconds())/stepSize + 2</span>
+        default:<span class="cov0" title="0">
+                capacity = 100</span> // Default reasonable capacity
+        }
+
+        // Clamp capacity to reasonable limits to prevent memory issues
+        <span class="cov0" title="0">if capacity &lt; 0 </span><span class="cov0" title="0">{
+                capacity = 0
+        }</span> else<span class="cov0" title="0"> if capacity &gt; 1000 </span><span class="cov0" title="0">{ // More conservative limit
+                capacity = 1000 // Prevent excessive memory usage for large time ranges
+        }</span>
+
+        // Additional safety check: prevent creating slices with too many elements
+        <span class="cov0" title="0">maxElements := 1000
+        if capacity &gt; maxElements </span><span class="cov0" title="0">{
+                // For very large ranges, we might want to suggest using the iterator version instead
+                return []DateTime{} // Return empty slice for safety
+        }</span>
+
+        <span class="cov0" title="0">result := make([]DateTime, 0, capacity)
+        current := p.Start
+        iterationCount := 0
+        maxIterations := 1000 // Safety limit
+
+        for !current.After(p.End) &amp;&amp; iterationCount &lt; maxIterations </span><span class="cov0" title="0">{
+                result = append(result, current)
+                iterationCount++
+
+                switch unit </span>{
+                case UnitYear:<span class="cov0" title="0">
+                        current = current.AddYears(stepSize)</span>
+                case UnitMonth:<span class="cov0" title="0">
+                        current = current.AddMonths(stepSize)</span>
+                case UnitDay, UnitWeek:<span class="cov0" title="0">
+                        inc := stepSize
+                        if unit == UnitWeek </span><span class="cov0" title="0">{
+                                inc = stepSize * 7
+                        }</span>
+                        <span class="cov0" title="0">current = current.AddDays(inc)</span>
+                case UnitHour:<span class="cov0" title="0">
+                        current = current.AddHours(stepSize)</span>
+                case UnitMinute:<span class="cov0" title="0">
+                        current = current.AddMinutes(stepSize)</span>
+                case UnitSecond:<span class="cov0" title="0">
+                        current = current.AddSeconds(stepSize)</span>
+                default:<span class="cov0" title="0">
+                        // For invalid units, return empty slice
+                        return []DateTime{}</span>
+                }
+        }
+
+        <span class="cov0" title="0">return result</span>
+}
+
+// FastRangeDays returns a slice of DateTime instances for day-based iteration
+// Optimized for the most common use case of daily iteration.
+func (p Period) FastRangeDays(step ...int) []DateTime <span class="cov0" title="0">{
+        stepSize := 1
+        if len(step) &gt; 0 &amp;&amp; step[0] &gt; 0 </span><span class="cov0" title="0">{
+                stepSize = step[0]
+        }</span>
+
+        <span class="cov0" title="0">days := p.Days()
+        if days &lt; 0 </span><span class="cov0" title="0">{
+                return []DateTime{}
+        }</span>
+
+        <span class="cov0" title="0">capacity := days/stepSize + 1
+        if capacity &gt; 1000 </span><span class="cov0" title="0">{ // More conservative limit
+                return []DateTime{} // Return empty slice for very large ranges
+        }</span>
+
+        <span class="cov0" title="0">result := make([]DateTime, 0, capacity)
+        current := p.Start
+        iterationCount := 0
+        maxIterations := 1000
+
+        for !current.After(p.End) &amp;&amp; iterationCount &lt; maxIterations </span><span class="cov0" title="0">{
+                result = append(result, current)
+                current = current.AddDays(stepSize)
+                iterationCount++
+        }</span>
+
+        <span class="cov0" title="0">return result</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package chronogo
+
+import (
+        "sync"
+        "time"
+)
+
+// TestingMode controls whether time functions use mocked time
+var (
+        testingMode  bool
+        frozenTime   *time.Time
+        testingMutex sync.RWMutex
+)
+
+// FreezeTime freezes time to a specific moment for testing purposes
+func FreezeTime(t time.Time) <span class="cov0" title="0">{
+        testingMutex.Lock()
+        defer testingMutex.Unlock()
+        testingMode = true
+        frozenTime = &amp;t
+}</span>
+
+// UnfreezeTime restores normal time behavior
+func UnfreezeTime() <span class="cov0" title="0">{
+        testingMutex.Lock()
+        defer testingMutex.Unlock()
+        testingMode = false
+        frozenTime = nil
+}</span>
+
+// IsFrozen returns whether time is currently frozen for testing
+func IsFrozen() bool <span class="cov0" title="0">{
+        testingMutex.RLock()
+        defer testingMutex.RUnlock()
+        return testingMode &amp;&amp; frozenTime != nil
+}</span>
+
+// GetFrozenTime returns the frozen time if set
+func GetFrozenTime() (time.Time, bool) <span class="cov0" title="0">{
+        testingMutex.RLock()
+        defer testingMutex.RUnlock()
+        if testingMode &amp;&amp; frozenTime != nil </span><span class="cov0" title="0">{
+                return *frozenTime, true
+        }</span>
+        <span class="cov0" title="0">return time.Time{}, false</span>
+}
+
+// TravelTo sets a specific time for testing (alias for FreezeTime)
+func TravelTo(t time.Time) <span class="cov0" title="0">{
+        FreezeTime(t)
+}</span>
+
+// TravelBack restores normal time (alias for UnfreezeTime)
+func TravelBack() <span class="cov0" title="0">{
+        UnfreezeTime()
+}</span>
+
+// MockTestNow returns the current time, respecting frozen time for testing
+func MockTestNow() time.Time <span class="cov0" title="0">{
+        testingMutex.RLock()
+        defer testingMutex.RUnlock()
+
+        if testingMode &amp;&amp; frozenTime != nil </span><span class="cov0" title="0">{
+                return *frozenTime
+        }</span>
+        <span class="cov0" title="0">return time.Now()</span>
+}
+
+// MockTestToday returns today's date, respecting frozen time for testing
+func MockTestToday() DateTime <span class="cov0" title="0">{
+        return DateTime{MockTestNow()}
+}</span>
+
+// MockTestTomorrow returns tomorrow's date, respecting frozen time for testing
+func MockTestTomorrow() DateTime <span class="cov0" title="0">{
+        return MockTestToday().AddDays(1)
+}</span>
+
+// MockTestYesterday returns yesterday's date, respecting frozen time for testing
+func MockTestYesterday() DateTime <span class="cov0" title="0">{
+        return MockTestToday().AddDays(-1)
+}</span>
+
+// WithFrozenTime executes a function with time frozen to a specific moment
+func WithFrozenTime(t time.Time, fn func()) <span class="cov0" title="0">{
+        FreezeTime(t)
+        defer UnfreezeTime()
+        fn()
+}</span>
+
+// TestHelper provides a convenient interface for common testing scenarios
+type TestHelper struct {
+        originalTime *time.Time
+}
+
+// NewTestHelper creates a new test helper
+func NewTestHelper() *TestHelper <span class="cov0" title="0">{
+        return &amp;TestHelper{}
+}</span>
+
+// Freeze freezes time and returns the helper for chaining
+func (th *TestHelper) Freeze(t time.Time) *TestHelper <span class="cov0" title="0">{
+        if !testingMode </span><span class="cov0" title="0">{
+                now := time.Now()
+                th.originalTime = &amp;now
+        }</span>
+        <span class="cov0" title="0">FreezeTime(t)
+        return th</span>
+}
+
+// Restore restores time to normal or original state
+func (th *TestHelper) Restore() <span class="cov0" title="0">{
+        if th.originalTime != nil </span><span class="cov0" title="0">{
+                FreezeTime(*th.originalTime)
+                th.originalTime = nil
+        }</span> else<span class="cov0" title="0"> {
+                UnfreezeTime()
+        }</span>
+}
+
+// Travel moves to a specific time (updates frozen time)
+func (th *TestHelper) Travel(t time.Time) *TestHelper <span class="cov0" title="0">{
+        FreezeTime(t)
+        return th
+}</span>
+
+// Forward moves time forward by a duration
+func (th *TestHelper) Forward(d time.Duration) *TestHelper <span class="cov0" title="0">{
+        current := MockTestNow()
+        FreezeTime(current.Add(d))
+        return th
+}</span>
+
+// Backward moves time backward by a duration
+func (th *TestHelper) Backward(d time.Duration) *TestHelper <span class="cov0" title="0">{
+        current := MockTestNow()
+        FreezeTime(current.Add(-d))
+        return th
+}</span>
+
+// Mock date/time creation functions that respect frozen time
+func MockNow() DateTime <span class="cov0" title="0">{
+        return DateTime{MockTestNow()}
+}</span>
+
+func MockToday() DateTime <span class="cov0" title="0">{
+        now := MockTestNow()
+        year, month, day := now.Date()
+        return Date(year, month, day, 0, 0, 0, 0, time.Local)
+}</span>
+
+func MockTomorrow() DateTime <span class="cov0" title="0">{
+        return MockToday().AddDays(1)
+}</span>
+
+func MockYesterday() DateTime <span class="cov0" title="0">{
+        return MockToday().AddDays(-1)
+}</span>
+
+// Testing utility for creating specific dates easily
+func CreateTestDate(year, month, day int) DateTime <span class="cov0" title="0">{
+        return Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local)
+}</span>
+
+func CreateTestDateTime(year, month, day, hour, minute, second int) DateTime <span class="cov0" title="0">{
+        return Date(year, time.Month(month), day, hour, minute, second, 0, time.UTC)
+}</span>
+
+func CreateTestTime(hour, minute, second int) DateTime <span class="cov0" title="0">{
+        today := MockTestToday()
+        year, month, day := today.Date()
+        return Date(year, month, day, hour, minute, second, 0, time.UTC)
+}</span>
+
+// Assertion helpers for testing
+func AssertTimeEquals(expected, actual DateTime, tolerance time.Duration) bool <span class="cov0" title="0">{
+        diff := actual.Sub(expected)
+        if diff &lt; 0 </span><span class="cov0" title="0">{
+                diff = -diff
+        }</span>
+        <span class="cov0" title="0">return diff &lt;= tolerance</span>
+}
+
+func AssertDateEquals(expected, actual DateTime) bool <span class="cov0" title="0">{
+        return expected.Format("2006-01-02") == actual.Format("2006-01-02")
+}</span>
+
+// Benchmark helpers
+func BenchmarkWithFrozenTime(t time.Time, iterations int, fn func()) time.Duration <span class="cov0" title="0">{
+        start := time.Now()
+
+        WithFrozenTime(t, func() </span><span class="cov0" title="0">{
+                for i := 0; i &lt; iterations; i++ </span><span class="cov0" title="0">{
+                        fn()
+                }</span>
+        })
+
+        <span class="cov0" title="0">return time.Since(start)</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
