@@ -457,15 +457,25 @@
             opacity: 1;
         }
 
+        /* Enhanced Responsive Design */
         @media (max-width: 1200px) {
             .playground-grid {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .container {
+                padding: 0 1.5rem;
             }
         }
 
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
             }
 
             .demo-comparison {
@@ -479,20 +489,85 @@
 
             .demo-container {
                 flex-direction: column;
+                gap: 0.75rem;
             }
 
             .demo-input, .demo-output {
                 min-width: auto;
                 width: 100%;
+                font-size: 0.8rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .live-demo {
+                padding: 1.5rem;
+                margin: 1.5rem auto;
             }
 
             .cta-buttons, .examples-row {
                 flex-direction: column;
                 align-items: center;
+                gap: 0.75rem;
+            }
+
+            .install-flow {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .playground-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
 
             .container {
                 padding: 0 1rem;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .badges {
+                gap: 0.3rem;
+            }
+
+            .badge {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .demo-input, .demo-output {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .live-demo {
+                padding: 1rem;
+            }
+
+            .btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .demo-showcase pre {
+                font-size: 0.75rem;
+                padding: 1rem;
             }
         }
     </style>
@@ -506,10 +581,10 @@
                 
                 <!-- Live Demo Section -->
                 <div class="live-demo">
-                    <h3>🚀 See it in action:</h3>
+                    <h3>🚀 See the new Advanced Parsing in action:</h3>
                     <div class="demo-container">
                         <div class="demo-input">
-                            <code>ChronoGo.Parse("2025-01-01").AddDays(100).DiffForHumans()</code>
+                            <code>ChronoGo.Parse("2023-W52-1").AddDays(100).DiffForHumans()</code>
                         </div>
                         <div class="demo-arrow">→</div>
                         <div class="demo-output">
@@ -519,7 +594,7 @@
                 </div>
                 
                 <div class="badges">
-                    <span class="badge">🔥 v0.4.3</span>
+                    <span class="badge">🔥 v0.5.0</span>
                     <span class="badge">⚡ 91.7% Coverage</span>
                     <span class="badge">🛡️ Thread Safe</span>
                     <span class="badge">💼 Business Ready</span>
@@ -658,7 +733,77 @@ Tue 00:00, Tue 06:00, Tue 12:00, Tue 18:00
                     </div>
                 </div>
 
-                <!-- Demo 6: Parsing Power -->
+                <!-- Demo 6: Advanced Parsing Features -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🚀 Advanced Parsing Features</h3>
+                        <p>New ISO 8601 extensions, token-based formats, and flexible parsing options</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// ISO 8601 Ordinal dates (day of year)
+ordinal1, _ := ChronoGo.Parse("2023-359")     // 2023-12-25
+ordinal2, _ := ChronoGo.Parse("2024366")      // 2024-12-31 (compact)
+
+// ISO 8601 Week dates  
+week1, _ := ChronoGo.Parse("2023-W52-1")      // Monday of week 52
+week2, _ := ChronoGo.Parse("2023W521")        // Compact format
+week3, _ := ChronoGo.Parse("2023-W52")        // Defaults to Monday
+
+// Token-based custom formats
+date1, _ := ChronoGo.FromFormatTokens("25/12/2023 14:30", "DD/MM/YYYY HH:mm")
+date2, _ := ChronoGo.FromFormatTokens("December 25, 2023", "MMMM D, YYYY")
+
+// ISO 8601 Intervals
+interval1, _ := ChronoGo.Parse("2023-01-01T00:00:00Z/2023-12-31T23:59:59Z")
+interval2, _ := ChronoGo.Parse("2023-01-01T00:00:00Z/P1Y2M3DT4H5M6S")
+
+// Fallback parsing with multiple format attempts
+result, _ := ChronoGo.ParseWithFallback("Mon, 25 Dec 2023 10:30:45 UTC")
+
+<span class="output">
+✅ Ordinal: 359th day = Dec 25, 2023
+✅ Week: W52-1 = Monday Dec 25, 2023  
+✅ Tokens: DD/MM/YYYY → 25/12/2023
+✅ Intervals: Date ranges with durations
+✅ Fallback: Tries multiple formats automatically
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 7: Parsing with Options -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>⚙️ Parsing with Options</h3>
+                        <p>Strict vs lenient parsing modes for different use cases</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Strict parsing - only allows exact formats
+strictOptions := ChronoGo.ParseOptions{Strict: true}
+result1, err := ChronoGo.Parse("2023-12-25T10:30:45Z", strictOptions)
+// ✅ Succeeds - valid RFC3339
+
+result2, err := ChronoGo.Parse("2023/12/25 10:30:45", strictOptions)  
+// ❌ Fails - not RFC3339
+
+// Lenient parsing - tries multiple formats
+lenientOptions := ChronoGo.ParseOptions{Strict: false}
+result3, _ := ChronoGo.Parse("2023/12/25 10:30:45", lenientOptions)
+// ✅ Succeeds - automatically converts
+
+// Multiple format parsing
+formats := []string{"YYYY-MM-DD", "DD/MM/YYYY", "MMMM D, YYYY"}
+result4, _ := ChronoGo.ParseMultiple("25/12/2023", formats)
+
+<span class="output">
+🔒 Strict: Enforces exact format compliance
+🔓 Lenient: Flexible format detection  
+🎯 Multiple: Tries specific formats in order
+⚡ Smart: Best of both worlds
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 8: Intelligent Parsing -->
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>🧠 Intelligent Parsing</h3>
@@ -689,7 +834,7 @@ for _, dateStr := range dates {
                     </div>
                 </div>
 
-                <!-- Demo 7: Age Calculations -->
+                <!-- Demo 9: Age Calculations -->
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>🎂 Age & Duration Magic</h3>
@@ -718,7 +863,7 @@ Work tenure: 5 years ago
                     </div>
                 </div>
 
-                <!-- Demo 8: Time Comparisons -->
+                <!-- Demo 10: Smart Time Comparisons -->
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>⚖️ Smart Time Comparisons</h3>
@@ -750,7 +895,7 @@ isSoon := eventDate.IsBetween(now, now.AddDays(30))
                     </div>
                 </div>
 
-                <!-- Demo 9: Calendar Operations -->
+                <!-- Demo 11: Calendar Intelligence -->
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>📅 Calendar Intelligence</h3>
@@ -826,6 +971,21 @@ fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
                         <h4>Parse & Format</h4>
                         <code>ChronoGo.Parse("2025-01-15").Format("Jan 2, 2006")</code>
                         <span class="result">→ "Jan 15, 2025"</span>
+                    </div>
+                    <div class="quick-example">
+                        <h4>ISO 8601 Ordinal</h4>
+                        <code>ChronoGo.Parse("2023-359")</code>
+                        <span class="result">→ Dec 25, 2023 (359th day)</span>
+                    </div>
+                    <div class="quick-example">
+                        <h4>ISO 8601 Week Date</h4>
+                        <code>ChronoGo.Parse("2023-W52-1")</code>
+                        <span class="result">→ Monday of week 52</span>
+                    </div>
+                    <div class="quick-example">
+                        <h4>Token Formats</h4>
+                        <code>ChronoGo.FromFormatTokens("25/12/2023", "DD/MM/YYYY")</code>
+                        <span class="result">→ Dec 25, 2023</span>
                     </div>
                     <div class="quick-example">
                         <h4>Business Days</h4>

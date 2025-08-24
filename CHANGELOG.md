@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-08-24
+
+### Added
+- Advanced parsing functions supporting multiple datetime formats
+- ISO 8601 ordinal date parsing (YYYY-DDD format)
+- ISO 8601 week date parsing (YYYY-Www-D format)
+- ISO 8601 interval parsing (start/end, start/duration, duration/end)
+- Duration parsing for ISO 8601 format (P1Y2M3DT4H5M6S)
+- Token-based format parsing with `FromFormatTokens()` function
+- Fallback parsing with `ParseWithFallback()` for human-friendly formats
+- Multiple format parsing with `ParseMultiple()` function
+- Maximum leniency parsing with `ParseAny()` function
+- Optimized parsing with format detection heuristics
+- Parse options support (strict/lenient modes)
+- Comprehensive validation functions (`IsValidDateTimeString()`)
+- Support for Unix timestamp parsing (seconds, milliseconds, microseconds, nanoseconds)
+
+### Changed
+- Removed references to external library names for generic branding
+- Improved error handling in parsing functions
+- Enhanced code documentation and comments
+
+### Fixed
+- Token replacement conflicts in format conversion
+- Error checking compliance in benchmark functions
+- Code formatting and linting issues
+
 ## [0.4.3] - 2025-08-23
 
 ### Added
@@ -214,7 +241,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.4.3...HEAD
+[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/coredds/ChronoGo/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/coredds/ChronoGo/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/coredds/ChronoGo/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/coredds/ChronoGo/compare/v0.4.0...v0.4.1

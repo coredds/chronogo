@@ -1,6 +1,6 @@
 # ChronoGo
 
-[![Version](https://img.shields.io/badge/version-v0.4.3-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.5.0-green.svg)](https://github.com/coredds/ChronoGo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml)
@@ -108,6 +108,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Version History
 
+- **v0.5.0**: Advanced parsing functions (ISO 8601 ordinal/week dates, intervals, token-based formats)
 - **v0.4.3**: Enhanced test coverage (91.7%), improved safety checks, optimized DST handling
 - **v0.4.2**: GitHub Actions CI/CD, comprehensive linting, automated dependency management
 - **v0.4.0**: Business day operations, enhanced error handling, developer documentation

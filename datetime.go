@@ -1,5 +1,5 @@
-// Package chronogo provides a Go implementation of Python's Pendulum library
-// for powerful and easy-to-use datetime and timezone handling.
+// Package chronogo provides a Go implementation of powerful datetime handling
+// for easy-to-use datetime and timezone operations.
 package chronogo
 
 import (
