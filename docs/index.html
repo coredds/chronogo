@@ -577,18 +577,18 @@
         <div class="container">
             <div class="hero">
                 <h1>ChronoGo</h1>
-                <p>Experience the magic of intuitive datetime manipulation in Go</p>
+                <p>A comprehensive Go datetime library with advanced parsing, business logic, holiday support, and enterprise-grade security</p>
                 
                 <!-- Live Demo Section -->
                 <div class="live-demo">
-                    <h3>🚀 See the new Advanced Parsing in action:</h3>
+                    <h3>🚀 See ChronoGo's Power in Action:</h3>
                     <div class="demo-container">
                         <div class="demo-input">
-                            <code>ChronoGo.Parse("2023-W52-1").AddDays(100).DiffForHumans()</code>
+                            <code>ChronoGo.Today().AddBusinessDays(5).DiffForHumans()</code>
                         </div>
                         <div class="demo-arrow">→</div>
                         <div class="demo-output">
-                            <strong>"in 14 weeks"</strong>
+                            <strong>"in 1 week"</strong>
                         </div>
                     </div>
                 </div>
@@ -596,8 +596,9 @@
                 <div class="badges">
                     <span class="badge">🔥 v0.6.0</span>
                     <span class="badge">⚡ 91.7% Coverage</span>
-                    <span class="badge">🛡️ Thread Safe</span>
-                    <span class="badge">💼 Business Ready</span>
+                    <span class="badge">🛡️ Security Hardened</span>
+                    <span class="badge">🎄 Holiday Support</span>
+                    <span class="badge">💼 Enterprise Ready</span>
                 </div>
                 <div class="cta-buttons">
                     <a href="#playground" class="btn btn-primary">🎮 See Examples</a>
@@ -924,6 +925,45 @@ Q3 Start: 2025-07-01
 Q3 End: 2025-09-30
 Mondays in Aug: [Aug 4, Aug 11, Aug 18, Aug 25]
 Fiscal Year: 2025-04-01
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 12: Holiday & Business Logic -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🎄 Holiday & Business Logic</h3>
+                        <p>Enterprise-grade holiday support with GoHoliday integration</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Smart business day calculations
+today := ChronoGo.Today()
+
+// Check if today is a holiday (US by default)
+if today.IsHoliday() {
+    fmt.Println("It's a holiday!")
+}
+
+// Add 5 business days (skipping holidays)
+workDeadline := today.AddBusinessDays(5)
+
+// Get next business day
+nextWorkDay := today.NextBusinessDay()
+
+// Multi-country holiday support
+ukChecker := ChronoGo.NewHolidayChecker("GB")
+christmas := ChronoGo.Date(2025, 12, 25)
+isUKHoliday := ukChecker.IsHoliday(christmas)
+
+// Business days in current month
+businessDays := today.BusinessDaysInMonth()
+
+<span class="output">
+✅ Holiday check: false
+✅ Work deadline: Aug 31, 2025  
+✅ Next work day: Aug 27, 2025
+✅ UK Christmas: true
+✅ Business days this month: 22
 </span></code></pre>
                     </div>
                 </div>
