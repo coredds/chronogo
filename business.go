@@ -2,6 +2,8 @@ package chronogo
 
 import (
 	"time"
+
+	goholiday "github.com/coredds/GoHoliday/chronogo"
 )
 
 // HolidayChecker is an interface for checking if a date is a holiday.
@@ -181,19 +183,105 @@ func (hc *DefaultHolidayChecker) findWeekdayOccurrence(year int, month time.Mont
 	return target
 }
 
+// GoHolidayChecker wraps the GoHoliday library to implement the HolidayChecker interface.
+// This provides comprehensive holiday data for multiple countries and regions.
+type GoHolidayChecker struct {
+	checker *goholiday.FastCountryChecker
+	country string
+}
+
+// NewGoHolidayChecker creates a new holiday checker using the GoHoliday library.
+// The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP").
+func NewGoHolidayChecker(country string) *GoHolidayChecker {
+	return &GoHolidayChecker{
+		checker: goholiday.Checker(country),
+		country: country,
+	}
+}
+
+// IsHoliday checks if the given date is a holiday using the GoHoliday library.
+func (ghc *GoHolidayChecker) IsHoliday(dt DateTime) bool {
+	return ghc.checker.IsHoliday(dt.Time)
+}
+
+// GetHolidayName returns the name of the holiday if the date is a holiday, empty string otherwise.
+func (ghc *GoHolidayChecker) GetHolidayName(dt DateTime) string {
+	return ghc.checker.GetHolidayName(dt.Time)
+}
+
+// CountHolidaysInRange counts holidays within a date range.
+func (ghc *GoHolidayChecker) CountHolidaysInRange(start, end DateTime) int {
+	return ghc.checker.CountHolidaysInRange(start.Time, end.Time)
+}
+
+// GetCountry returns the country code for this holiday checker.
+func (ghc *GoHolidayChecker) GetCountry() string {
+	return ghc.country
+}
+
+// NewHolidayChecker creates a new GoHoliday-based holiday checker for the specified country.
+// This is the recommended way to create holiday checkers for production use.
+// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP
+func NewHolidayChecker(country string) HolidayChecker {
+	return NewGoHolidayChecker(country)
+}
+
+// defaultUSHolidayChecker is a cached US holiday checker for convenience functions
+var defaultUSHolidayChecker = NewGoHolidayChecker("US")
+
 // Business date operations for DateTime
 
 // IsBusinessDay returns true if the date is a business day (Monday-Friday and not a holiday).
+// If no holiday checker is provided, it uses the default US holiday checker.
 func (dt DateTime) IsBusinessDay(holidayChecker ...HolidayChecker) bool {
 	if dt.IsWeekend() {
 		return false
 	}
 
+	var checker HolidayChecker
 	if len(holidayChecker) > 0 && holidayChecker[0] != nil {
-		return !holidayChecker[0].IsHoliday(dt)
+		checker = holidayChecker[0]
+	} else {
+		checker = defaultUSHolidayChecker
 	}
 
-	return true
+	return !checker.IsHoliday(dt)
+}
+
+// IsHoliday returns true if the date is a holiday.
+// If no holiday checker is provided, it uses the default US holiday checker.
+func (dt DateTime) IsHoliday(holidayChecker ...HolidayChecker) bool {
+	var checker HolidayChecker
+	if len(holidayChecker) > 0 && holidayChecker[0] != nil {
+		checker = holidayChecker[0]
+	} else {
+		checker = defaultUSHolidayChecker
+	}
+
+	return checker.IsHoliday(dt)
+}
+
+// GetHolidayName returns the name of the holiday if the date is a holiday.
+// Returns empty string if the date is not a holiday.
+// If no holiday checker is provided, it uses the default US holiday checker.
+func (dt DateTime) GetHolidayName(holidayChecker ...HolidayChecker) string {
+	var checker HolidayChecker
+	if len(holidayChecker) > 0 && holidayChecker[0] != nil {
+		checker = holidayChecker[0]
+	} else {
+		checker = defaultUSHolidayChecker
+	}
+
+	// Try to cast to GoHolidayChecker for enhanced functionality
+	if ghc, ok := checker.(*GoHolidayChecker); ok {
+		return ghc.GetHolidayName(dt)
+	}
+
+	// Fallback for other HolidayChecker implementations
+	if checker.IsHoliday(dt) {
+		return "Holiday" // Generic name for non-GoHoliday checkers
+	}
+	return ""
 }
 
 // NextBusinessDay returns the next business day.
@@ -264,14 +352,6 @@ func (dt DateTime) BusinessDaysBetween(other DateTime, holidayChecker ...Holiday
 	}
 
 	return count
-}
-
-// IsHoliday checks if the date is a holiday using the provided checker.
-func (dt DateTime) IsHoliday(holidayChecker HolidayChecker) bool {
-	if holidayChecker == nil {
-		return false
-	}
-	return holidayChecker.IsHoliday(dt)
 }
 
 // BusinessDaysInMonth returns the number of business days in the month.

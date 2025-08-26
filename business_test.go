@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+// NullChecker is a holiday checker that never considers any date a holiday
+type NullChecker struct{}
+
+func (nc *NullChecker) IsHoliday(dt DateTime) bool {
+	return false
+}
+
 func TestNewUSHolidayChecker(t *testing.T) {
 	checker := NewUSHolidayChecker()
 
@@ -321,23 +328,26 @@ func TestGetHolidays(t *testing.T) {
 }
 
 func TestHolidayWithoutChecker(t *testing.T) {
-	// Test business day operations without a holiday checker
+	// Test business day operations with explicit null checker to bypass default
 	monday := Date(2024, time.January, 8, 0, 0, 0, 0, time.UTC)
 	saturday := Date(2024, time.January, 6, 0, 0, 0, 0, time.UTC)
 	newYear := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC) // Monday but holiday
 
-	// Without checker, only weekends matter
-	if !monday.IsBusinessDay() {
-		t.Error("Monday should be business day without holiday checker")
+	// Create a minimal checker that always returns false
+	nullChecker := &NullChecker{}
+
+	// With null checker, only weekends matter
+	if !monday.IsBusinessDay(nullChecker) {
+		t.Error("Monday should be business day with null checker")
 	}
 
-	if saturday.IsBusinessDay() {
+	if saturday.IsBusinessDay(nullChecker) {
 		t.Error("Saturday should not be business day")
 	}
 
-	// New Year's Day should be business day without checker (since it's Monday)
-	if !newYear.IsBusinessDay() {
-		t.Error("New Year's Day should be business day without holiday checker")
+	// New Year's Day should be business day with null checker (since it's Monday)
+	if !newYear.IsBusinessDay(nullChecker) {
+		t.Error("New Year's Day should be business day with null checker")
 	}
 }
 
@@ -403,9 +413,15 @@ func TestDateTimeIsHoliday(t *testing.T) {
 		t.Error("Regular day should not be a holiday")
 	}
 
-	// Test with nil checker
-	if newYears.IsHoliday(nil) {
-		t.Error("Should return false when no checker provided")
+	// Test with default checker (no arguments) - should use GoHoliday US by default
+	if !newYears.IsHoliday() {
+		t.Error("New Year's Day should be a holiday with default checker")
+	}
+
+	// Test with null checker
+	nullChecker := &NullChecker{}
+	if newYears.IsHoliday(nullChecker) {
+		t.Error("Should return false when null checker provided")
 	}
 }
 
@@ -429,5 +445,108 @@ func TestBusinessDaysInYear(t *testing.T) {
 	// 2023 has 365 days total, 104 weekend days, ~10 holidays = 251 business days
 	if businessDays2023 < 250 || businessDays2023 > 252 {
 		t.Errorf("2023 should have approximately 251 business days, got %d", businessDays2023)
+	}
+}
+
+// Test GoHoliday integration
+func TestGoHolidayChecker(t *testing.T) {
+	// Test US holidays with GoHoliday
+	usChecker := NewGoHolidayChecker("US")
+
+	testCases := []struct {
+		name     string
+		date     DateTime
+		expected bool
+	}{
+		{"New Year's Day 2024", Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC), true},
+		{"Independence Day 2024", Date(2024, time.July, 4, 0, 0, 0, 0, time.UTC), true},
+		{"Christmas 2024", Date(2024, time.December, 25, 0, 0, 0, 0, time.UTC), true},
+		{"Random Tuesday", Date(2024, time.March, 5, 0, 0, 0, 0, time.UTC), false},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := usChecker.IsHoliday(tc.date)
+			if result != tc.expected {
+				t.Errorf("%s: expected %v, got %v", tc.name, tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestGoHolidayGetHolidayName(t *testing.T) {
+	usChecker := NewGoHolidayChecker("US")
+
+	// Test getting holiday name
+	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	holidayName := usChecker.GetHolidayName(newYears)
+	if holidayName == "" {
+		t.Error("Should return holiday name for New Year's Day")
+	}
+
+	// Test non-holiday
+	regularDay := Date(2024, time.March, 5, 0, 0, 0, 0, time.UTC)
+	nonHolidayName := usChecker.GetHolidayName(regularDay)
+	if nonHolidayName != "" {
+		t.Error("Should return empty string for non-holiday")
+	}
+}
+
+func TestDefaultHolidayChecker(t *testing.T) {
+	// Test that business day functions use GoHoliday by default
+	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC) // New Year's Day
+
+	// Should be a holiday (using default US GoHoliday checker)
+	if !newYears.IsHoliday() {
+		t.Error("New Year's Day should be detected as holiday with default checker")
+	}
+
+	// Should not be a business day
+	if newYears.IsBusinessDay() {
+		t.Error("New Year's Day should not be a business day")
+	}
+
+	// Test getting holiday name with default checker
+	holidayName := newYears.GetHolidayName()
+	if holidayName == "" {
+		t.Error("Should return holiday name with default checker")
+	}
+}
+
+func TestMultipleCountries(t *testing.T) {
+	// Test different countries
+	countries := []string{"US", "GB", "CA", "JP"}
+
+	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	for _, country := range countries {
+		t.Run(country, func(t *testing.T) {
+			checker := NewGoHolidayChecker(country)
+
+			// All countries should have New Year's Day as a holiday
+			if !checker.IsHoliday(newYears) {
+				t.Errorf("New Year's Day should be a holiday in %s", country)
+			}
+
+			// Check country code
+			if checker.GetCountry() != country {
+				t.Errorf("Expected country %s, got %s", country, checker.GetCountry())
+			}
+		})
+	}
+}
+
+func TestNewHolidayChecker(t *testing.T) {
+	// Test the convenience function
+	checker := NewHolidayChecker("US")
+
+	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	if !checker.IsHoliday(newYears) {
+		t.Error("New Year's Day should be detected as holiday")
+	}
+
+	// Verify it returns a GoHolidayChecker
+	if _, ok := checker.(*GoHolidayChecker); !ok {
+		t.Error("NewHolidayChecker should return a GoHolidayChecker")
 	}
 }

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-08-26
+
+### Added
+- Comprehensive GitHub Actions security workflow with automated vulnerability scanning
+- CodeQL security analysis for enhanced code security
+- Dependency review automation to catch vulnerable dependencies
+- Security policy documentation (SECURITY.md)
+- Local security testing scripts for PowerShell and Bash
+- govulncheck integration for Go vulnerability detection
+- Hardcoded secret detection in security workflow
+
+### Enhanced
+- Repository security posture with enterprise-grade scanning
+- Documentation with security badges and vulnerability reporting procedures
+- Developer workflow with automated security checks
+
 ## [0.5.0] - 2025-08-24
 
 ### Added
@@ -241,7 +257,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/coredds/ChronoGo/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/coredds/ChronoGo/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/coredds/ChronoGo/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/coredds/ChronoGo/compare/v0.4.1...v0.4.2

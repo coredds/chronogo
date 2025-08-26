@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: test cover race lint bench ci fmt
+.PHONY: test cover race lint bench ci fmt security
 
 test:
 	go test ./...
@@ -21,6 +21,10 @@ bench:
 
 fmt:
 	go fmt ./...
+
+security:
+	@chmod +x scripts/security-check.sh
+	@./scripts/security-check.sh
 
 ci: fmt test cover
 
