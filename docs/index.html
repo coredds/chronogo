@@ -1002,6 +1002,105 @@ businessDays := today.BusinessDaysInMonth()
 </span></code></pre>
                     </div>
                 </div>
+
+                <!-- Demo 13: Enhanced Business Calculator -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>⚡ Enhanced Business Calculator</h3>
+                        <p>High-performance business day operations with custom weekend support</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Create optimized business day calculator
+calc := ChronoGo.NewEnhancedBusinessDayCalculator("US")
+
+// Set custom weekends (e.g., Friday-Saturday for Middle East)
+calc.SetCustomWeekends([]time.Weekday{time.Friday, time.Saturday})
+
+// High-performance business day operations
+today := ChronoGo.Today()
+nextBiz := calc.NextBusinessDay(today)
+bizDays := calc.BusinessDaysBetween(today, nextBiz.AddDays(30))
+
+// Check if end of business month
+isEOM := calc.IsEndOfMonth(today)
+
+<span class="output">
+✅ Next business day: Aug 27, 2025
+✅ Business days ahead: 22
+✅ End of month: false
+✅ Custom weekends: Fri-Sat
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 14: Holiday-Aware Scheduler -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>📅 Holiday-Aware Scheduler</h3>
+                        <p>Intelligent scheduling that respects holidays and business days</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Create holiday-aware scheduler for meetings
+scheduler := ChronoGo.NewHolidayAwareScheduler("US")
+
+// Schedule recurring weekly meetings (avoids holidays)
+startDate := ChronoGo.Date(2025, 9, 1)
+weeklyMeetings := scheduler.ScheduleRecurring(
+    startDate, 7*24*time.Hour, 8) // 8 weeks
+
+// Schedule monthly end-of-month reports
+monthlyReports := scheduler.ScheduleMonthlyEndOfMonth(
+    startDate, 6) // 6 months
+
+// Schedule only on business days
+businessMeetings := scheduler.ScheduleBusinessDays(startDate, 10)
+
+<span class="output">
+✅ Weekly meetings: 8 scheduled
+✅ Monthly reports: 6 scheduled  
+✅ Business meetings: 10 scheduled
+✅ All dates avoid holidays
+</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Demo 15: Holiday Calendar -->
+                <div class="demo-card">
+                    <div class="demo-header">
+                        <h3>🗓️ Holiday Calendar Integration</h3>
+                        <p>Calendar views with holiday information and upcoming tracking</p>
+                    </div>
+                    <div class="demo-showcase">
+                        <pre><code>// Create holiday calendar for any country
+calendar := ChronoGo.NewHolidayCalendar("US")
+
+// Get all holidays in current month
+thisMonth := calendar.GetMonthlyHolidays(2025, time.August)
+
+// Find upcoming holidays
+upcoming := calendar.GetUpcomingHolidays(ChronoGo.Now(), 3)
+
+// Generate full month calendar with holiday info
+monthEntries := calendar.GenerateMonth(2025, time.December)
+
+// Print formatted calendar
+calendar.PrintMonth(2025, time.December)
+
+// Access individual calendar entries
+for _, entry := range monthEntries {
+    if entry.IsHoliday {
+        fmt.Printf("Holiday: %s\n", entry.String())
+    }
+}
+
+<span class="output">
+✅ Aug holidays: Labor Day (Sep 2)
+✅ Next 3 holidays found
+✅ Full December calendar
+✅ Holiday: 2025-12-25 (Thu) [HOLIDAY: Christmas Day]
+</span></code></pre>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

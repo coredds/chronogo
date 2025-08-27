@@ -1,4 +1,4 @@
-// ChronoGo v0.6.0 - A Go datetime library with advanced parsing capabilities
+// ChronoGo v0.6.1 - A Go datetime library with advanced parsing capabilities
 module github.com/coredds/ChronoGo
 
 go 1.23

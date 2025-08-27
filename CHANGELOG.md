@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2025-08-27
+
+### Added
+- Enhanced Business Day Calculator with optimized performance and custom weekend support
+- Holiday-Aware Scheduler for intelligent scheduling that respects holidays and business days
+- Holiday Calendar integration with month/year views and upcoming holiday tracking
+- Support for custom weekend days (e.g., Friday-Saturday for Middle Eastern countries)
+- Recurring scheduling with holiday avoidance (daily, weekly, monthly, quarterly)
+- End-of-month business day scheduling with automatic holiday adjustment
+- Calendar entries with comprehensive holiday information and formatting
+- Upcoming holiday tracking with configurable count limits
+- Business day-only scheduling functionality
+
+### Enhanced
+- GoHoliday dependency updated to latest version with expanded country support
+- Documentation website with new demo cards showcasing enhanced features
+- README with comprehensive examples of new business operations
+- Test coverage for all new enhanced features
+
+### Performance
+- Optimized business day calculations using GoHoliday's enhanced algorithms
+- Improved holiday lookup performance with integrated caching
+- Enhanced scheduling algorithms for better performance with large date ranges
+
 ## [0.6.0] - 2025-08-26
 
 ### Added
