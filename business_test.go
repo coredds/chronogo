@@ -528,6 +528,29 @@ func TestMultipleCountries(t *testing.T) {
 				t.Errorf("New Year's Day should be a holiday in %s", country)
 			}
 
+			name := checker.GetHolidayName(newYears)
+			if name == "" {
+				t.Errorf("New Year's Day should have a name in %s", country)
+			}
+		})
+	}
+}
+
+func TestAllSupportedCountries(t *testing.T) {
+	// Test all countries officially supported by GoHoliday (per their README)
+	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP"}
+
+	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	for _, country := range countries {
+		t.Run(country, func(t *testing.T) {
+			checker := NewGoHolidayChecker(country)
+
+			// All countries should have New Year's Day as a holiday
+			if !checker.IsHoliday(newYears) {
+				t.Errorf("New Year's Day should be a holiday in %s", country)
+			}
+
 			// Check country code
 			if checker.GetCountry() != country {
 				t.Errorf("Expected country %s, got %s", country, checker.GetCountry())

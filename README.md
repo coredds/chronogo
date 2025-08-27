@@ -97,7 +97,7 @@ func main() {
 
 ### Business Date Support
 - **Holiday Management**: Integrated GoHoliday library with comprehensive multi-country holiday data
-- **Supported Countries**: US, GB, CA, AU, NZ, DE, FR, JP with sub-microsecond lookup performance
+- **Supported Countries**: 8 countries with full regional subdivision support (US, GB, CA, AU, NZ, DE, FR, JP) with sub-microsecond lookup performance
 - **Default US Holidays**: Business day calculations use US holidays automatically when no checker specified
 - **Custom Holiday Support**: Implement HolidayChecker interface for organization-specific holidays
 - **Business Days**: Calculate working days excluding weekends and holidays

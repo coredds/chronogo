@@ -192,6 +192,7 @@ type GoHolidayChecker struct {
 
 // NewGoHolidayChecker creates a new holiday checker using the GoHoliday library.
 // The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP").
+// GoHoliday officially supports 8 countries with comprehensive regional subdivision data.
 func NewGoHolidayChecker(country string) *GoHolidayChecker {
 	return &GoHolidayChecker{
 		checker: goholiday.Checker(country),
@@ -221,7 +222,7 @@ func (ghc *GoHolidayChecker) GetCountry() string {
 
 // NewHolidayChecker creates a new GoHoliday-based holiday checker for the specified country.
 // This is the recommended way to create holiday checkers for production use.
-// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP
+// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP (8 countries with comprehensive regional subdivision support)
 func NewHolidayChecker(country string) HolidayChecker {
 	return NewGoHolidayChecker(country)
 }
