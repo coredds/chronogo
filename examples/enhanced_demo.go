@@ -29,7 +29,7 @@ func main() {
 	fmt.Println("\n🌍 Multi-Country Holiday Checking (15 Countries):")
 	countries := []string{"US", "BR", "IN", "KR", "IT", "ES", "NL"}
 	newYear := chronogo.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC)
-	
+
 	for _, country := range countries {
 		checker := chronogo.NewGoHolidayChecker(country)
 		if checker.IsHoliday(newYear) {
