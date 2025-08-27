@@ -18,7 +18,7 @@ type EnhancedBusinessDayCalculator struct {
 func NewEnhancedBusinessDayCalculator(countryCode string) *EnhancedBusinessDayCalculator {
 	country := goholidays.NewCountry(countryCode)
 	calculator := goholidays.NewBusinessDayCalculator(country)
-	
+
 	return &EnhancedBusinessDayCalculator{
 		calculator: calculator,
 		country:    country,

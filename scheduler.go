@@ -16,7 +16,7 @@ type HolidayAwareScheduler struct {
 func NewHolidayAwareScheduler(countryCode string) *HolidayAwareScheduler {
 	country := goholidays.NewCountry(countryCode)
 	scheduler := goholidays.NewHolidayAwareScheduler(country)
-	
+
 	return &HolidayAwareScheduler{
 		scheduler: scheduler,
 		country:   country,
@@ -61,7 +61,7 @@ func (has *HolidayAwareScheduler) ScheduleBusinessDays(start DateTime, days int)
 	calculator := goholidays.NewBusinessDayCalculator(has.country)
 	result := make([]DateTime, 0, days)
 	current := start
-	
+
 	for i := 0; i < days; i++ {
 		if calculator.IsBusinessDay(current.Time) {
 			result = append(result, current)
@@ -72,7 +72,7 @@ func (has *HolidayAwareScheduler) ScheduleBusinessDays(start DateTime, days int)
 			current = current.AddDays(1)
 		}
 	}
-	
+
 	return result
 }
 
