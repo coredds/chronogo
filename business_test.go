@@ -537,8 +537,8 @@ func TestMultipleCountries(t *testing.T) {
 }
 
 func TestAllSupportedCountries(t *testing.T) {
-	// Test all countries officially supported by GoHoliday (per their README)
-	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP"}
+	// Test all countries officially supported by GoHoliday v0.3.0+ (per their README)
+	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR"}
 
 	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
 

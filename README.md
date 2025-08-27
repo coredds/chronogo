@@ -64,11 +64,17 @@ func main() {
         fmt.Printf("Upcoming: %s\n", holiday.String())
     }
     
-    // Multi-country holiday checking
-    checker := ChronoGo.NewGoHolidayChecker("US", "GB", "CA")
+    // Multi-country holiday checking (GoHoliday v0.3.0+ supports 15 countries)
+    usChecker := ChronoGo.NewGoHolidayChecker("US")
+    brChecker := ChronoGo.NewGoHolidayChecker("BR") // Brazil
+    inChecker := ChronoGo.NewGoHolidayChecker("IN") // India
+    
     newYear := ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-    if checker.IsHoliday(newYear) {
-        fmt.Println("Holiday:", checker.GetHolidayName(newYear))
+    if usChecker.IsHoliday(newYear) {
+        fmt.Println("US Holiday:", usChecker.GetHolidayName(newYear))
+    }
+    if brChecker.IsHoliday(newYear) {
+        fmt.Println("Brazil Holiday:", brChecker.GetHolidayName(newYear))
     }
     
     // Period iteration
@@ -97,7 +103,7 @@ func main() {
 
 ### Business Date Support
 - **Holiday Management**: Integrated GoHoliday library with comprehensive multi-country holiday data
-- **Supported Countries**: 8 countries with full regional subdivision support (US, GB, CA, AU, NZ, DE, FR, JP) with sub-microsecond lookup performance
+- **Supported Countries**: 15 countries with 200+ regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR) with sub-microsecond lookup performance
 - **Default US Holidays**: Business day calculations use US holidays automatically when no checker specified
 - **Custom Holiday Support**: Implement HolidayChecker interface for organization-specific holidays
 - **Business Days**: Calculate working days excluding weekends and holidays
