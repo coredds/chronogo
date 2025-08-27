@@ -623,7 +623,7 @@
                         </div>
                         <div class="demo-arrow">→</div>
                         <div class="demo-output">
-                            <strong>"Sep 2, 2025"</strong>
+                            <strong id="dynamic-date">"Loading..."</strong>
                         </div>
                     </div>
                 </div>
@@ -1215,6 +1215,32 @@ fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
                 });
             });
         });
+
+        // Dynamic date calculation for live demo
+        function updateDynamicDate() {
+            const today = new Date();
+            const futureDate = new Date(today);
+            futureDate.setDate(today.getDate() + 7);
+            
+            // Format as "MMM D, YYYY" to match the ChronoGo style
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            };
+            const formattedDate = futureDate.toLocaleDateString('en-US', options);
+            
+            const dynamicDateElement = document.getElementById('dynamic-date');
+            if (dynamicDateElement) {
+                dynamicDateElement.textContent = `"${formattedDate}"`;
+            }
+        }
+
+        // Update the date when the page loads
+        document.addEventListener('DOMContentLoaded', updateDynamicDate);
+        
+        // Optional: Update every minute to keep it current
+        setInterval(updateDynamicDate, 60000);
     </script>
 </body>
 </html>
