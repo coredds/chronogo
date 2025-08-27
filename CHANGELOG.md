@@ -7,14 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2025-08-27
+
 ### Changed
 - Updated GoHoliday integration to support 15 countries (was 8)
 - Enhanced multi-country support: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR
 - Updated documentation to reflect GoHoliday v0.3.0+ capabilities with 200+ regional subdivisions
 - Improved Quick Start examples to showcase new countries (Brazil, India, South Korea)
 - Enhanced demo application with multi-country holiday checking
-
-## [0.6.1] - 2025-08-27
 
 ### Added
 - Enhanced Business Day Calculator with optimized performance and custom weekend support
