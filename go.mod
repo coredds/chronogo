@@ -3,4 +3,4 @@ module github.com/coredds/ChronoGo
 
 go 1.23
 
-require github.com/coredds/GoHoliday v0.0.0-20250825180304-21b4150b170d
+require github.com/coredds/GoHoliday v0.0.0-20250827164640-d1754766319a
