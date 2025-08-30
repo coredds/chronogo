@@ -136,11 +136,6 @@ golangci-lint run
 - Security fixes are prioritized and released as patch versions
 - Release notes clearly document any security-related changes
 
-## Security Contacts
-
-- **Primary Security Contact**: security@coredds.com
-- **GitHub Security Advisories**: [ChronoGo Security Advisories](https://github.com/coredds/ChronoGo/security/advisories)
-
 ## Acknowledgments
 
 We appreciate the security research community's efforts in responsibly disclosing vulnerabilities. Contributors who report valid security issues will be acknowledged in our security advisories (with their permission).
