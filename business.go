@@ -191,8 +191,8 @@ type GoHolidayChecker struct {
 }
 
 // NewGoHolidayChecker creates a new holiday checker using the GoHoliday library.
-// The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR").
-// GoHoliday v0.3.0+ supports 15 countries with comprehensive regional subdivision data.
+// The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "MY", "ID", "PH", "VN", "TW", "HK", "ZA", "EG", "NG", "KE", "GH", "MA", "TN").
+// GoHoliday v0.5.3+ supports 33 countries with comprehensive regional subdivision data and multi-language holiday names.
 func NewGoHolidayChecker(country string) *GoHolidayChecker {
 	return &GoHolidayChecker{
 		checker: goholiday.Checker(country),
@@ -215,6 +215,34 @@ func (ghc *GoHolidayChecker) CountHolidaysInRange(start, end DateTime) int {
 	return ghc.checker.CountHolidaysInRange(start.Time, end.Time)
 }
 
+// GetHolidaysInRange returns all holidays in the specified date range.
+// Returns a map where keys are holiday dates and values are holiday names.
+// New in GoHoliday v0.5.3+ - optimized for calendar operations.
+func (ghc *GoHolidayChecker) GetHolidaysInRange(start, end DateTime) map[DateTime]string {
+	holidays := ghc.checker.GetHolidaysInRange(start.Time, end.Time)
+	result := make(map[DateTime]string, len(holidays))
+	for date, name := range holidays {
+		result[DateTime{Time: date}] = name
+	}
+	return result
+}
+
+// AreHolidays performs batch holiday checking for efficient range operations.
+// New in GoHoliday v0.5.3+ - optimized for bulk date processing.
+func (ghc *GoHolidayChecker) AreHolidays(dates []DateTime) []bool {
+	times := make([]time.Time, len(dates))
+	for i, dt := range dates {
+		times[i] = dt.Time
+	}
+	return ghc.checker.AreHolidays(times)
+}
+
+// ClearCache clears the holiday cache to free memory.
+// Useful for long-running applications. New in GoHoliday v0.5.3+.
+func (ghc *GoHolidayChecker) ClearCache() {
+	ghc.checker.ClearCache()
+}
+
 // GetCountry returns the country code for this holiday checker.
 func (ghc *GoHolidayChecker) GetCountry() string {
 	return ghc.country
@@ -222,7 +250,8 @@ func (ghc *GoHolidayChecker) GetCountry() string {
 
 // NewHolidayChecker creates a new GoHoliday-based holiday checker for the specified country.
 // This is the recommended way to create holiday checkers for production use.
-// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR (15 countries with 200+ regional subdivisions)
+// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN (33 countries with 500+ regional subdivisions)
+// Features: Sub-microsecond holiday lookups, multi-language support, thread-safe operations, intelligent caching
 func NewHolidayChecker(country string) HolidayChecker {
 	return NewGoHolidayChecker(country)
 }
@@ -301,6 +330,34 @@ func (dt DateTime) PreviousBusinessDay(holidayChecker ...HolidayChecker) DateTim
 		prev = prev.AddDays(-1)
 	}
 	return prev
+}
+
+// GetHolidaysInRange returns all holidays between this date and the end date.
+// If no holiday checker is provided, it uses the default US holiday checker.
+// New in GoHoliday v0.5.3+ - optimized for calendar operations.
+func (dt DateTime) GetHolidaysInRange(end DateTime, holidayChecker ...HolidayChecker) map[DateTime]string {
+	var checker HolidayChecker
+	if len(holidayChecker) > 0 && holidayChecker[0] != nil {
+		checker = holidayChecker[0]
+	} else {
+		checker = defaultUSHolidayChecker
+	}
+
+	// Try to cast to GoHolidayChecker for enhanced functionality
+	if ghc, ok := checker.(*GoHolidayChecker); ok {
+		return ghc.GetHolidaysInRange(dt, end)
+	}
+
+	// Fallback for other HolidayChecker implementations
+	result := make(map[DateTime]string)
+	current := dt
+	for current.Before(end) || current.Equal(end) {
+		if checker.IsHoliday(current) {
+			result[current] = "Holiday" // Generic name for non-GoHoliday checkers
+		}
+		current = current.AddDays(1)
+	}
+	return result
 }
 
 // AddBusinessDays adds the specified number of business days.

@@ -7,12 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- GoHoliday v0.5.3 integration with expanded country support (33 countries, up from 15)
+- Multi-language holiday names support via GoHoliday
+- Sub-microsecond holiday lookup performance with intelligent caching
+- Thread-safe holiday operations for concurrent applications
+- Enhanced regional subdivision support (500+ subdivisions across 33 countries)
+
+### Changed
+- Updated GoHoliday dependency from commit-based version to v0.5.3
+- Expanded supported countries: Added PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN
+- Enhanced documentation to reflect new GoHoliday capabilities
+
 ## [0.6.1] - 2025-08-27
 
 ### Changed
 - Updated GoHoliday integration to support 15 countries (was 8)
 - Enhanced multi-country support: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR
-- Updated documentation to reflect GoHoliday v0.3.0+ capabilities with 200+ regional subdivisions
+- Updated documentation to reflect GoHoliday v0.5.3+ capabilities with 500+ regional subdivisions across 33 countries
 - Improved Quick Start examples to showcase new countries (Brazil, India, South Korea)
 - Enhanced demo application with multi-country holiday checking
 

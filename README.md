@@ -19,11 +19,7 @@ ChronoGo is a comprehensive Go datetime library inspired by Python's Pendulum. I
 - **Immutable Operations**: All methods return new instances for thread safety
 - **Period and Duration Types**: Time intervals with powerful iteration capabilities
 - **Comprehensive Parsing**: Support for common datetime formats with intelligent detection
-- **Enterprise Holiday Support**: Integrated GoHoliday library with multi-country holiday data
-- **Enhanced Business Operations**: Optimized business day calculator and holiday-aware scheduler
-- **Calendar Integration**: Holiday calendar with month/year views and upcoming holiday tracking
-- **Advanced Scheduling**: Holiday-aware recurring schedules and business day scheduling
-- **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic
+- **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic with GoHoliday integration
 - **Serialization Support**: Built-in JSON/Text marshalers and SQL driver integration
 - **High Performance**: Optimized operations with extensive test coverage (91.7%)
 
@@ -64,7 +60,7 @@ func main() {
         fmt.Printf("Upcoming: %s\n", holiday.String())
     }
     
-    // Multi-country holiday checking (GoHoliday v0.3.0+ supports 15 countries)
+    // Multi-country holiday checking (GoHoliday v0.5.3+ supports 33 countries)
     usChecker := ChronoGo.NewGoHolidayChecker("US")
     brChecker := ChronoGo.NewGoHolidayChecker("BR") // Brazil
     inChecker := ChronoGo.NewGoHolidayChecker("IN") // India
@@ -76,6 +72,21 @@ func main() {
     if brChecker.IsHoliday(newYear) {
         fmt.Println("Brazil Holiday:", brChecker.GetHolidayName(newYear))
     }
+    
+    // Enhanced holiday operations with GoHoliday v0.5.3+
+    // Get all holidays in a date range
+    start := ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+    end := ChronoGo.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)
+    holidays := usChecker.GetHolidaysInRange(start, end)
+    fmt.Printf("Q1 2024 US holidays: %d\n", len(holidays))
+    
+    // Batch holiday checking for performance
+    dates := []ChronoGo.DateTime{
+        ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),  // New Year's Day
+        ChronoGo.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),  // Independence Day
+    }
+    results := usChecker.AreHolidays(dates)
+    fmt.Printf("Batch check results: %v\n", results)
     
     // Period iteration
     period := ChronoGo.NewPeriod(ChronoGo.Now(), ChronoGo.Now().AddDays(7))
@@ -94,20 +105,14 @@ func main() {
 - **Timezone**: Convert between timezones with proper DST handling
 - **Comparison**: Before(), After(), Between(), Equal() methods
 
-### Enhanced Business Operations
-- **Optimized Calculator**: EnhancedBusinessDayCalculator with improved performance and custom weekend support
-- **Holiday-Aware Scheduler**: Intelligent scheduling that respects holidays and business days
-- **Calendar Integration**: Holiday calendars with month/year views and upcoming holiday tracking
-- **Recurring Schedules**: Generate schedules for daily, weekly, monthly, and quarterly intervals
-- **End-of-Month Scheduling**: Smart scheduling for month-end business processes
-
 ### Business Date Support
-- **Holiday Management**: Integrated GoHoliday library with comprehensive multi-country holiday data
-- **Supported Countries**: 15 countries with 200+ regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR) with sub-microsecond lookup performance
-- **Default US Holidays**: Business day calculations use US holidays automatically when no checker specified
+- **Holiday Management**: Integrated GoHoliday v0.5.3+ library with comprehensive multi-country holiday data
+- **Supported Countries**: 33 countries with 500+ regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN)
+- **Performance**: Sub-microsecond lookup performance with intelligent caching and thread-safe operations
+- **Multi-language Support**: Holiday names available in multiple languages
+- **Business Day Calculations**: Working day arithmetic with holiday awareness
 - **Custom Holiday Support**: Implement HolidayChecker interface for organization-specific holidays
-- **Business Days**: Calculate working days excluding weekends and holidays
-- **Working Day Arithmetic**: Add/subtract business days with holiday awareness
+- **Enhanced Operations**: Holiday-aware scheduling, calendar integration, and recurring schedules
 
 ### Period and Duration
 - **Period Type**: Represents time intervals between two datetime instances
@@ -184,9 +189,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Version History
 
-- **v0.6.1**: Enhanced business operations with optimized calculator, holiday-aware scheduler, and calendar integration
-- **v0.6.0**: Security hardening with GitHub Actions security workflow, comprehensive vulnerability scanning, dependency review automation
-- **v0.5.0**: Advanced parsing functions (ISO 8601 ordinal/week dates, intervals, token-based formats), GoHoliday integration for enterprise holiday support
+- **v0.6.1**: GoHoliday v0.5.3+ integration with 33 countries support, enhanced business operations, holiday-aware scheduling
+- **v0.6.0**: Security hardening with comprehensive vulnerability scanning and dependency review automation
+- **v0.5.0**: Advanced parsing functions, GoHoliday integration for enterprise holiday support
 - **v0.4.3**: Enhanced test coverage (91.7%), improved safety checks, optimized DST handling
 - **v0.4.2**: GitHub Actions CI/CD, comprehensive linting, automated dependency management
 - **v0.4.0**: Business day operations, enhanced error handling, developer documentation

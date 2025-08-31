@@ -537,8 +537,8 @@ func TestMultipleCountries(t *testing.T) {
 }
 
 func TestAllSupportedCountries(t *testing.T) {
-	// Test all countries officially supported by GoHoliday v0.3.0+ (per their README)
-	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR"}
+	// Test all countries officially supported by GoHoliday v0.5.3+ (per their README)
+	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "MY", "ID", "PH", "VN", "TW", "HK", "ZA", "EG", "NG", "KE", "GH", "MA", "TN"}
 
 	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
 
@@ -571,5 +571,73 @@ func TestNewHolidayChecker(t *testing.T) {
 	// Verify it returns a GoHolidayChecker
 	if _, ok := checker.(*GoHolidayChecker); !ok {
 		t.Error("NewHolidayChecker should return a GoHolidayChecker")
+	}
+}
+
+func TestGoHolidayV53Features(t *testing.T) {
+	checker := NewGoHolidayChecker("US")
+
+	// Test GetHolidaysInRange
+	start := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2024, time.January, 31, 0, 0, 0, 0, time.UTC)
+
+	holidays := checker.GetHolidaysInRange(start, end)
+
+	// Should contain New Year's Day and MLK Day
+	if len(holidays) < 1 {
+		t.Error("Expected at least 1 holiday in January 2024")
+	}
+
+	// Check that New Year's Day is included
+	newYear := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	if name, exists := holidays[newYear]; !exists || name == "" {
+		t.Error("Expected New Year's Day to be in holidays map with a name")
+	}
+
+	// Test AreHolidays batch checking
+	dates := []DateTime{
+		Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC), // New Year's Day
+		Date(2024, time.January, 2, 0, 0, 0, 0, time.UTC), // Not a holiday
+		Date(2024, time.July, 4, 0, 0, 0, 0, time.UTC),    // Independence Day
+	}
+
+	results := checker.AreHolidays(dates)
+	if len(results) != 3 {
+		t.Errorf("Expected 3 results, got %d", len(results))
+	}
+
+	if !results[0] {
+		t.Error("Expected January 1st to be a holiday")
+	}
+	if results[1] {
+		t.Error("Expected January 2nd to not be a holiday")
+	}
+	if !results[2] {
+		t.Error("Expected July 4th to be a holiday")
+	}
+
+	// Test ClearCache (should not error)
+	checker.ClearCache()
+}
+
+func TestDateTimeGetHolidaysInRange(t *testing.T) {
+	start := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := Date(2024, time.January, 31, 0, 0, 0, 0, time.UTC)
+
+	// Test with default US checker
+	holidays := start.GetHolidaysInRange(end)
+
+	if len(holidays) < 1 {
+		t.Error("Expected at least 1 holiday in January 2024")
+	}
+
+	// Test with custom checker
+	checker := NewGoHolidayChecker("CA") // Canada
+	holidaysCA := start.GetHolidaysInRange(end, checker)
+
+	// Canada should also have New Year's Day
+	newYear := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	if _, exists := holidaysCA[newYear]; !exists {
+		t.Error("Expected New Year's Day to be a holiday in Canada")
 	}
 }

@@ -9,12 +9,12 @@ import (
 )
 
 func main() {
-	fmt.Println("🚀 ChronoGo v0.6.1 - Enhanced Business Operations Demo")
-	fmt.Println("📈 GoHoliday v0.3.0+ - 15 Countries Support")
+	fmt.Println("ChronoGo v0.6.1 - Enhanced Business Operations Demo")
+	fmt.Println("GoHoliday v0.5.3+ - 33 Countries Support")
 	fmt.Println(strings.Repeat("=", 60))
 
 	// Enhanced Business Day Calculator
-	fmt.Println("\n⚡ Enhanced Business Day Calculator:")
+	fmt.Println("\nEnhanced Business Day Calculator:")
 	calc := chronogo.NewEnhancedBusinessDayCalculator("US")
 
 	today := chronogo.Today()
@@ -25,9 +25,9 @@ func main() {
 	fmt.Printf("   Next business day: %s\n", nextBiz.Format("2006-01-02"))
 	fmt.Printf("   Business days in next 30 days: %d\n", bizDays)
 
-	// Multi-Country Holiday Checking (New in GoHoliday v0.3.0)
-	fmt.Println("\n🌍 Multi-Country Holiday Checking (15 Countries):")
-	countries := []string{"US", "BR", "IN", "KR", "IT", "ES", "NL"}
+	// Multi-Country Holiday Checking (Enhanced in GoHoliday v0.5.3)
+	fmt.Println("\nMulti-Country Holiday Checking (33 Countries):")
+	countries := []string{"US", "BR", "IN", "KR", "IT", "ES", "NL", "PT", "PL", "CN", "TH", "SG", "ZA", "EG"}
 	newYear := chronogo.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	for _, country := range countries {
@@ -39,13 +39,13 @@ func main() {
 	}
 
 	// Custom weekends for international business
-	fmt.Println("\n🌍 International Business (Custom Weekends):")
+	fmt.Println("\nInternational Business (Custom Weekends):")
 	calc.SetCustomWeekends([]time.Weekday{time.Friday, time.Saturday})
 	fmt.Printf("   With Fri-Sat weekends, Sunday is business day: %t\n",
 		calc.IsBusinessDay(today.AddDays(1))) // Assuming today is Saturday
 
 	// Holiday-Aware Scheduler
-	fmt.Println("\n📅 Holiday-Aware Scheduler:")
+	fmt.Println("\nHoliday-Aware Scheduler:")
 	scheduler := chronogo.NewHolidayAwareScheduler("US")
 
 	// Schedule weekly team meetings
@@ -69,7 +69,7 @@ func main() {
 	}
 
 	// Holiday Calendar
-	fmt.Println("\n🗓️ Holiday Calendar:")
+	fmt.Println("\nHoliday Calendar:")
 	calendar := chronogo.NewHolidayCalendar("US")
 
 	// Upcoming holidays
@@ -87,7 +87,7 @@ func main() {
 	}
 
 	// Convenience methods
-	fmt.Println("\n🎯 Convenient DateTime Methods:")
+	fmt.Println("\nConvenient DateTime Methods:")
 	dt := chronogo.Date(2025, time.January, 15, 0, 0, 0, 0, time.UTC)
 
 	// Get enhanced calculator
@@ -100,5 +100,5 @@ func main() {
 	fmt.Printf("   Upcoming holidays from %s: %d found\n",
 		dt.Format("2006-01-02"), len(upcomingFromDate))
 
-	fmt.Println("\n✨ All features work seamlessly with existing ChronoGo functionality!")
+	fmt.Println("\nAll features work seamlessly with existing ChronoGo functionality!")
 }
