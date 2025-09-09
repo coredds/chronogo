@@ -193,6 +193,7 @@ type GoHolidayChecker struct {
 // NewGoHolidayChecker creates a new holiday checker using the GoHoliday library.
 // The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "MY", "ID", "PH", "VN", "TW", "HK", "ZA", "EG", "NG", "KE", "GH", "MA", "TN").
 // GoHoliday v0.5.3+ supports 33 countries with comprehensive regional subdivision data and multi-language holiday names.
+// Based on Vacanza holidays v0.80+ framework. See DEPENDENCIES.md for version tracking.
 func NewGoHolidayChecker(country string) *GoHolidayChecker {
 	return &GoHolidayChecker{
 		checker: goholiday.Checker(country),
@@ -252,6 +253,7 @@ func (ghc *GoHolidayChecker) GetCountry() string {
 // This is the recommended way to create holiday checkers for production use.
 // Supported countries: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN (33 countries with 500+ regional subdivisions)
 // Features: Sub-microsecond holiday lookups, multi-language support, thread-safe operations, intelligent caching
+// Based on Vacanza holidays v0.80+ framework. See DEPENDENCIES.md for version tracking.
 func NewHolidayChecker(country string) HolidayChecker {
 	return NewGoHolidayChecker(country)
 }

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sub-microsecond holiday lookup performance with intelligent caching
 - Thread-safe holiday operations for concurrent applications
 - Enhanced regional subdivision support (500+ subdivisions across 33 countries)
+- Version tracking: GoHoliday v0.5.3+ is based on Vacanza holidays v0.80+ for future update tracking
 
 ### Changed
 - Updated GoHoliday dependency from commit-based version to v0.5.3

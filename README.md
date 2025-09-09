@@ -106,7 +106,7 @@ func main() {
 - **Comparison**: Before(), After(), Between(), Equal() methods
 
 ### Business Date Support
-- **Holiday Management**: Integrated GoHoliday v0.5.3+ library with comprehensive multi-country holiday data
+- **Holiday Management**: Integrated GoHoliday v0.5.3+ library with comprehensive multi-country holiday data (based on Vacanza holidays v0.80+)
 - **Supported Countries**: 33 countries with 500+ regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN)
 - **Performance**: Sub-microsecond lookup performance with intelligent caching and thread-safe operations
 - **Multi-language Support**: Holiday names available in multiple languages
