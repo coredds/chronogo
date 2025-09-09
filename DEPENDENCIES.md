@@ -32,8 +32,15 @@ US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, 
 - **Go Version**: 1.23+
 - **Main Dependency**: github.com/coredds/GoHoliday v0.5.3
 
+## Expansion Opportunities
+- **Available for Addition**: 24+ additional countries verified as available in GoHoliday v0.5.3+
+- **Priority Targets**: Switzerland (CH), Norway (NO), Sweden (SE), Israel (IL), Turkey (TR), UAE (AE), Saudi Arabia (SA)
+- **Strategic Value**: Financial centers, major economies, regional completion opportunities
+- **See**: EXPANSION_ROADMAP.md for detailed implementation strategy
+
 ## Last Update Check
 - **Date**: January 2025
 - **Vacanza Version Checked**: v0.80 (latest as of September 2025)
 - **Status**: Up to date - no critical updates needed for supported countries
+- **Expansion Status**: 24+ countries verified as ready for implementation
 - **Next Check Recommended**: March 2025
