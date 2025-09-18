@@ -1,6 +1,6 @@
 # ChronoGo
 
-[![Version](https://img.shields.io/badge/version-v0.6.1-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.2-green.svg)](https://github.com/coredds/ChronoGo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.23-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml)
@@ -196,7 +196,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Version History
 
-- **v0.6.1**: GoHoliday v0.6.3+ integration with 34 countries support (added Turkey and Ukraine), enhanced business operations, holiday-aware scheduling, subdivision and category support
+- **v0.6.2**: GoHoliday v0.6.3+ integration with 34 countries support (added Turkey and Ukraine), enhanced business operations, holiday-aware scheduling, subdivision and category support, new APIs for subdivisions and holiday categories
+- **v0.6.1**: Maintenance release and documentation improvements
 - **v0.6.0**: Security hardening with comprehensive vulnerability scanning and dependency review automation
 - **v0.5.0**: Advanced parsing functions, GoHoliday integration for enterprise holiday support
 - **GoHoliday v0.6.3**: Added Turkey and Ukraine support, subdivision/category APIs, enhanced performance, error handling improvements

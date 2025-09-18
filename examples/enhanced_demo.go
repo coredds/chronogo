@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	fmt.Println("ChronoGo v0.6.1 - Enhanced Business Operations Demo")
-	fmt.Println("GoHoliday v0.5.3+ - 33 Countries Support")
+	fmt.Println("ChronoGo v0.6.2 - Enhanced Business Operations Demo")
+	fmt.Println("GoHoliday v0.6.3+ - 34 Countries Support")
 	fmt.Println(strings.Repeat("=", 60))
 
 	// Enhanced Business Day Calculator
@@ -25,7 +25,7 @@ func main() {
 	fmt.Printf("   Next business day: %s\n", nextBiz.Format("2006-01-02"))
 	fmt.Printf("   Business days in next 30 days: %d\n", bizDays)
 
-	// Multi-Country Holiday Checking (Enhanced in GoHoliday v0.5.3)
+	// Multi-Country Holiday Checking (Enhanced in GoHoliday v0.6.3)
 	fmt.Println("\nMulti-Country Holiday Checking (33 Countries):")
 	countries := []string{"US", "BR", "IN", "KR", "IT", "ES", "NL", "PT", "PL", "CN", "TH", "SG", "ZA", "EG"}
 	newYear := chronogo.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC)

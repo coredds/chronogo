@@ -221,7 +221,7 @@ func (ghc *GoHolidayChecker) CountHolidaysInRange(start, end DateTime) int {
 
 // GetHolidaysInRange returns all holidays in the specified date range.
 // Returns a map where keys are holiday dates and values are holiday names.
-// New in GoHoliday v0.5.3+ - optimized for calendar operations.
+// New in GoHoliday v0.6.3+ - optimized for calendar operations.
 func (ghc *GoHolidayChecker) GetHolidaysInRange(start, end DateTime) map[DateTime]string {
 	holidays := ghc.checker.GetHolidaysInRange(start.Time, end.Time)
 	result := make(map[DateTime]string, len(holidays))
@@ -232,7 +232,7 @@ func (ghc *GoHolidayChecker) GetHolidaysInRange(start, end DateTime) map[DateTim
 }
 
 // AreHolidays performs batch holiday checking for efficient range operations.
-// New in GoHoliday v0.5.3+ - optimized for bulk date processing.
+// New in GoHoliday v0.6.3+ - optimized for bulk date processing.
 func (ghc *GoHolidayChecker) AreHolidays(dates []DateTime) []bool {
 	times := make([]time.Time, len(dates))
 	for i, dt := range dates {
@@ -242,7 +242,7 @@ func (ghc *GoHolidayChecker) AreHolidays(dates []DateTime) []bool {
 }
 
 // ClearCache clears the holiday cache to free memory.
-// Useful for long-running applications. New in GoHoliday v0.5.3+.
+// Useful for long-running applications. New in GoHoliday v0.6.3+.
 func (ghc *GoHolidayChecker) ClearCache() {
 	ghc.checker.ClearCache()
 }
@@ -369,7 +369,7 @@ func (dt DateTime) PreviousBusinessDay(holidayChecker ...HolidayChecker) DateTim
 
 // GetHolidaysInRange returns all holidays between this date and the end date.
 // If no holiday checker is provided, it uses the default US holiday checker.
-// New in GoHoliday v0.5.3+ - optimized for calendar operations.
+// New in GoHoliday v0.6.3+ - optimized for calendar operations.
 func (dt DateTime) GetHolidaysInRange(end DateTime, holidayChecker ...HolidayChecker) map[DateTime]string {
 	var checker HolidayChecker
 	if len(holidayChecker) > 0 && holidayChecker[0] != nil {

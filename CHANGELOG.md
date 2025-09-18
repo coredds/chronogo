@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2024-09-18
+
 ### Added
 - GoHoliday v0.6.3 integration with expanded country support (34 countries, up from 33)
 - Turkey (TR) and Ukraine (UA) holiday support via GoHoliday v0.6.3+
@@ -30,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated GoHoliday integration to support 15 countries (was 8)
 - Enhanced multi-country support: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR
-- Updated documentation to reflect GoHoliday v0.5.3+ capabilities with 500+ regional subdivisions across 33 countries
+- Updated documentation to reflect GoHoliday v0.6.3+ capabilities with comprehensive regional subdivisions across 34 countries
 - Improved Quick Start examples to showcase new countries (Brazil, India, South Korea)
 - Enhanced demo application with multi-country holiday checking
 
@@ -306,7 +308,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/coredds/ChronoGo/compare/v0.6.1...v0.6.2
 [0.6.0]: https://github.com/coredds/ChronoGo/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/coredds/ChronoGo/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/coredds/ChronoGo/compare/v0.4.2...v0.4.3
