@@ -60,10 +60,11 @@ func main() {
         fmt.Printf("Upcoming: %s\n", holiday.String())
     }
     
-    // Multi-country holiday checking (GoHoliday v0.5.3+ supports 33 countries)
+    // Multi-country holiday checking (GoHoliday v0.6.3+ supports 34 countries)
     usChecker := ChronoGo.NewGoHolidayChecker("US")
     brChecker := ChronoGo.NewGoHolidayChecker("BR") // Brazil
-    inChecker := ChronoGo.NewGoHolidayChecker("IN") // India
+    trChecker := ChronoGo.NewGoHolidayChecker("TR") // Turkey (new in v0.6.3)
+    uaChecker := ChronoGo.NewGoHolidayChecker("UA") // Ukraine (new in v0.6.3)
     
     newYear := ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
     if usChecker.IsHoliday(newYear) {
@@ -73,7 +74,13 @@ func main() {
         fmt.Println("Brazil Holiday:", brChecker.GetHolidayName(newYear))
     }
     
-    // Enhanced holiday operations with GoHoliday v0.5.3+
+    // Enhanced holiday operations with GoHoliday v0.6.3+
+    
+    // New features in v0.6.3: subdivision support, holiday categories, language support
+    subdivisions := usChecker.GetSubdivisions()
+    categories := usChecker.GetHolidayCategories()
+    language := usChecker.GetLanguage()
+    holidayCount, _ := usChecker.GetHolidayCount(2024)
     // Get all holidays in a date range
     start := ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
     end := ChronoGo.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)
@@ -106,8 +113,8 @@ func main() {
 - **Comparison**: Before(), After(), Between(), Equal() methods
 
 ### Business Date Support
-- **Holiday Management**: Integrated GoHoliday v0.5.3+ library with comprehensive multi-country holiday data (based on Vacanza holidays v0.80+)
-- **Supported Countries**: 33 countries with 500+ regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN)
+- **Holiday Management**: Integrated GoHoliday v0.6.3+ library with comprehensive multi-country holiday data (34 countries including Turkey and Ukraine)
+- **Supported Countries**: 34 countries with comprehensive regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, TR, UA, AT, BE, CH, CL, FI, IE, IL, NO, SE, AR, ID)
 - **Performance**: Sub-microsecond lookup performance with intelligent caching and thread-safe operations
 - **Multi-language Support**: Holiday names available in multiple languages
 - **Business Day Calculations**: Working day arithmetic with holiday awareness
@@ -189,9 +196,10 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Version History
 
-- **v0.6.1**: GoHoliday v0.5.3+ integration with 33 countries support, enhanced business operations, holiday-aware scheduling
+- **v0.6.1**: GoHoliday v0.6.3+ integration with 34 countries support (added Turkey and Ukraine), enhanced business operations, holiday-aware scheduling, subdivision and category support
 - **v0.6.0**: Security hardening with comprehensive vulnerability scanning and dependency review automation
 - **v0.5.0**: Advanced parsing functions, GoHoliday integration for enterprise holiday support
+- **GoHoliday v0.6.3**: Added Turkey and Ukraine support, subdivision/category APIs, enhanced performance, error handling improvements
 - **v0.4.3**: Enhanced test coverage (91.7%), improved safety checks, optimized DST handling
 - **v0.4.2**: GitHub Actions CI/CD, comprehensive linting, automated dependency management
 - **v0.4.0**: Business day operations, enhanced error handling, developer documentation

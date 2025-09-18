@@ -58,7 +58,8 @@ func (ebc *EnhancedBusinessDayCalculator) BusinessDaysBetween(start, end DateTim
 	return ebc.calculator.BusinessDaysBetween(start.Time, end.Time)
 }
 
-// IsEndOfMonth checks if the date is the last business day of the month
+// IsEndOfMonth checks if a date is the last business day of the month.
+// New in GoHoliday v0.6.3+ - useful for end-of-month business processes.
 func (ebc *EnhancedBusinessDayCalculator) IsEndOfMonth(dt DateTime) bool {
 	return ebc.calculator.IsEndOfMonth(dt.Time)
 }

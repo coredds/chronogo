@@ -3,6 +3,7 @@ package chronogo
 import (
 	"time"
 
+	goholidays "github.com/coredds/GoHoliday"
 	goholiday "github.com/coredds/GoHoliday/chronogo"
 )
 
@@ -186,18 +187,20 @@ func (hc *DefaultHolidayChecker) findWeekdayOccurrence(year int, month time.Mont
 // GoHolidayChecker wraps the GoHoliday library to implement the HolidayChecker interface.
 // This provides comprehensive holiday data for multiple countries and regions.
 type GoHolidayChecker struct {
-	checker *goholiday.FastCountryChecker
-	country string
+	checker        *goholiday.FastCountryChecker
+	countryChecker *goholidays.Country
+	country        string
 }
 
 // NewGoHolidayChecker creates a new holiday checker using the GoHoliday library.
-// The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "MY", "ID", "PH", "VN", "TW", "HK", "ZA", "EG", "NG", "KE", "GH", "MA", "TN").
-// GoHoliday v0.5.3+ supports 33 countries with comprehensive regional subdivision data and multi-language holiday names.
-// Based on Vacanza holidays v0.80+ framework. See DEPENDENCIES.md for version tracking.
+// The country parameter should be a 2-letter ISO country code (e.g., "US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "TR", "UA", "AT", "BE", "CH", "CL", "FI", "IE", "IL", "NO", "SE").
+// GoHoliday v0.6.3+ supports 34 countries with comprehensive regional subdivision data and multi-language holiday names.
+// Based on Vacanza holidays framework. See DEPENDENCIES.md for version tracking.
 func NewGoHolidayChecker(country string) *GoHolidayChecker {
 	return &GoHolidayChecker{
-		checker: goholiday.Checker(country),
-		country: country,
+		checker:        goholiday.Checker(country),
+		countryChecker: goholidays.NewCountry(country),
+		country:        country,
 	}
 }
 
@@ -249,11 +252,41 @@ func (ghc *GoHolidayChecker) GetCountry() string {
 	return ghc.country
 }
 
+// GetSubdivisions returns the supported subdivisions for this country.
+// New in GoHoliday v0.6.3+ - provides access to regional holiday data.
+func (ghc *GoHolidayChecker) GetSubdivisions() []string {
+	return ghc.countryChecker.GetSubdivisions()
+}
+
+// GetHolidayCategories returns the supported holiday categories for this country.
+// New in GoHoliday v0.6.3+ - categories include "public", "bank", "school", etc.
+func (ghc *GoHolidayChecker) GetHolidayCategories() []goholidays.HolidayCategory {
+	return ghc.countryChecker.GetCategories()
+}
+
+// GetLanguage returns the language used for holiday names.
+// New in GoHoliday v0.6.3+ - supports multi-language holiday names.
+func (ghc *GoHolidayChecker) GetLanguage() string {
+	return ghc.countryChecker.GetLanguage()
+}
+
+// GetHolidayCount returns the number of holidays in a given year.
+// New in GoHoliday v0.6.3+ - efficient counting without loading all holidays.
+func (ghc *GoHolidayChecker) GetHolidayCount(year int) (int, error) {
+	return ghc.countryChecker.GetHolidayCount(year)
+}
+
+// ValidateCountryCode validates if a country code is supported.
+// New in GoHoliday v0.6.3+ - provides validation before creating checkers.
+func ValidateCountryCode(countryCode string) error {
+	return goholidays.ValidateCountryCode(countryCode)
+}
+
 // NewHolidayChecker creates a new GoHoliday-based holiday checker for the specified country.
 // This is the recommended way to create holiday checkers for production use.
-// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN (33 countries with 500+ regional subdivisions)
+// Supported countries: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, TR, UA, AT, BE, CH, CL, FI, IE, IL, NO, SE (34 countries with comprehensive regional subdivisions)
 // Features: Sub-microsecond holiday lookups, multi-language support, thread-safe operations, intelligent caching
-// Based on Vacanza holidays v0.80+ framework. See DEPENDENCIES.md for version tracking.
+// Based on Vacanza holidays framework. See DEPENDENCIES.md for version tracking.
 func NewHolidayChecker(country string) HolidayChecker {
 	return NewGoHolidayChecker(country)
 }

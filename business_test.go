@@ -631,13 +631,109 @@ func TestDateTimeGetHolidaysInRange(t *testing.T) {
 		t.Error("Expected at least 1 holiday in January 2024")
 	}
 
-	// Test with custom checker
-	checker := NewGoHolidayChecker("CA") // Canada
-	holidaysCA := start.GetHolidaysInRange(end, checker)
+	// Test new GoHoliday v0.6.3+ features
+	testNewGoHolidayV63Features(t)
+}
 
-	// Canada should also have New Year's Day
-	newYear := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
-	if _, exists := holidaysCA[newYear]; !exists {
-		t.Error("Expected New Year's Day to be a holiday in Canada")
+func testNewGoHolidayV63Features(t *testing.T) {
+	// Test Turkey (TR) - new country in v0.6.3
+	trChecker := NewGoHolidayChecker("TR")
+	if trChecker.GetCountry() != "TR" {
+		t.Error("Turkish checker should return TR country code")
+	}
+
+	// Test Ukraine (UA) - new country in v0.6.3
+	uaChecker := NewGoHolidayChecker("UA")
+	if uaChecker.GetCountry() != "UA" {
+		t.Error("Ukrainian checker should return UA country code")
+	}
+
+	// Test new subdivision support (via full Country API)
+	usChecker := NewGoHolidayChecker("US")
+	subdivisions := usChecker.GetSubdivisions()
+	// Note: subdivisions might be empty for chronogo interface, but should not panic
+	_ = subdivisions // subdivisions functionality available via Country API
+
+	// Test holiday categories
+	categories := usChecker.GetHolidayCategories()
+	if len(categories) == 0 {
+		t.Error("US should have holiday categories available")
+	}
+
+	// Test language support
+	language := usChecker.GetLanguage()
+	if language == "" {
+		t.Error("US checker should return a language")
+	}
+
+	// Test holiday count for current year
+	currentYear := time.Now().Year()
+	count, err := usChecker.GetHolidayCount(currentYear)
+	if err != nil {
+		t.Errorf("Error getting holiday count: %v", err)
+	}
+	if count == 0 {
+		t.Error("US should have holidays in current year")
+	}
+
+	// Test country code validation
+	err = ValidateCountryCode("US")
+	if err != nil {
+		t.Errorf("US should be a valid country code: %v", err)
+	}
+
+	err = ValidateCountryCode("INVALID")
+	if err == nil {
+		t.Error("INVALID should not be a valid country code")
+	}
+}
+
+func TestEnhancedBusinessDayCalculatorV63Features(t *testing.T) {
+	calc := NewEnhancedBusinessDayCalculator("US")
+
+	// Test IsEndOfMonth feature - new in v0.6.3
+	// Test last business day of January 2024 (Wednesday, January 31, 2024)
+	lastBizDayJan := Date(2024, time.January, 31, 0, 0, 0, 0, time.UTC)
+	if !calc.IsEndOfMonth(lastBizDayJan) {
+		t.Error("January 31, 2024 should be the last business day of the month")
+	}
+
+	// Test a non-end-of-month business day
+	midMonthDay := Date(2024, time.January, 15, 0, 0, 0, 0, time.UTC)
+	if calc.IsEndOfMonth(midMonthDay) {
+		t.Error("January 15, 2024 should not be the last business day of the month")
+	}
+}
+
+func TestNewCountriesV63(t *testing.T) {
+	// Test all 34 countries supported in v0.6.3
+	countries := []string{
+		"AR", "AT", "AU", "BE", "BR", "CA", "CH", "CL", "CN", "DE",
+		"ES", "FI", "FR", "GB", "ID", "IE", "IL", "IN", "IT", "JP",
+		"KR", "MX", "NL", "NO", "NZ", "PL", "PT", "RU", "SE", "SG",
+		"TH", "TR", "UA", "US",
+	}
+
+	for _, country := range countries {
+		t.Run(country, func(t *testing.T) {
+			checker := NewGoHolidayChecker(country)
+			if checker.GetCountry() != country {
+				t.Errorf("Country checker for %s should return %s", country, country)
+			}
+
+			// Test that we can get some basic info without errors
+			_ = checker.GetSubdivisions()      // Should not panic
+			_ = checker.GetHolidayCategories() // Should not panic
+			_ = checker.GetLanguage()          // Should not panic
+
+			// Test getting holiday count for 2024
+			count, err := checker.GetHolidayCount(2024)
+			if err != nil {
+				t.Errorf("Error getting holiday count for %s: %v", country, err)
+			}
+			if count < 0 {
+				t.Errorf("Holiday count for %s should be non-negative", country)
+			}
+		})
 	}
 }

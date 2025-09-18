@@ -8,16 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- GoHoliday v0.5.3 integration with expanded country support (33 countries, up from 15)
+- GoHoliday v0.6.3 integration with expanded country support (34 countries, up from 33)
+- Turkey (TR) and Ukraine (UA) holiday support via GoHoliday v0.6.3+
+- Enhanced holiday APIs: subdivision support, holiday categories, language detection
+- Holiday count API for efficient counting without loading all holidays
+- Country code validation API for safer holiday checker creation
+- IsEndOfMonth method for enhanced business day calculations
 - Multi-language holiday names support via GoHoliday
 - Sub-microsecond holiday lookup performance with intelligent caching
 - Thread-safe holiday operations for concurrent applications
-- Enhanced regional subdivision support (500+ subdivisions across 33 countries)
-- Version tracking: GoHoliday v0.5.3+ is based on Vacanza holidays v0.80+ for future update tracking
+- Enhanced regional subdivision support across all supported countries
+- Version tracking: GoHoliday v0.6.3+ is based on Vacanza holidays framework for future update tracking
 
 ### Changed
-- Updated GoHoliday dependency from commit-based version to v0.5.3
-- Expanded supported countries: Added PT, PL, RU, CN, TH, SG, MY, ID, PH, VN, TW, HK, ZA, EG, NG, KE, GH, MA, TN
+- Updated GoHoliday dependency from v0.5.3 to v0.6.3
+- Expanded supported countries: Added Turkey (TR) and Ukraine (UA) in v0.6.3, bringing total to 34 countries
 - Enhanced documentation to reflect new GoHoliday capabilities
 
 ## [0.6.1] - 2025-08-27
