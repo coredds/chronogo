@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	fmt.Println("ChronoGo v0.6.2 - Enhanced Business Operations Demo")
+	fmt.Println("ChronoGo v0.6.5 - Enhanced Business Operations Demo")
 	fmt.Println("GoHoliday v0.6.3+ - 34 Countries Support")
 	fmt.Println(strings.Repeat("=", 60))
 

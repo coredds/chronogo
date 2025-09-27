@@ -203,8 +203,11 @@ func convertTokenFormat(format string) string {
 		{"YYYY", "2006"},
 		{"MMMM", "January"},
 		{"MMM", "Jan"},
+		{"dddd", "Monday"},
+		{"ddd", "Mon"},
 		{"MM", "01"},
 		{"DD", "02"},
+		{"Do", "2nd"}, // Ordinal day - Go doesn't have native support, but we'll handle this specially
 		{"HH", "15"},
 		{"hh", "03"},
 		{"mm", "04"},

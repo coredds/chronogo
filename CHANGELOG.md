@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.5] - 2024-09-27
+
+### Added
+- **Comprehensive Localization Support**: Added full internationalization capabilities with 6 supported locales
+  - English (United States) - en-US
+  - Spanish (Spain) - es-ES  
+  - French (France) - fr-FR
+  - German (Germany) - de-DE
+  - Chinese Simplified - zh-Hans
+  - Portuguese (Brazil) - pt-BR
+- **Localized Date Formatting**: New `FormatLocalized()` and `FormatLocalizedDefault()` methods for locale-aware date formatting
+- **Localized Human-Readable Differences**: New `HumanStringLocalized()` and `HumanStringLocalizedDefault()` methods for time differences in multiple languages
+- **Locale Management System**: Complete locale registry with `RegisterLocale()`, `GetLocale()`, `SetDefaultLocale()`, and `GetAvailableLocales()`
+- **Localized Month/Weekday Names**: New `GetMonthName()`, `GetWeekdayName()` methods with locale support
+- **Ordinal Number Support**: Localized ordinal suffixes (1st, 2nd, 3rd, etc.) for all supported languages
+- **AM/PM Localization**: Locale-aware AM/PM indicators
+- **Comprehensive Test Coverage**: 100% test coverage for all localization features with extensive unit tests
+- **Localization Demo**: Added interactive demo showcasing all localization capabilities
+- **Performance Optimized**: Efficient locale data structures with minimal memory footprint
+
+### Changed
+- Updated version badges and documentation to reflect v0.6.5
+- Enhanced README with comprehensive localization examples and usage patterns
+- Improved code formatting and linting compliance
+
 ## [0.6.2] - 2024-09-18
 
 ### Added
@@ -308,7 +333,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.6.2...HEAD
+[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.6.5...HEAD
+[0.6.5]: https://github.com/coredds/ChronoGo/compare/v0.6.2...v0.6.5
 [0.6.2]: https://github.com/coredds/ChronoGo/compare/v0.6.1...v0.6.2
 [0.6.0]: https://github.com/coredds/ChronoGo/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/coredds/ChronoGo/compare/v0.4.3...v0.5.0
