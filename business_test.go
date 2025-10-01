@@ -537,18 +537,35 @@ func TestMultipleCountries(t *testing.T) {
 }
 
 func TestAllSupportedCountries(t *testing.T) {
-	// Test all countries officially supported by GoHoliday v0.6.3+ (per their README)
+	// Test all countries officially supported by GoHoliday v0.6.4+ (per their README)
 	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "MY", "ID", "PH", "VN", "TW", "HK", "ZA", "EG", "NG", "KE", "GH", "MA", "TN"}
 
 	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	// Countries that don't observe New Year's Day as a public holiday
+	countriesWithoutNewYears := map[string]bool{
+		"IN": true, // India doesn't observe January 1st as a public holiday
+	}
 
 	for _, country := range countries {
 		t.Run(country, func(t *testing.T) {
 			checker := NewGoHolidayChecker(country)
 
-			// All countries should have New Year's Day as a holiday
-			if !checker.IsHoliday(newYears) {
-				t.Errorf("New Year's Day should be a holiday in %s", country)
+			// Check that the checker is working by verifying it can detect holidays
+			// Not all countries observe New Year's Day as a public holiday
+			if !countriesWithoutNewYears[country] {
+				if !checker.IsHoliday(newYears) {
+					t.Errorf("New Year's Day should be a holiday in %s", country)
+				}
+			} else {
+				// For countries that don't observe New Year's Day, verify they have other holidays
+				// For India, check Republic Day (January 26)
+				if country == "IN" {
+					republicDay := Date(2024, time.January, 26, 0, 0, 0, 0, time.UTC)
+					if !checker.IsHoliday(republicDay) {
+						t.Errorf("Republic Day should be a holiday in India")
+					}
+				}
 			}
 
 			// Check country code
