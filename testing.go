@@ -19,10 +19,11 @@ var frozenTime bool
 // Call ClearTestNow() to restore normal behavior.
 //
 // Example:
-//   chronogo.SetTestNow(chronogo.Date(2024, 1, 15, 12, 0, 0, 0, time.UTC))
-//   defer chronogo.ClearTestNow()
-//   
-//   now := chronogo.Now() // Returns 2024-01-15 12:00:00 UTC
+//
+//	chronogo.SetTestNow(chronogo.Date(2024, 1, 15, 12, 0, 0, 0, time.UTC))
+//	defer chronogo.ClearTestNow()
+//
+//	now := chronogo.Now() // Returns 2024-01-15 12:00:00 UTC
 func SetTestNow(dt DateTime) {
 	testNowMutex.Lock()
 	defer testNowMutex.Unlock()
@@ -60,12 +61,13 @@ func IsTestMode() bool {
 // All calls to Now() will return the same frozen time until UnfreezeTime() is called.
 //
 // Example:
-//   chronogo.FreezeTime()
-//   defer chronogo.UnfreezeTime()
-//   
-//   now1 := chronogo.Now()
-//   time.Sleep(100 * time.Millisecond)
-//   now2 := chronogo.Now() // Same as now1, time is frozen
+//
+//	chronogo.FreezeTime()
+//	defer chronogo.UnfreezeTime()
+//
+//	now1 := chronogo.Now()
+//	time.Sleep(100 * time.Millisecond)
+//	now2 := chronogo.Now() // Same as now1, time is frozen
 func FreezeTime() {
 	testNowMutex.Lock()
 	defer testNowMutex.Unlock()
@@ -77,8 +79,9 @@ func FreezeTime() {
 // FreezeTimeAt freezes time at a specific DateTime for testing.
 //
 // Example:
-//   chronogo.FreezeTimeAt(chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
-//   defer chronogo.UnfreezeTime()
+//
+//	chronogo.FreezeTimeAt(chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+//	defer chronogo.UnfreezeTime()
 func FreezeTimeAt(dt DateTime) {
 	testNowMutex.Lock()
 	defer testNowMutex.Unlock()
@@ -104,12 +107,13 @@ func IsFrozen() bool {
 // Unlike FreezeTime, subsequent calls to Now() will still advance normally from this point.
 //
 // Example:
-//   chronogo.TravelTo(chronogo.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC))
-//   defer chronogo.ClearTestNow()
-//   
-//   now := chronogo.Now() // Returns 2024-12-25 00:00:00 UTC
-//   time.Sleep(1 * time.Second)
-//   later := chronogo.Now() // Returns 2024-12-25 00:00:01 UTC (time advances)
+//
+//	chronogo.TravelTo(chronogo.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC))
+//	defer chronogo.ClearTestNow()
+//
+//	now := chronogo.Now() // Returns 2024-12-25 00:00:00 UTC
+//	time.Sleep(1 * time.Second)
+//	later := chronogo.Now() // Returns 2024-12-25 00:00:01 UTC (time advances)
 func TravelTo(dt DateTime) {
 	testNowMutex.Lock()
 	defer testNowMutex.Unlock()
@@ -121,19 +125,20 @@ func TravelTo(dt DateTime) {
 // TravelBack moves the test time backwards by the specified duration.
 //
 // Example:
-//   chronogo.TravelBack(24 * time.Hour) // Go back 1 day
-//   defer chronogo.ClearTestNow()
+//
+//	chronogo.TravelBack(24 * time.Hour) // Go back 1 day
+//	defer chronogo.ClearTestNow()
 func TravelBack(d time.Duration) {
 	testNowMutex.Lock()
 	defer testNowMutex.Unlock()
-	
+
 	var base time.Time
 	if testNow != nil {
 		base = *testNow
 	} else {
 		base = time.Now()
 	}
-	
+
 	t := base.Add(-d)
 	testNow = &t
 	frozenTime = false
@@ -142,19 +147,20 @@ func TravelBack(d time.Duration) {
 // TravelForward moves the test time forward by the specified duration.
 //
 // Example:
-//   chronogo.TravelForward(7 * 24 * time.Hour) // Go forward 1 week
-//   defer chronogo.ClearTestNow()
+//
+//	chronogo.TravelForward(7 * 24 * time.Hour) // Go forward 1 week
+//	defer chronogo.ClearTestNow()
 func TravelForward(d time.Duration) {
 	testNowMutex.Lock()
 	defer testNowMutex.Unlock()
-	
+
 	var base time.Time
 	if testNow != nil {
 		base = *testNow
 	} else {
 		base = time.Now()
 	}
-	
+
 	t := base.Add(d)
 	testNow = &t
 	frozenTime = false
@@ -164,11 +170,12 @@ func TravelForward(d time.Duration) {
 // This is useful for scoped time mocking in tests.
 //
 // Example:
-//   chronogo.WithTestNow(chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), func() {
-//       now := chronogo.Now() // Returns 2024-01-01 00:00:00 UTC
-//       // ... test code ...
-//   })
-//   // Test time automatically cleared after function returns
+//
+//	chronogo.WithTestNow(chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), func() {
+//	    now := chronogo.Now() // Returns 2024-01-01 00:00:00 UTC
+//	    // ... test code ...
+//	})
+//	// Test time automatically cleared after function returns
 func WithTestNow(dt DateTime, fn func()) {
 	SetTestNow(dt)
 	defer ClearTestNow()
@@ -178,11 +185,12 @@ func WithTestNow(dt DateTime, fn func()) {
 // WithFrozenTime executes a function with frozen time and automatically cleans up.
 //
 // Example:
-//   chronogo.WithFrozenTime(func() {
-//       now1 := chronogo.Now()
-//       time.Sleep(100 * time.Millisecond)
-//       now2 := chronogo.Now() // Same as now1
-//   })
+//
+//	chronogo.WithFrozenTime(func() {
+//	    now1 := chronogo.Now()
+//	    time.Sleep(100 * time.Millisecond)
+//	    now2 := chronogo.Now() // Same as now1
+//	})
 func WithFrozenTime(fn func()) {
 	FreezeTime()
 	defer UnfreezeTime()
@@ -192,9 +200,10 @@ func WithFrozenTime(fn func()) {
 // WithFrozenTimeAt executes a function with time frozen at a specific DateTime.
 //
 // Example:
-//   chronogo.WithFrozenTimeAt(chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), func() {
-//       // Time is frozen at 2024-01-01 00:00:00 UTC
-//   })
+//
+//	chronogo.WithFrozenTimeAt(chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC), func() {
+//	    // Time is frozen at 2024-01-01 00:00:00 UTC
+//	})
 func WithFrozenTimeAt(dt DateTime, fn func()) {
 	FreezeTimeAt(dt)
 	defer UnfreezeTime()
@@ -206,7 +215,7 @@ func WithFrozenTimeAt(dt DateTime, fn func()) {
 func getTestableNow() time.Time {
 	testNowMutex.RLock()
 	defer testNowMutex.RUnlock()
-	
+
 	if testNow != nil {
 		if frozenTime {
 			// Return exact frozen time
@@ -216,7 +225,6 @@ func getTestableNow() time.Time {
 		// This allows time to advance naturally from the test point
 		return *testNow
 	}
-	
+
 	return time.Now()
 }
-

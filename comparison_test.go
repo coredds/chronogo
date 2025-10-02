@@ -7,7 +7,7 @@ import (
 
 func TestIsBirthday(t *testing.T) {
 	birthday := Date(1990, 5, 15, 0, 0, 0, 0, time.UTC)
-	
+
 	tests := []struct {
 		name     string
 		date     DateTime
@@ -255,4 +255,3 @@ func TestToAtomString(t *testing.T) {
 		t.Errorf("Expected Atom and W3C strings to match: %s vs %s", atom, w3c)
 	}
 }
-

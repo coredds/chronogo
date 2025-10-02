@@ -445,15 +445,16 @@ func (p Period) FastRangeDays(step ...int) []DateTime {
 // Two periods overlap if they share any common time.
 //
 // Example:
-//   p1 := chronogo.NewPeriod(
-//       chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
-//       chronogo.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC),
-//   )
-//   p2 := chronogo.NewPeriod(
-//       chronogo.Date(2024, 1, 5, 0, 0, 0, 0, time.UTC),
-//       chronogo.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),
-//   )
-//   p1.Overlaps(p2) // Returns true
+//
+//	p1 := chronogo.NewPeriod(
+//	    chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+//	    chronogo.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC),
+//	)
+//	p2 := chronogo.NewPeriod(
+//	    chronogo.Date(2024, 1, 5, 0, 0, 0, 0, time.UTC),
+//	    chronogo.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),
+//	)
+//	p1.Overlaps(p2) // Returns true
 func (p Period) Overlaps(other Period) bool {
 	// Two periods overlap if:
 	// - This period's start is before or equal to other's end AND
@@ -465,35 +466,37 @@ func (p Period) Overlaps(other Period) bool {
 // If the periods overlap, returns a zero period.
 //
 // Example:
-//   p1 := chronogo.NewPeriod(start1, end1)
-//   p2 := chronogo.NewPeriod(start2, end2)
-//   gap := p1.Gap(p2) // Returns the period between them
+//
+//	p1 := chronogo.NewPeriod(start1, end1)
+//	p2 := chronogo.NewPeriod(start2, end2)
+//	gap := p1.Gap(p2) // Returns the period between them
 func (p Period) Gap(other Period) Period {
 	// If periods overlap, there's no gap
 	if p.Overlaps(other) {
 		return Period{}
 	}
-	
+
 	// Find which period comes first
 	if p.End.Before(other.Start) {
 		return Period{Start: p.End, End: other.Start}
 	}
-	
+
 	return Period{Start: other.End, End: p.Start}
 }
 
 // Encompasses checks if this period completely contains another period.
 //
 // Example:
-//   outer := chronogo.NewPeriod(
-//       chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
-//       chronogo.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC),
-//   )
-//   inner := chronogo.NewPeriod(
-//       chronogo.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC),
-//       chronogo.Date(2024, 6, 30, 0, 0, 0, 0, time.UTC),
-//   )
-//   outer.Encompasses(inner) // Returns true
+//
+//	outer := chronogo.NewPeriod(
+//	    chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+//	    chronogo.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC),
+//	)
+//	inner := chronogo.NewPeriod(
+//	    chronogo.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC),
+//	    chronogo.Date(2024, 6, 30, 0, 0, 0, 0, time.UTC),
+//	)
+//	outer.Encompasses(inner) // Returns true
 func (p Period) Encompasses(other Period) bool {
 	return !p.Start.After(other.Start) && !p.End.Before(other.End)
 }
@@ -502,19 +505,20 @@ func (p Period) Encompasses(other Period) bool {
 // that spans from the earliest start to the latest end.
 //
 // Example:
-//   p1 := chronogo.NewPeriod(start1, end1)
-//   p2 := chronogo.NewPeriod(start2, end2)
-//   merged := p1.Merge(p2) // Returns period covering both
+//
+//	p1 := chronogo.NewPeriod(start1, end1)
+//	p2 := chronogo.NewPeriod(start2, end2)
+//	merged := p1.Merge(p2) // Returns period covering both
 func (p Period) Merge(other Period) Period {
 	start := p.Start
 	if other.Start.Before(start) {
 		start = other.Start
 	}
-	
+
 	end := p.End
 	if other.End.After(end) {
 		end = other.End
 	}
-	
+
 	return Period{Start: start, End: end}
 }

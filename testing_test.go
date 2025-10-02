@@ -182,7 +182,7 @@ func TestGetTestNow(t *testing.T) {
 		t.Fatal("Expected GetTestNow() to return a value")
 	}
 
-	if !retrievedTime.Equal(testTime) {
+	if retrievedTime != nil && !retrievedTime.Equal(testTime) {
 		t.Errorf("Expected GetTestNow() to return %v, got %v", testTime, *retrievedTime)
 	}
 }
@@ -310,4 +310,3 @@ func TestConcurrentTestNowAccess(t *testing.T) {
 	// Should not panic or race
 	t.Log("Concurrent access test passed")
 }
-

@@ -136,4 +136,3 @@ func ordinalSuffix(n int) string {
 		return "th"
 	}
 }
-

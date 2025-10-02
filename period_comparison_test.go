@@ -188,4 +188,3 @@ func TestPeriodMergeNonOverlapping(t *testing.T) {
 			merged.Start.Format("2006-01-02"), merged.End.Format("2006-01-02"))
 	}
 }
-

@@ -250,7 +250,7 @@ func TestNthWeekdayOfYear(t *testing.T) {
 
 	// 10th Monday of 2024
 	tenthMonday := dt.NthWeekdayOfYear(10, time.Monday)
-	
+
 	if tenthMonday.IsZero() {
 		t.Fatal("Expected non-zero result for 10th Monday of 2024")
 	}
@@ -275,7 +275,7 @@ func TestNthWeekdayOfYear(t *testing.T) {
 		}
 		current = current.AddDays(1)
 	}
-	
+
 	if count < 10 {
 		t.Errorf("Only found %d Mondays while counting, expected at least 10", count)
 	}
@@ -389,13 +389,12 @@ func TestFarthestWeekday(t *testing.T) {
 	if !farthestSame.Equal(expectedSame) {
 		t.Errorf("Expected %v, got %v", expectedSame, farthestSame)
 	}
-	
+
 	// Farthest Sunday from Wednesday: 4 days forward vs 3 days back - should go forward
 	farthestSunday := dt.FarthestWeekday(time.Sunday)
 	expectedSunday := Date(2024, 1, 21, 12, 0, 0, 0, time.UTC) // Next Sunday (4 days forward)
-	
+
 	if !farthestSunday.Equal(expectedSunday) {
 		t.Errorf("Expected farthest Sunday %v, got %v", expectedSunday, farthestSunday)
 	}
 }
-
