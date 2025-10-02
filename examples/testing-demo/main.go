@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Testing Helpers Demo ===\n")
+	fmt.Println("=== Testing Helpers Demo ===")
 	testingHelpersDemo()
 
-	fmt.Println("\n=== Weekday Navigation Demo ===\n")
+	fmt.Println("\n=== Weekday Navigation Demo ===")
 	weekdayNavigationDemo()
 
-	fmt.Println("\n=== Nth Weekday Occurrence Demo ===\n")
+	fmt.Println("\n=== Nth Weekday Occurrence Demo ===")
 	nthWeekdayDemo()
 }
 
