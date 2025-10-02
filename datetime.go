@@ -321,6 +321,30 @@ func (dt DateTime) ToDateTimeString() string {
 	return dt.Time.Format("2006-01-02 15:04:05")
 }
 
+// ToCookieString returns the datetime in HTTP cookie format (RFC 1123).
+// Example: "Mon, 15 Jan 2024 12:00:00 GMT"
+func (dt DateTime) ToCookieString() string {
+	return dt.UTC().Format(time.RFC1123)
+}
+
+// ToRSSString returns the datetime in RSS feed format (RFC 1123Z).
+// Example: "Mon, 15 Jan 2024 12:00:00 +0000"
+func (dt DateTime) ToRSSString() string {
+	return dt.Format(time.RFC1123Z)
+}
+
+// ToW3CString returns the datetime in W3C format (ISO 8601 / RFC 3339).
+// Example: "2024-01-15T12:00:00Z" or "2024-01-15T12:00:00+00:00"
+func (dt DateTime) ToW3CString() string {
+	return dt.Format(time.RFC3339)
+}
+
+// ToAtomString returns the datetime in Atom feed format (RFC 3339).
+// This is an alias for ToW3CString().
+func (dt DateTime) ToAtomString() string {
+	return dt.ToW3CString()
+}
+
 // ToISO8601String returns the datetime in ISO 8601 format.
 func (dt DateTime) ToISO8601String() string {
 	return dt.Time.Format("2006-01-02T15:04:05Z07:00")
