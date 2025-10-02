@@ -58,18 +58,22 @@ func getStandardOffset(loc *time.Location, year int) int {
 }
 
 // Now returns the current datetime in the local timezone.
+// When testing helpers are active (SetTestNow, FreezeTime, TravelTo),
+// this will return the mocked time instead of the actual current time.
 func Now() DateTime {
-	return DateTime{time.Now()}
+	return DateTime{getTestableNow()}
 }
 
 // NowUTC returns the current datetime in UTC timezone.
+// When testing helpers are active, this will return the mocked time in UTC.
 func NowUTC() DateTime {
-	return DateTime{time.Now().UTC()}
+	return DateTime{getTestableNow().UTC()}
 }
 
 // NowIn returns the current datetime in the specified timezone.
+// When testing helpers are active, this will return the mocked time in the specified timezone.
 func NowIn(loc *time.Location) DateTime {
-	return DateTime{time.Now().In(loc)}
+	return DateTime{getTestableNow().In(loc)}
 }
 
 // Today returns today's date at midnight in the local timezone.
