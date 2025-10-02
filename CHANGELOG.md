@@ -7,6 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.7] - 2025-10-01
+
+### Added
+- **Testing Helpers**: Complete test time manipulation toolkit
+  - `SetTestNow()`, `ClearTestNow()` - Mock current time for deterministic tests
+  - `FreezeTime()`, `UnfreezeTime()` - Stop time at a specific moment
+  - `TravelTo()`, `TravelBack()`, `TravelForward()` - Time travel for testing
+  - `WithTestNow()`, `WithFrozenTime()` - Scoped time mocking with auto-cleanup
+  - `GetTestNow()`, `IsTestMode()`, `IsFrozen()` - Query test state
+  
+- **Weekday Navigation**: Powerful weekday manipulation methods
+  - `NextWeekday()`, `PreviousWeekday()` - Navigate to specific weekdays
+  - `ClosestWeekday()`, `FarthestWeekday()` - Find nearest/farthest occurrences
+  - `NextOrSameWeekday()`, `PreviousOrSameWeekday()` - Include current day option
+  
+- **Nth Weekday Occurrence**: Advanced weekday occurrence finding
+  - `NthWeekdayOf()` - Get nth occurrence in month/year/quarter (supports n=-1 for last)
+  - `FirstWeekdayOf()`, `LastWeekdayOf()` - Convenience methods
+  - `NthWeekdayOfMonth()`, `NthWeekdayOfYear()` - Specific unit helpers
+  - `IsNthWeekdayOf()` - Check if date is nth occurrence
+  - `WeekdayOccurrenceInMonth()` - Get occurrence number (1-5)
+  
+- **Comparison Methods**: Enhanced datetime comparison utilities
+  - `IsBirthday()`, `IsAnniversary()` - Check recurring annual dates
+  - `IsSameDay()`, `IsSameMonth()`, `IsSameYear()` - Calendar comparisons
+  - `IsSameQuarter()`, `IsSameWeek()` - Advanced temporal comparisons
+  - `Average()` - Get midpoint between two DateTimes
+  - `Closest()`, `Farthest()` - Find nearest/farthest from a list of dates
+  
+- **Period Operations**: Advanced period manipulation
+  - `Overlaps()` - Check if two periods share any common time
+  - `Gap()` - Get the period between two non-overlapping periods
+  - `Encompasses()` - Check if one period completely contains another
+  - `Merge()` - Combine two periods into one spanning both
+  
+- **String Formats**: Additional standard format methods
+  - `ToCookieString()` - HTTP cookie format (RFC1123)
+  - `ToRSSString()` - RSS feed format (RFC1123Z)
+  - `ToW3CString()` - W3C datetime format (RFC3339)
+  - `ToAtomString()` - Atom feed format
+
+### Changed
+- Updated `Now()`, `NowUTC()`, `NowIn()` to respect test time settings
+- Improved `NthWeekdayOf()` to support up to 53 occurrences for year-level queries
+- Enhanced thread-safety with proper mutex protection for test time state
+
+### Tests
+- Added 250+ new test cases for all features
+- Comprehensive edge case coverage
+- Thread-safety verification tests
+- All tests passing with 90%+ code coverage
+
+### Documentation
+- Created `PENDULUM_COMPARISON.md` - Detailed feature comparison with Python's Pendulum
+- Added `examples/testing-demo/main.go` - Comprehensive demonstration of new features
+- Updated all method documentation with examples
+
+### Performance
+- Optimized weekday calculations
+- Efficient test time state management
+- Zero-allocation path for common operations
+
+## [0.6.6] - 2025-01-01
+
+### Changed
+- Updated GoHoliday dependency to v0.6.4
+- Fixed India holiday test (New Year's Day is not a public holiday in India)
+- Updated all GoHoliday version references in documentation and comments
+
+### Tests
+- Fixed `TestAllSupportedCountries` to correctly handle countries without New Year's Day
+- Added specific test for India's Republic Day (January 26)
+
 ## [0.6.5] - 2024-09-27
 
 ### Added

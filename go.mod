@@ -1,4 +1,4 @@
-// ChronoGo v0.6.5 - A Go datetime library with localization support
+// ChronoGo v0.6.7 - A Go datetime library with localization support
 module github.com/coredds/ChronoGo
 
 go 1.23
