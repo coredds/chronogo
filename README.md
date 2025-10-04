@@ -8,21 +8,39 @@
 [![Codecov](https://codecov.io/gh/coredds/chronogo/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/chronogo)
 [![Go Reference](https://pkg.go.dev/badge/github.com/coredds/chronogo.svg)](https://pkg.go.dev/github.com/coredds/chronogo)
 
-chronogo is a comprehensive Go datetime library inspired by Python's Pendulum. It provides a powerful, fluent API that enhances Go's standard time package with better timezone handling, human-friendly operations, and extensive business date functionality.
+A comprehensive Go datetime library inspired by Python's Pendulum. chronogo enhances Go's standard time package with natural language parsing, business date operations, localization support, and a fluent API for intuitive datetime manipulation.
 
-## Key Features
+## Features
 
-- **Enhanced DateTime Type**: Drop-in enhancement of Go's time.Time with extended functionality
-- **Robust Timezone Support**: Proper DST handling with optimized timezone operations
-- **Fluent API**: Method chaining for intuitive date/time manipulation
-- **Human-Readable Output**: Time differences like "2 hours ago" and "in 3 days"
-- **Localization Support**: Multi-language formatting and human-readable differences (6 locales)
-- **Immutable Operations**: All methods return new instances for thread safety
-- **Period and Duration Types**: Time intervals with powerful iteration capabilities
-- **Natural Language Parsing**: Parse "tomorrow", "next Monday", "3 days ago" in multiple languages (EN, ES, PT, FR, DE, ZH, JA)
-- **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic with goholiday integration
-- **Serialization Support**: Built-in JSON/Text marshalers and SQL driver integration
-- **High Performance**: Optimized operations with extensive test coverage (91.7%)
+### Core Capabilities
+- **Natural Language Parsing**: Parse dates in 7 languages - "tomorrow", "mañana", "demain", "明天" (powered by godateparser)
+- **Enhanced DateTime Type**: Extended functionality built on Go's time.Time
+- **Fluent API**: Method chaining for readable, expressive code
+- **Convenience Methods**: On() and At() for quick date/time setting
+- **Diff Type**: Rich datetime differences with calendar-aware and precise calculations
+- **ISO 8601 Support**: Long year detection, ordinal dates, week dates, intervals
+- **Immutable Operations**: Thread-safe with all methods returning new instances
+
+### Business Operations
+- **Holiday Support**: 34 countries with comprehensive regional data (via goholiday)
+- **Business Day Calculations**: Working day arithmetic with automatic holiday awareness
+- **Enhanced Calculator**: High-performance operations with custom weekend support
+- **Holiday-Aware Scheduler**: Intelligent scheduling that respects holidays and business days
+- **Calendar Integration**: Holiday calendars with formatted output and tracking
+
+### Localization
+- **6 Locales**: en-US, es-ES, fr-FR, de-DE, zh-Hans, pt-BR
+- **Localized Formatting**: Date and time formatting in multiple languages
+- **Human-Readable Differences**: "2 hours ago", "hace 2 horas", "il y a 2 heures"
+- **Ordinal Numbers**: Language-specific ordinal formatting
+
+### Advanced Features
+- **Timezone Operations**: Proper DST handling with optimized conversions
+- **Period Type**: Time intervals with powerful iteration capabilities
+- **Comparison Methods**: Closest, Farthest, Between, and boolean checks
+- **Testing Helpers**: Time mocking and freezing for deterministic tests
+- **Serialization**: Built-in JSON/Text marshalers and SQL driver integration
+- **High Performance**: Optimized operations with 90% test coverage
 
 ## Installation
 
@@ -37,93 +55,54 @@ package main
 
 import (
     "fmt"
+    "time"
     "github.com/coredds/chronogo"
 )
 
 func main() {
     // Natural language parsing in multiple languages
-    dt1, _ := chronogo.Parse("tomorrow")                // English
-    dt2, _ := chronogo.Parse("next Monday")             // Relative dates
-    dt3, _ := chronogo.Parse("3 days ago")              // Quantity expressions
-    dt4, _ := chronogo.Parse("mañana")                  // Spanish for "tomorrow"
-    dt5, _ := chronogo.Parse("明天")                     // Chinese for "tomorrow"
+    dt1, _ := chronogo.Parse("tomorrow")
+    dt2, _ := chronogo.Parse("next Monday")
+    dt3, _ := chronogo.Parse("3 days ago")
+    dt4, _ := chronogo.Parse("mañana")        // Spanish
+    dt5, _ := chronogo.Parse("明天")           // Chinese
     
-    // Traditional datetime parsing still works
-    dt6, _ := chronogo.Parse("2024-01-15T14:30:00Z")   // ISO 8601
-    dt7, _ := chronogo.Parse("1705329000")              // Unix timestamp
+    // Technical format parsing
+    dt6, _ := chronogo.Parse("2024-01-15T14:30:00Z")  // ISO 8601
+    dt7, _ := chronogo.Parse("1705329000")             // Unix timestamp
+    dt8, _ := chronogo.Parse("2023-359")               // Ordinal date
+    dt9, _ := chronogo.Parse("2023-W52-1")             // Week date
     
-    // Create and manipulate datetime instances
-    dt := chronogo.Now().AddDays(3).InTimezone("America/New_York")
-    fmt.Println(dt.HumanString()) // "in 3 days"
+    // Convenience methods
+    meeting := chronogo.Now().On(2024, time.June, 15).At(14, 30, 0)
     
-    // Convenience methods for quick date/time modifications
-    meeting := chronogo.Now().On(2024, time.June, 15).At(14, 30, 0)  // Set to June 15, 2024 at 14:30
-    deadline := chronogo.Today().On(2024, time.December, 31).At(23, 59, 59)  // End of year deadline
-    
-    // Check if a year has 53 ISO weeks (long year)
-    if chronogo.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC).IsLongYear() {
-        fmt.Println("2020 is a long year with 53 weeks")
+    // ISO 8601 long year detection
+    if chronogo.Date(2020, time.January, 1).IsLongYear() {
+        fmt.Println("2020 has 53 ISO weeks")
     }
     
-    // Rich Diff type for datetime differences
-    start := chronogo.Date(2023, time.January, 15, 10, 0, 0, 0, time.UTC)
-    end := chronogo.Date(2024, time.March, 20, 14, 30, 0, 0, time.UTC)
+    // Rich Diff type
+    start := chronogo.Date(2023, time.January, 15)
+    end := chronogo.Date(2024, time.March, 20)
     diff := end.Diff(start)
-    fmt.Printf("Calendar-aware: %d years, %d months\n", diff.Years(), diff.Months())
-    fmt.Printf("Precise: %.2f days, %.2f hours\n", diff.InDays(), diff.InHours())
-    fmt.Printf("Human-readable: %s\n", diff.ForHumans())
-    fmt.Printf("Compact: %s\n", diff.CompactString())
     
-    // Business date calculations with enhanced performance
+    fmt.Printf("%d years, %d months\n", diff.Years(), diff.Months())
+    fmt.Printf("%.2f days\n", diff.InDays())
+    fmt.Println(diff.ForHumans())  // "1 year from now"
+    
+    // Business date calculations
     calc := chronogo.NewEnhancedBusinessDayCalculator("US")
     workday := calc.AddBusinessDays(chronogo.Today(), 5)
-    fmt.Println(workday.Format("2006-01-02"))
+    
+    // Holiday checking
+    usChecker := chronogo.NewGoHolidayChecker("US")
+    if usChecker.IsHoliday(chronogo.Today()) {
+        fmt.Println("Holiday:", usChecker.GetHolidayName(chronogo.Today()))
+    }
     
     // Holiday-aware scheduling
     scheduler := chronogo.NewHolidayAwareScheduler("US")
     meetings := scheduler.ScheduleRecurring(chronogo.Now(), 24*time.Hour, 10)
-    
-    // Holiday calendar integration
-    calendar := chronogo.NewHolidayCalendar("US")
-    upcoming := calendar.GetUpcomingHolidays(chronogo.Now(), 5)
-    for _, holiday := range upcoming {
-        fmt.Printf("Upcoming: %s\n", holiday.String())
-    }
-    
-    // Multi-country holiday checking (goholiday v0.6.3+ supports 34 countries)
-    usChecker := chronogo.NewGoHolidayChecker("US")
-    brChecker := chronogo.NewGoHolidayChecker("BR") // Brazil
-    trChecker := chronogo.NewGoHolidayChecker("TR") // Turkey (new in v0.6.3)
-    uaChecker := chronogo.NewGoHolidayChecker("UA") // Ukraine (new in v0.6.3)
-    
-    newYear := chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-    if usChecker.IsHoliday(newYear) {
-        fmt.Println("US Holiday:", usChecker.GetHolidayName(newYear))
-    }
-    if brChecker.IsHoliday(newYear) {
-        fmt.Println("Brazil Holiday:", brChecker.GetHolidayName(newYear))
-    }
-    
-    // Enhanced holiday operations with goholiday v0.6.3+
-    
-    // New features in v0.6.3: subdivision support, holiday categories, language support
-    subdivisions := usChecker.GetSubdivisions()
-    categories := usChecker.GetHolidayCategories()
-    language := usChecker.GetLanguage()
-    holidayCount, _ := usChecker.GetHolidayCount(2024)
-    // Get all holidays in a date range
-    start := chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-    end := chronogo.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)
-    holidays := usChecker.GetHolidaysInRange(start, end)
-    fmt.Printf("Q1 2024 US holidays: %d\n", len(holidays))
-    
-    // Batch holiday checking for performance
-    dates := []chronogo.DateTime{
-        chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),  // New Year's Day
-        chronogo.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),  // Independence Day
-    }
-    results := usChecker.AreHolidays(dates)
-    fmt.Printf("Batch check results: %v\n", results)
     
     // Period iteration
     period := chronogo.NewPeriod(chronogo.Now(), chronogo.Now().AddDays(7))
@@ -133,219 +112,233 @@ func main() {
 }
 ```
 
-## Localization Support
+## Usage Examples
 
-chronogo provides comprehensive localization support for formatting dates and human-readable time differences in multiple languages.
+### Natural Language Parsing
 
-### Supported Locales
+```go
+// Parse dates in multiple languages
+dt1, _ := chronogo.Parse("tomorrow")
+dt2, _ := chronogo.Parse("next Monday")
+dt3, _ := chronogo.Parse("3 days ago")
+dt4, _ := chronogo.Parse("mañana")        // Spanish
+dt5, _ := chronogo.Parse("demain")        // French
+dt6, _ := chronogo.Parse("明天")           // Chinese
 
-- **en-US** (English - United States)
-- **es-ES** (Spanish - Spain) 
-- **fr-FR** (French - France)
-- **de-DE** (German - Germany)
-- **zh-Hans** (Chinese - Simplified)
-- **pt-BR** (Portuguese - Brazil)
+// Configure languages
+chronogo.SetDefaultParseLanguages("en", "es")
 
-### Localized Formatting
+// Strict mode (technical formats only)
+dt7, _ := chronogo.ParseStrict("2024-01-15T14:30:00Z")  // OK
+dt8, _ := chronogo.ParseStrict("tomorrow")               // Error
+```
+
+### Convenience Methods
+
+```go
+// Quick date and time setting
+dt := chronogo.Now()
+  .On(2024, time.December, 25)
+  .At(14, 30, 0)
+
+// ISO 8601 long year detection
+if dt.IsLongYear() {
+    fmt.Println("This year has 53 ISO weeks")
+}
+
+// Boundary operations
+start := dt.StartOfMonth()
+end := dt.EndOfMonth()
+firstMonday := dt.FirstWeekdayOf(time.Monday)
+lastFriday := dt.LastWeekdayOf(time.Friday)
+```
+
+### Diff Type
+
+```go
+// Create difference between dates
+start := chronogo.Date(2023, time.January, 15)
+end := chronogo.Date(2025, time.March, 20)
+diff := start.Diff(end)
+
+// Calendar-aware differences
+fmt.Printf("%d years, %d months\n", diff.Years(), diff.Months())
+
+// Precise differences
+fmt.Printf("%.2f years\n", diff.InYears())
+fmt.Printf("%d total days\n", diff.InDays())
+
+// Human-readable
+fmt.Println(diff.ForHumans())      // "2 years from now"
+fmt.Println(diff.CompactString())  // "2y 2m"
+
+// Comparisons
+if diff.IsPositive() {
+    fmt.Println("Future date")
+}
+```
+
+### Business Date Operations
+
+```go
+// Business day calculations
+today := chronogo.Today()
+deadline := today.AddBusinessDays(5)
+
+// Holiday checking
+if today.IsHoliday() {
+    fmt.Println("It's a holiday!")
+}
+
+// Enhanced calculator with custom weekends
+calc := chronogo.NewEnhancedBusinessDayCalculator("US")
+calc.SetCustomWeekends([]time.Weekday{time.Friday, time.Saturday})
+
+nextBiz := calc.NextBusinessDay(today)
+bizDays := calc.BusinessDaysBetween(today, today.AddDays(30))
+
+// Multi-country support (34 countries)
+usChecker := chronogo.NewGoHolidayChecker("US")
+ukChecker := chronogo.NewGoHolidayChecker("GB")
+jpChecker := chronogo.NewGoHolidayChecker("JP")
+```
+
+### Holiday-Aware Scheduler
+
+```go
+// Create scheduler
+scheduler := chronogo.NewHolidayAwareScheduler("US")
+
+// Schedule recurring meetings (avoids holidays)
+start := chronogo.Date(2025, time.September, 1)
+meetings := scheduler.ScheduleRecurring(start, 7*24*time.Hour, 8)
+
+// Monthly end-of-month reports
+reports := scheduler.ScheduleMonthlyEndOfMonth(start, 6)
+
+// Business days only
+bizMeetings := scheduler.ScheduleBusinessDays(start, 10)
+```
+
+### Localization
 
 ```go
 dt := chronogo.Date(2024, time.January, 15, 14, 30, 0, 0, time.UTC)
 
-// English formatting
+// Localized formatting (6 locales supported)
 result, _ := dt.FormatLocalized("dddd, MMMM Do YYYY", "en-US")
-fmt.Println(result) // "Monday, January 15th 2024"
+// "Monday, January 15th 2024"
 
-// Spanish formatting  
 result, _ = dt.FormatLocalized("dddd, Do de MMMM de YYYY", "es-ES")
-fmt.Println(result) // "lunes, 15º de enero de 2024"
+// "lunes, 15º de enero de 2024"
 
-// French formatting
-result, _ = dt.FormatLocalized("dddd Do MMMM YYYY", "fr-FR") 
-fmt.Println(result) // "lundi 15e janvier 2024"
+// Human-readable differences
+past := chronogo.Now().AddHours(-2)
+result, _ = past.HumanStringLocalized("en-US")  // "2 hours ago"
+result, _ = past.HumanStringLocalized("es-ES")  // "hace 2 horas"
+result, _ = past.HumanStringLocalized("fr-FR")  // "il y a 2 heures"
 
-// German formatting
-result, _ = dt.FormatLocalized("dddd, Do MMMM YYYY", "de-DE")
-fmt.Println(result) // "Montag, 15. Januar 2024"
-
-// Chinese formatting
-result, _ = dt.FormatLocalized("YYYY年MMMM Do dddd", "zh-Hans")
-fmt.Println(result) // "2024年一月 15日 星期一"
-
-// Portuguese formatting
-result, _ = dt.FormatLocalized("dddd, Do de MMMM de YYYY", "pt-BR")
-fmt.Println(result) // "segunda-feira, 15º de janeiro de 2024"
-```
-
-### Localized Human-Readable Differences
-
-```go
-now := chronogo.Now()
-past := now.AddHours(-2)
-future := now.AddDays(3)
-
-// English
-result, _ := past.HumanStringLocalized("en-US")
-fmt.Println(result) // "2 hours ago"
-
-// Spanish  
-result, _ = past.HumanStringLocalized("es-ES")
-fmt.Println(result) // "hace 2 horas"
-
-// French
-result, _ = past.HumanStringLocalized("fr-FR") 
-fmt.Println(result) // "il y a 2 heures"
-
-// German
-result, _ = past.HumanStringLocalized("de-DE")
-fmt.Println(result) // "vor 2 Stunden"
-
-// Chinese
-result, _ = past.HumanStringLocalized("zh-Hans")
-fmt.Println(result) // "2小时前"
-
-// Portuguese
-result, _ = past.HumanStringLocalized("pt-BR")
-fmt.Println(result) // "há 2 horas"
-```
-
-### Default Locale Management
-
-```go
-// Set default locale for the application
+// Default locale
 chronogo.SetDefaultLocale("es-ES")
-
-// Use default locale formatting
-dt := chronogo.Now()
-result := dt.FormatLocalizedDefault("dddd, MMMM Do")
-fmt.Println(result) // Uses Spanish formatting
-
-// Use default locale for human strings
-result = dt.HumanStringLocalizedDefault()
-fmt.Println(result) // Uses Spanish phrasing
+result = dt.FormatLocalizedDefault("dddd, MMMM Do")
 ```
 
-### Locale Information
+### Timezone Operations
 
 ```go
-// Get available locales
-locales := chronogo.GetAvailableLocales()
-fmt.Println(locales) // ["en-US", "es-ES", "fr-FR", "de-DE", "zh-Hans", "pt-BR"]
+// Create and convert timezones
+meeting := chronogo.Parse("2025-01-15 14:00")
+  .InTimezone("America/New_York")
 
-// Get month and weekday names
-dt := chronogo.Date(2024, time.June, 15, 0, 0, 0, 0, time.UTC) // Monday
+tokyo := meeting.InTimezone("Asia/Tokyo")
+london := meeting.InTimezone("Europe/London")
 
-monthName, _ := dt.GetMonthName("fr-FR")
-fmt.Println(monthName) // "juin"
-
-weekdayName, _ := dt.GetWeekdayName("de-DE") 
-fmt.Println(weekdayName) // "Montag"
+// DST-aware conversions
+fmt.Println("NYC:", meeting.Format("15:04"))
+fmt.Println("Tokyo:", tokyo.Format("15:04"))
+fmt.Println("London:", london.Format("15:04"))
 ```
 
-## Core Components
+### Period Operations
 
-### DateTime Operations
-- **Creation**: Now(), Today(), Date(), FromUnix(), Parse()
-- **Manipulation**: Add/Subtract time units with fluent API
-- **Convenience Methods**: On(), At() for quick date/time setting
-- **Differences**: Explicit Diff type with rich methods for time differences
-- **Formatting**: Standard Go layouts plus human-readable output
-- **Timezone**: Convert between timezones with proper DST handling
-- **Comparison**: Before(), After(), Between(), Equal() methods
-- **ISO 8601**: IsLongYear() for 53-week year detection
-
-### Business Date Support
-- **Holiday Management**: Integrated goholiday v0.6.3+ library with comprehensive multi-country holiday data (34 countries including Turkey and Ukraine)
-- **Supported Countries**: 34 countries with comprehensive regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, TR, UA, AT, BE, CH, CL, FI, IE, IL, NO, SE, AR, ID)
-- **Performance**: Sub-microsecond lookup performance with intelligent caching and thread-safe operations
-- **Multi-language Support**: Holiday names available in multiple languages
-- **Business Day Calculations**: Working day arithmetic with holiday awareness
-- **Custom Holiday Support**: Implement HolidayChecker interface for organization-specific holidays
-- **Enhanced Operations**: Holiday-aware scheduling, calendar integration, and recurring schedules
-
-### Period and Duration
-- **Period Type**: Represents time intervals between two datetime instances
-- **Range Operations**: Iterate over periods by day, hour, or custom units
-- **Duration Extensions**: Human-readable duration formatting and calculations
-
-### Parsing and Serialization
-- **Natural Language Parsing**: Powered by godateparser with support for 7 languages (English, Spanish, Portuguese, French, German, Chinese, Japanese)
-- **Multi-Language NLP**: Parse "tomorrow", "mañana", "demain", "明天" automatically
-- **Intelligent Parsing**: Automatic format detection for technical formats (ISO8601, RFC3339, Unix timestamps)
-- **Custom Formats**: Token-based and Go layout format parsing
-- **JSON/SQL Support**: Built-in marshaling for database and API integration
-
-Example:
 ```go
-// Natural language parsing
-dt1, _ := chronogo.Parse("tomorrow")               // Future relative
-dt2, _ := chronogo.Parse("3 days ago")             // Past relative
-dt3, _ := chronogo.Parse("next Monday")            // Next weekday
-dt4, _ := chronogo.Parse("mañana")                 // Spanish
-dt5, _ := chronogo.Parse("demain")                 // French
-dt6, _ := chronogo.Parse("明天")                    // Chinese
+// Create period
+start := chronogo.Date(2025, time.January, 1)
+end := chronogo.Date(2025, time.January, 31)
+period := chronogo.NewPeriod(start, end)
 
-// Technical format parsing
-dt7, _ := chronogo.Parse("2024-01-15T14:30:00Z")  // ISO 8601
-dt8, _ := chronogo.Parse("1705329000")             // Unix timestamp
-
-// Custom language configuration
-chronogo.SetDefaultParseLanguages("en", "es")      // English and Spanish only
-config := chronogo.ParseConfig{
-    Languages: []string{"en", "fr"},                // Explicit languages
-    Location:  time.UTC,
-    Strict:    false,                               // Allow natural language
+// Iterate by day
+for _, dt := range period.Days() {
+    fmt.Println(dt.Format("Jan 2"))
 }
-dt9, _ := chronogo.ParseWith("demain", config)
 
-// Strict mode: technical formats only
-dt10, _ := chronogo.ParseStrict("2024-01-15T14:30:00Z")  // OK
-dt11, _ := chronogo.ParseStrict("tomorrow")               // Error: natural language disabled
+// Custom intervals
+for _, dt := range period.RangeByUnitSlice(chronogo.Hour, 6) {
+    fmt.Println(dt.Format("Jan 2 15:04"))
+}
+
+// Check containment
+inRange := period.Contains(chronogo.Date(2025, time.January, 15))
 ```
+
+### Testing Helpers
+
+```go
+// Mock current time
+chronogo.SetTestNow(chronogo.Date(2024, time.January, 1))
+defer chronogo.ClearTestNow()
+
+// Freeze time
+chronogo.FreezeTime(chronogo.Date(2024, time.January, 1))
+defer chronogo.UnfreezeTime()
+
+// Time travel
+chronogo.TravelTo(chronogo.Date(2024, time.June, 1))
+defer chronogo.TravelBack()
+
+// Scoped mocking with auto-cleanup
+chronogo.WithTestNow(chronogo.Date(2024, time.January, 1), func() {
+    // Test code here
+})
+```
+
+## Supported Countries
+
+Business date operations support 34 countries via goholiday integration:
+
+US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, TR, UA, AT, BE, CH, CL, FI, IE, IL, NO, SE, AR, ID
 
 ## Dependencies
 
-chronogo integrates with the following libraries:
-
-- **godateparser**: Advanced natural language date parsing library supporting 7 languages with intelligent relative date handling.
-- **goholiday**: Enterprise-grade holiday data library providing comprehensive holiday support for multiple countries with optimized lookup performance.
+- **godateparser**: Natural language date parsing in 7 languages
+- **goholiday**: Holiday data for 34 countries with regional subdivisions
 
 ## Documentation
 
-For detailed API documentation and examples, visit [pkg.go.dev/github.com/coredds/chronogo](https://pkg.go.dev/github.com/coredds/chronogo).
+Full API documentation: [pkg.go.dev/github.com/coredds/chronogo](https://pkg.go.dev/github.com/coredds/chronogo)
 
 ## Testing
 
-Run the test suite with coverage:
 ```bash
 go test -cover ./...
 ```
 
-Current test coverage: 91.7% with comprehensive safety checks and edge case handling.
+Current coverage: 90% with comprehensive edge case handling
 
 ## Security
 
-chronogo includes comprehensive security scanning and monitoring:
+Automated security scanning with GitHub Actions:
+- CodeQL static analysis
+- Go vulnerability database checks (govulncheck)
+- Dependency vulnerability scanning
+- License compliance checking
 
-### Automated Security Scanning
-- **GitHub Actions**: Automated security workflows on every push and PR
-- **CodeQL Analysis**: Static application security testing
-- **Vulnerability Scanning**: Go vulnerability database checks with `govulncheck`
-- **Dependency Review**: Automated dependency vulnerability scanning
-- **License Compliance**: Automated license compliance checking
+Security tools: gosec, Semgrep, Snyk, OSSF Scorecard
 
-### Security Tools Integration
-- **gosec**: Go security checker for common security issues
-- **Semgrep**: Static analysis for security patterns
-- **Snyk**: Vulnerability scanning for dependencies
-- **OSSF Scorecard**: Open source security best practices assessment
-
-### Local Security Checks
-Run security checks locally:
+Run local security checks:
 ```bash
 # Unix/Linux/macOS
 make security
-
-# Or run the script directly
 ./scripts/security-check.sh
 
 # Windows PowerShell
@@ -354,30 +347,16 @@ make security
 
 ## Contributing
 
-Contributions are welcome! Please:
-
 1. Fork the repository
 2. Create a feature branch
 3. Add tests for new functionality
-4. Ensure all tests pass and linting is clean
+4. Ensure tests pass and linting is clean
 5. Submit a pull request
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file
 
-## Version History
-
-- **v0.6.5**: Comprehensive localization support with 6 locales (en-US, es-ES, fr-FR, de-DE, zh-Hans, pt-BR), localized date formatting, human-readable differences, ordinal numbers, and AM/PM indicators
-- **v0.6.2**: goholiday v0.6.3+ integration with 34 countries support (added Turkey and Ukraine), enhanced business operations, holiday-aware scheduling, subdivision and category support, new APIs for subdivisions and holiday categories
-- **v0.6.1**: Maintenance release and documentation improvements
-- **v0.6.0**: Security hardening with comprehensive vulnerability scanning and dependency review automation
-- **v0.5.0**: Advanced parsing functions, goholiday integration for enterprise holiday support
-- **goholiday v0.6.3**: Added Turkey and Ukraine support, subdivision/category APIs, enhanced performance, error handling improvements
-- **v0.4.3**: Enhanced test coverage (91.7%), improved safety checks, optimized DST handling
-- **v0.4.2**: GitHub Actions CI/CD, comprehensive linting, automated dependency management
-- **v0.4.0**: Business day operations, enhanced error handling, developer documentation
-- **v0.3.0**: Holiday support, must functions, comprehensive validation
-- **v0.2.0**: Fluent API, enhanced utilities, duration improvements
+## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
