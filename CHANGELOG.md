@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.9] - 2025-10-04
+
+### Added
+- Japanese (ja-JP) locale support for complete parity with godateparser
+- Localized date formatting in Japanese (month names, weekday names, ordinals)
+- Human-readable time differences in Japanese ("2時間前", "3日後", etc.)
+- Comprehensive test coverage for Japanese locale
+
+### Changed
+- Updated locale count from 6 to 7 (en-US, es-ES, fr-FR, de-DE, zh-Hans, pt-BR, ja-JP)
+- Documentation updated to reflect 7-locale support
+
 ## [0.6.8] - 2025-10-04
 
 ### Changed

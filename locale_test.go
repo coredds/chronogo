@@ -9,7 +9,7 @@ import (
 func TestLocaleRegistration(t *testing.T) {
 	// Test getting available locales
 	locales := GetAvailableLocales()
-	expectedLocales := []string{"en-US", "es-ES", "fr-FR", "de-DE", "zh-Hans", "pt-BR"}
+	expectedLocales := []string{"en-US", "es-ES", "fr-FR", "de-DE", "zh-Hans", "pt-BR", "ja-JP"}
 
 	for _, expected := range expectedLocales {
 		found := false
@@ -37,6 +37,7 @@ func TestGetLocale(t *testing.T) {
 		{"de-DE", true, "Deutsch (Deutschland)"},
 		{"zh-Hans", true, "中文 (简体)"},
 		{"pt-BR", true, "Português (Brasil)"},
+		{"ja-JP", true, "日本語 (日本)"},
 		{"invalid", false, ""},
 	}
 
@@ -486,5 +487,146 @@ func BenchmarkGetLocale(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = GetLocale("en-US")
+	}
+}
+
+func TestJapaneseLocale(t *testing.T) {
+	dt := Date(2024, time.January, 15, 14, 30, 0, 0, time.UTC) // Monday
+
+	// Test month name
+	monthName, err := dt.GetMonthName("ja-JP")
+	if err != nil {
+		t.Errorf("Failed to get Japanese month name: %v", err)
+	}
+	if monthName != "1月" {
+		t.Errorf("Expected month name '1月', got '%s'", monthName)
+	}
+
+	// Test weekday name (Monday)
+	weekdayName, err := dt.GetWeekdayName("ja-JP")
+	if err != nil {
+		t.Errorf("Failed to get Japanese weekday name: %v", err)
+	}
+	if weekdayName != "月曜日" {
+		t.Errorf("Expected weekday name '月曜日', got '%s'", weekdayName)
+	}
+
+	// Test localized formatting
+	result, err := dt.FormatLocalized("YYYY年MMMM Do dddd", "ja-JP")
+	if err != nil {
+		t.Errorf("Failed to format with Japanese locale: %v", err)
+	}
+	if !strings.Contains(result, "2024年") || !strings.Contains(result, "1月") || !strings.Contains(result, "15日") {
+		t.Errorf("Expected Japanese date format, got '%s'", result)
+	}
+
+	// Test human-readable past
+	past := dt.AddHours(-2)
+	humanStr, err := past.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "2時間前" {
+		t.Errorf("Expected '2時間前', got '%s'", humanStr)
+	}
+
+	// Test human-readable future
+	future := dt.AddHours(3)
+	humanStr, err = future.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "3時間後" {
+		t.Errorf("Expected '3時間後', got '%s'", humanStr)
+	}
+
+	// Test days
+	pastDays := dt.AddDays(-5)
+	humanStr, err = pastDays.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "5日前" {
+		t.Errorf("Expected '5日前', got '%s'", humanStr)
+	}
+
+	// Test weeks
+	futureWeeks := dt.AddDays(14)
+	humanStr, err = futureWeeks.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "2週間後" {
+		t.Errorf("Expected '2週間後', got '%s'", humanStr)
+	}
+
+	// Test months
+	futureMonths := dt.AddDays(90)
+	humanStr, err = futureMonths.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "3ヶ月後" {
+		t.Errorf("Expected '3ヶ月後', got '%s'", humanStr)
+	}
+
+	// Test years
+	futureYears := dt.AddDays(730)
+	humanStr, err = futureYears.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "2年後" {
+		t.Errorf("Expected '2年後', got '%s'", humanStr)
+	}
+
+	// Test moments (few seconds)
+	fewSeconds := dt.AddSeconds(5)
+	humanStr, err = fewSeconds.HumanStringLocalized("ja-JP", dt)
+	if err != nil {
+		t.Errorf("Failed to get Japanese human string: %v", err)
+	}
+	if humanStr != "すぐに" {
+		t.Errorf("Expected 'すぐに', got '%s'", humanStr)
+	}
+}
+
+func TestJapaneseOrdinals(t *testing.T) {
+	locale, err := GetLocale("ja-JP")
+	if err != nil {
+		t.Fatalf("Failed to get Japanese locale: %v", err)
+	}
+
+	// Test various dates
+	tests := []struct {
+		day      int
+		expected string
+	}{
+		{1, "日"},
+		{2, "日"},
+		{15, "日"},
+		{31, "日"},
+	}
+
+	for _, test := range tests {
+		suffix := locale.getOrdinalSuffix(test.day)
+		if suffix != test.expected {
+			t.Errorf("Day %d: expected ordinal '%s', got '%s'", test.day, test.expected, suffix)
+		}
+	}
+}
+
+func TestJapaneseAMPM(t *testing.T) {
+	locale, err := GetLocale("ja-JP")
+	if err != nil {
+		t.Fatalf("Failed to get Japanese locale: %v", err)
+	}
+
+	if locale.AMPMNames[0] != "午前" {
+		t.Errorf("Expected AM to be '午前', got '%s'", locale.AMPMNames[0])
+	}
+
+	if locale.AMPMNames[1] != "午後" {
+		t.Errorf("Expected PM to be '午後', got '%s'", locale.AMPMNames[1])
 	}
 }

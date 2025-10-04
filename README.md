@@ -13,7 +13,7 @@ A comprehensive Go datetime library inspired by Python's Pendulum. chronogo enha
 ## Features
 
 ### Core Capabilities
-- **Natural Language Parsing**: Parse dates in 7 languages - "tomorrow", "mañana", "demain", "明天" (powered by godateparser)
+- **Natural Language Parsing**: Parse dates in 7 languages - English, Spanish, Portuguese, French, German, Chinese, Japanese (powered by godateparser)
 - **Enhanced DateTime Type**: Extended functionality built on Go's time.Time
 - **Fluent API**: Method chaining for readable, expressive code
 - **Convenience Methods**: On() and At() for quick date/time setting
@@ -29,10 +29,10 @@ A comprehensive Go datetime library inspired by Python's Pendulum. chronogo enha
 - **Calendar Integration**: Holiday calendars with formatted output and tracking
 
 ### Localization
-- **6 Locales**: en-US, es-ES, fr-FR, de-DE, zh-Hans, pt-BR
-- **Localized Formatting**: Date and time formatting in multiple languages
-- **Human-Readable Differences**: "2 hours ago", "hace 2 horas", "il y a 2 heures"
-- **Ordinal Numbers**: Language-specific ordinal formatting
+- **7 Locales for Formatting**: en-US, es-ES, fr-FR, de-DE, zh-Hans, pt-BR, ja-JP
+- **Localized Date Formatting**: Format dates and times in multiple languages
+- **Human-Readable Differences**: "2 hours ago", "hace 2 horas", "il y a 2 heures", "2時間前"
+- **Ordinal Numbers**: Language-specific ordinal formatting (1st, 2nd, 3rd, 日, etc.)
 
 ### Advanced Features
 - **Timezone Operations**: Proper DST handling with optimized conversions
@@ -225,22 +225,26 @@ bizMeetings := scheduler.ScheduleBusinessDays(start, 10)
 ```go
 dt := chronogo.Date(2024, time.January, 15, 14, 30, 0, 0, time.UTC)
 
-// Localized formatting (6 locales supported)
+// Localized formatting (7 locales supported)
 result, _ := dt.FormatLocalized("dddd, MMMM Do YYYY", "en-US")
 // "Monday, January 15th 2024"
 
 result, _ = dt.FormatLocalized("dddd, Do de MMMM de YYYY", "es-ES")
 // "lunes, 15º de enero de 2024"
 
+result, _ = dt.FormatLocalized("YYYY年MMMM Do dddd", "ja-JP")
+// "2024年1月 15日 月曜日"
+
 // Human-readable differences
 past := chronogo.Now().AddHours(-2)
 result, _ = past.HumanStringLocalized("en-US")  // "2 hours ago"
 result, _ = past.HumanStringLocalized("es-ES")  // "hace 2 horas"
 result, _ = past.HumanStringLocalized("fr-FR")  // "il y a 2 heures"
+result, _ = past.HumanStringLocalized("ja-JP")  // "2時間前"
 
 // Default locale
-chronogo.SetDefaultLocale("es-ES")
-result = dt.FormatLocalizedDefault("dddd, MMMM Do")
+chronogo.SetDefaultLocale("ja-JP")
+result = dt.FormatLocalizedDefault("YYYY年MMMM Do")
 ```
 
 ### Timezone Operations

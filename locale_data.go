@@ -8,6 +8,7 @@ func registerDefaultLocales() {
 	RegisterLocale(createDeDELocale())
 	RegisterLocale(createZhHansLocale())
 	RegisterLocale(createPtBRLocale())
+	RegisterLocale(createJaJPLocale())
 }
 
 // createEnUSLocale creates the English (United States) locale
@@ -340,6 +341,58 @@ func createPortugueseOrdinals() map[int]string {
 	ordinals[1] = "º"
 	for i := 2; i <= 31; i++ {
 		ordinals[i] = "º"
+	}
+
+	return ordinals
+}
+
+// createJaJPLocale creates the Japanese (Japan) locale
+func createJaJPLocale() *Locale {
+	return &Locale{
+		Code: "ja-JP",
+		Name: "日本語 (日本)",
+		MonthNames: []string{
+			"1月", "2月", "3月", "4月", "5月", "6月",
+			"7月", "8月", "9月", "10月", "11月", "12月",
+		},
+		MonthAbbr: []string{
+			"1月", "2月", "3月", "4月", "5月", "6月",
+			"7月", "8月", "9月", "10月", "11月", "12月",
+		},
+		WeekdayNames: []string{
+			"日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日",
+		},
+		WeekdayAbbr: []string{
+			"日", "月", "火", "水", "木", "金", "土",
+		},
+		AMPMNames: []string{"午前", "午後"},
+		Ordinals:  createJapaneseOrdinals(),
+		TimeUnits: map[string]TimeUnitNames{
+			"second":   {Singular: "秒", Plural: "秒"},
+			"minute":   {Singular: "分", Plural: "分"},
+			"hour":     {Singular: "時間", Plural: "時間"},
+			"day":      {Singular: "日", Plural: "日"},
+			"week":     {Singular: "週間", Plural: "週間"},
+			"month":    {Singular: "ヶ月", Plural: "ヶ月"},
+			"year":     {Singular: "年", Plural: "年"},
+			"moments":  {Singular: "たった今", Plural: "すぐに"},
+			"patterns": {Singular: "%d%s前", Plural: "%d%s後"},
+		},
+		DateFormats: map[string]string{
+			"short":  "2006/1/2",
+			"medium": "2006年1月2日",
+			"long":   "2006年1月2日",
+			"full":   "2006年1月2日(月)",
+		},
+	}
+}
+
+func createJapaneseOrdinals() map[int]string {
+	ordinals := make(map[int]string)
+
+	// Japanese uses 日 (nichi/ka) for all dates
+	for i := 1; i <= 31; i++ {
+		ordinals[i] = "日"
 	}
 
 	return ordinals
