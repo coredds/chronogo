@@ -2,7 +2,6 @@ package chronogo
 
 import (
 	"testing"
-	"time"
 )
 
 // Parse performance benchmarks
@@ -33,7 +32,7 @@ func BenchmarkParseComparison(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			input := inputs[i%len(inputs)]
-			if _, err := ParseOptimized(input); err != nil {
+			if _, err := Parse(input); err != nil {
 				// Skip errors in benchmark
 				continue
 			}
@@ -54,7 +53,7 @@ func BenchmarkParseISO8601Specific(b *testing.B) {
 	b.Run("Optimized", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
-			_, _ = ParseOptimized(value)
+			_, _ = Parse(value)
 		}
 	})
 
@@ -90,7 +89,7 @@ func BenchmarkParseHeavyMix(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			input := inputs[i%len(inputs)]
-			_, _ = ParseOptimized(input)
+			_, _ = Parse(input)
 		}
 	})
 }
@@ -105,38 +104,8 @@ func BenchmarkBatchParsing(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			for _, value := range values {
-				_, _ = ParseOptimized(value)
+				_, _ = Parse(value)
 			}
-		}
-	})
-
-	b.Run("Batch", func(b *testing.B) {
-		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
-			_, _ = ParseBatch(values, time.UTC)
-		}
-	})
-}
-
-func BenchmarkParseDetection(b *testing.B) {
-	inputs := []string{
-		"2023-12-25T15:30:45Z",
-		"2023-12-25 15:30:45",
-		"2023-12-25",
-		"15:30:45",
-		"20231225",
-	}
-
-	b.Run("DetectLayout", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			input := inputs[i%len(inputs)]
-			_ = detectLayout(input)
-		}
-	})
-
-	b.Run("IsAllDigits", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			_ = isAllDigits("20231225")
 		}
 	})
 }

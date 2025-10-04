@@ -19,7 +19,7 @@ chronogo is a comprehensive Go datetime library inspired by Python's Pendulum. I
 - **Localization Support**: Multi-language formatting and human-readable differences (6 locales)
 - **Immutable Operations**: All methods return new instances for thread safety
 - **Period and Duration Types**: Time intervals with powerful iteration capabilities
-- **Comprehensive Parsing**: Support for common datetime formats with intelligent detection
+- **Natural Language Parsing**: Parse "tomorrow", "next Monday", "3 days ago" in multiple languages (EN, ES, PT, FR, DE, ZH, JA)
 - **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic with goholiday integration
 - **Serialization Support**: Built-in JSON/Text marshalers and SQL driver integration
 - **High Performance**: Optimized operations with extensive test coverage (91.7%)
@@ -41,9 +41,38 @@ import (
 )
 
 func main() {
+    // Natural language parsing in multiple languages
+    dt1, _ := chronogo.Parse("tomorrow")                // English
+    dt2, _ := chronogo.Parse("next Monday")             // Relative dates
+    dt3, _ := chronogo.Parse("3 days ago")              // Quantity expressions
+    dt4, _ := chronogo.Parse("mañana")                  // Spanish for "tomorrow"
+    dt5, _ := chronogo.Parse("明天")                     // Chinese for "tomorrow"
+    
+    // Traditional datetime parsing still works
+    dt6, _ := chronogo.Parse("2024-01-15T14:30:00Z")   // ISO 8601
+    dt7, _ := chronogo.Parse("1705329000")              // Unix timestamp
+    
     // Create and manipulate datetime instances
     dt := chronogo.Now().AddDays(3).InTimezone("America/New_York")
     fmt.Println(dt.HumanString()) // "in 3 days"
+    
+    // Convenience methods for quick date/time modifications
+    meeting := chronogo.Now().On(2024, time.June, 15).At(14, 30, 0)  // Set to June 15, 2024 at 14:30
+    deadline := chronogo.Today().On(2024, time.December, 31).At(23, 59, 59)  // End of year deadline
+    
+    // Check if a year has 53 ISO weeks (long year)
+    if chronogo.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC).IsLongYear() {
+        fmt.Println("2020 is a long year with 53 weeks")
+    }
+    
+    // Rich Diff type for datetime differences
+    start := chronogo.Date(2023, time.January, 15, 10, 0, 0, 0, time.UTC)
+    end := chronogo.Date(2024, time.March, 20, 14, 30, 0, 0, time.UTC)
+    diff := end.Diff(start)
+    fmt.Printf("Calendar-aware: %d years, %d months\n", diff.Years(), diff.Months())
+    fmt.Printf("Precise: %.2f days, %.2f hours\n", diff.InDays(), diff.InHours())
+    fmt.Printf("Human-readable: %s\n", diff.ForHumans())
+    fmt.Printf("Compact: %s\n", diff.CompactString())
     
     // Business date calculations with enhanced performance
     calc := chronogo.NewEnhancedBusinessDayCalculator("US")
@@ -217,9 +246,12 @@ fmt.Println(weekdayName) // "Montag"
 ### DateTime Operations
 - **Creation**: Now(), Today(), Date(), FromUnix(), Parse()
 - **Manipulation**: Add/Subtract time units with fluent API
+- **Convenience Methods**: On(), At() for quick date/time setting
+- **Differences**: Explicit Diff type with rich methods for time differences
 - **Formatting**: Standard Go layouts plus human-readable output
 - **Timezone**: Convert between timezones with proper DST handling
 - **Comparison**: Before(), After(), Between(), Equal() methods
+- **ISO 8601**: IsLongYear() for 53-week year detection
 
 ### Business Date Support
 - **Holiday Management**: Integrated goholiday v0.6.3+ library with comprehensive multi-country holiday data (34 countries including Turkey and Ukraine)
@@ -236,14 +268,45 @@ fmt.Println(weekdayName) // "Montag"
 - **Duration Extensions**: Human-readable duration formatting and calculations
 
 ### Parsing and Serialization
-- **Intelligent Parsing**: Automatic format detection for common datetime patterns
-- **Multiple Formats**: ISO8601, RFC3339, Unix timestamps, and custom formats
+- **Natural Language Parsing**: Powered by godateparser with support for 7 languages (English, Spanish, Portuguese, French, German, Chinese, Japanese)
+- **Multi-Language NLP**: Parse "tomorrow", "mañana", "demain", "明天" automatically
+- **Intelligent Parsing**: Automatic format detection for technical formats (ISO8601, RFC3339, Unix timestamps)
+- **Custom Formats**: Token-based and Go layout format parsing
 - **JSON/SQL Support**: Built-in marshaling for database and API integration
+
+Example:
+```go
+// Natural language parsing
+dt1, _ := chronogo.Parse("tomorrow")               // Future relative
+dt2, _ := chronogo.Parse("3 days ago")             // Past relative
+dt3, _ := chronogo.Parse("next Monday")            // Next weekday
+dt4, _ := chronogo.Parse("mañana")                 // Spanish
+dt5, _ := chronogo.Parse("demain")                 // French
+dt6, _ := chronogo.Parse("明天")                    // Chinese
+
+// Technical format parsing
+dt7, _ := chronogo.Parse("2024-01-15T14:30:00Z")  // ISO 8601
+dt8, _ := chronogo.Parse("1705329000")             // Unix timestamp
+
+// Custom language configuration
+chronogo.SetDefaultParseLanguages("en", "es")      // English and Spanish only
+config := chronogo.ParseConfig{
+    Languages: []string{"en", "fr"},                // Explicit languages
+    Location:  time.UTC,
+    Strict:    false,                               // Allow natural language
+}
+dt9, _ := chronogo.ParseWith("demain", config)
+
+// Strict mode: technical formats only
+dt10, _ := chronogo.ParseStrict("2024-01-15T14:30:00Z")  // OK
+dt11, _ := chronogo.ParseStrict("tomorrow")               // Error: natural language disabled
+```
 
 ## Dependencies
 
 chronogo integrates with the following libraries:
 
+- **godateparser**: Advanced natural language date parsing library supporting 7 languages with intelligent relative date handling.
 - **goholiday**: Enterprise-grade holiday data library providing comprehensive holiday support for multiple countries with optimized lookup performance.
 
 ## Documentation

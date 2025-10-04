@@ -1,2 +1,4 @@
+github.com/coredds/godateparser v1.3.3 h1:raizHkcYIjuvJerE9tMeQHyrc5x8QJEkQmLOd+ijAYQ=
+github.com/coredds/godateparser v1.3.3/go.mod h1:M1YfV9eu/F6b0uuZqGxRvl5e17zv+D4CIaXA+x9Hph4=
 github.com/coredds/goholiday v0.6.5 h1:Mvr35BV+g4ACaSslTSKsUtnG/n3S5j9n2Hz73uCUATI=
 github.com/coredds/goholiday v0.6.5/go.mod h1:B4GSb/T4wou4tlm0Uve4+/7vYn3VWLZgYd04nG995rM=

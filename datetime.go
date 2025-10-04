@@ -158,6 +158,30 @@ func (dt DateTime) IsLeapYear() bool {
 	return year%4 == 0 && (year%100 != 0 || year%400 == 0)
 }
 
+// IsLongYear returns whether the datetime's year is an ISO 8601 long year.
+// A long year has 53 ISO weeks instead of the normal 52.
+// This occurs when the year starts on a Thursday or is a leap year starting on Wednesday.
+//
+// Examples:
+//
+//	chronogo.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC).IsLongYear() // true - 2020 has 53 ISO weeks
+//	chronogo.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC).IsLongYear() // false - 2021 has 52 ISO weeks
+func (dt DateTime) IsLongYear() bool {
+	year := dt.Year()
+
+	// A year is a long year if it has 53 ISO weeks.
+	// This happens if:
+	// 1. January 1st is a Thursday, OR
+	// 2. January 1st is a Wednesday AND it's a leap year
+	//
+	// Equivalently, we can check if December 28 (which is always in the last week)
+	// is in week 53 of that year.
+	dec28 := time.Date(year, 12, 28, 0, 0, 0, 0, dt.Location())
+	_, week := dec28.ISOWeek()
+
+	return week == 53
+}
+
 // IsPast returns whether the datetime is in the past compared to now.
 func (dt DateTime) IsPast() bool {
 	return dt.Time.Before(time.Now())
@@ -289,6 +313,33 @@ func (dt DateTime) SetMinute(minute int) DateTime {
 // SetSecond returns a new DateTime with the second set to the specified value.
 func (dt DateTime) SetSecond(second int) DateTime {
 	return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), dt.Hour(), dt.Minute(), second, dt.Nanosecond(), dt.Location())}
+}
+
+// On is a convenience method that sets the date components (year, month, day) in one call.
+// This is a simpler alternative to using Set().Year().Month().Day() for date modifications.
+// The time components (hour, minute, second, nanosecond) remain unchanged.
+//
+// Examples:
+//
+//	dt := chronogo.Now()
+//	dt2 := dt.On(2024, time.January, 15)  // Sets date to 2024-01-15, keeps current time
+//	dt3 := dt.On(2025, time.December, 31) // Sets date to 2025-12-31, keeps current time
+func (dt DateTime) On(year int, month time.Month, day int) DateTime {
+	return DateTime{time.Date(year, month, day, dt.Hour(), dt.Minute(), dt.Second(), dt.Nanosecond(), dt.Location())}
+}
+
+// At is a convenience method that sets the time components (hour, minute, second) in one call.
+// This is a simpler alternative to using Set().Hour().Minute().Second() for time modifications.
+// The date components (year, month, day) and nanoseconds remain unchanged.
+//
+// Examples:
+//
+//	dt := chronogo.Today()
+//	dt2 := dt.At(14, 30, 0)    // Sets time to 14:30:00, keeps current date
+//	dt3 := dt.At(9, 0, 0)      // Sets time to 09:00:00, keeps current date
+//	dt4 := dt.At(23, 59, 59)   // Sets time to 23:59:59, keeps current date
+func (dt DateTime) At(hour, minute, second int) DateTime {
+	return DateTime{time.Date(dt.Year(), dt.Month(), dt.Day(), hour, minute, second, dt.Nanosecond(), dt.Location())}
 }
 
 // Before reports whether the datetime is before other.

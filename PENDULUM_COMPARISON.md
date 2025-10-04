@@ -88,8 +88,8 @@ chronogo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 | Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | **set(component)** | ✅ | ✅ Set() fluent | ✅ Complete | |
-| **on(year, month, day)** | ✅ | ⚠️ | ⚠️ Partial | Have Set().Year().Month().Day() |
-| **at(hour, minute, second)** | ✅ | ⚠️ | ⚠️ Partial | Have Set().Hour().Minute() |
+| **on(year, month, day)** | ✅ | ✅ On() | ✅ Complete | Convenience method for setting date |
+| **at(hour, minute, second)** | ✅ | ✅ At() | ✅ Complete | Convenience method for setting time |
 | **first_of(unit)** | ✅ first_of('month') | ✅ StartOfMonth() | ✅ Complete | |
 | **last_of(unit)** | ✅ last_of('month') | ✅ EndOfMonth() | ✅ Complete | |
 | **nth_of(unit, nth, day)** | ✅ nth_of('month', 2, pendulum.MONDAY) | ✅ NthWeekdayOf() | ✅ Complete | Get nth occurrence in period |
@@ -117,12 +117,12 @@ chronogo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 | Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
-| diff() method | ✅ | ⚠️ | ⚠️ Partial | Have Sub() but not full diff |
-| **diff_for_humans()** | ✅ | ✅ DiffForHumans() | ✅ Complete | Excellent implementation |
-| **in_words()** | ✅ | ✅ HumanString() | ✅ Complete | |
-| **diff.in_days()** | ✅ | ⚠️ | ⚠️ Partial | Period has Days() |
-| **diff.in_hours()** | ✅ | ⚠️ | ⚠️ Partial | Can get from Duration |
-| **absolute differences** | ✅ diff(absolute=True) | ⚠️ | ⚠️ Partial | Have to calculate manually |
+| diff() method | ✅ | ✅ Diff() | ✅ Complete | Returns rich Diff type |
+| **diff_for_humans()** | ✅ | ✅ DiffForHumans() / Diff.ForHumans() | ✅ Complete | Excellent implementation |
+| **in_words()** | ✅ | ✅ HumanString() / Diff.String() | ✅ Complete | |
+| **diff.in_days()** | ✅ | ✅ Diff.InDays() | ✅ Complete | Both precise and calendar-aware |
+| **diff.in_hours()** | ✅ | ✅ Diff.InHours() | ✅ Complete | Full time unit support |
+| **absolute differences** | ✅ diff(absolute=True) | ✅ DiffAbs() / Diff.Abs() | ✅ Complete | Explicit methods |
 
 ### Duration Type
 
@@ -167,9 +167,9 @@ chronogo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 | Quarter | ✅ quarter | ✅ Quarter() | ✅ Complete | |
 | **age** | ✅ age (returns years as int) | ✅ Age() | ✅ Complete | |
 | **is_leap_year()** | ✅ | ✅ IsLeapYear() | ✅ Complete | |
-| **is_long_year()** | ✅ ISO week year with 53 weeks | ❌ | ❌ Missing | ISO 8601 long year check |
-| **is_same_day(dt)** | ✅ | ⚠️ | ⚠️ Partial | Can compare dates |
-| **is_anniversary(dt)** | ✅ | ❌ | ❌ Missing | Check if same month/day |
+| **is_long_year()** | ✅ ISO week year with 53 weeks | ✅ IsLongYear() | ✅ Complete | ISO 8601 long year check |
+| **is_same_day(dt)** | ✅ | ✅ IsSameDay() | ✅ Complete | Can compare dates |
+| **is_anniversary(dt)** | ✅ | ✅ IsAnniversary() | ✅ Complete | Check if same month/day |
 
 ### String Formatting
 
@@ -219,22 +219,27 @@ chronogo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 4. ✅ **is_birthday()/is_anniversary()/comparison methods** - IMPLEMENTED with extras
 5. ✅ **Period.overlaps() and related methods** - IMPLEMENTED with Gap(), Encompasses(), Merge()
 6. ✅ **Extended String Formats** - ToCookieString(), ToRSSString(), ToW3CString() IMPLEMENTED
-7. **Natural Language Parsing** - Pendulum supports "next monday", "last week", etc. (TODO)
+7. ✅ **Natural Language Parsing** - IMPLEMENTED via godateparser with multi-language support (EN, ES, PT, FR, DE, ZH, JA)
+   - Supports relative dates: "tomorrow", "yesterday", "next Monday", "last week"
+   - Quantity expressions: "3 days ago", "in 2 weeks", "2 hours from now"
+   - Multi-language: "mañana" (ES), "demain" (FR), "morgen" (DE), "明天" (ZH), "明日" (JA)
+   - Fast-path optimization for technical formats (ISO 8601, Unix timestamps)
+   - Configurable language sets and strict mode for technical-only parsing
 8. **Naive/Aware DateTime Distinction** - Pendulum explicitly differentiates timezone-aware and naive datetimes (TODO)
 
 ### Medium Priority
 
-9. **ISO 8601 Week Dates** - YYYY-Www-D format parsing
-10. **ISO 8601 Ordinal Dates** - YYYY-DDD format parsing
-11. **is_long_year()** - ISO 8601 long year detection
-12. **average()** - Get midpoint between two datetimes
-13. **closest()/farthest()** - Find closest/farthest datetime from list
+9. ✅ **ISO 8601 Week Dates** - YYYY-Www-D format parsing IMPLEMENTED
+10. ✅ **ISO 8601 Ordinal Dates** - YYYY-DDD format parsing IMPLEMENTED
+11. ✅ **is_long_year()** - ISO 8601 long year detection IMPLEMENTED
+12. ✅ **average()** - Get midpoint between two datetimes IMPLEMENTED (Average() method)
+13. ✅ **closest()/farthest()** - Find closest/farthest datetime from list IMPLEMENTED (Closest(), Farthest() methods)
 14. **More Locales** - Pendulum supports 80+ locales vs chronogo's 6
 
 ### Low Priority
 
-15. **on()/at() Convenience Methods** - Simpler alternatives to Set()
-16. **Explicit Diff Type** - Richer difference object with more methods
+15. ✅ **on()/at() Convenience Methods** - IMPLEMENTED (On(), At() methods)
+16. ✅ **Explicit Diff Type** - IMPLEMENTED with rich methods (Diff type unifying Duration and Period)
 
 ## Recommendations
 
