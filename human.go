@@ -64,7 +64,7 @@ func Humanize(duration time.Duration) string {
 	}
 
 	absDuration := time.Duration(math.Abs(float64(duration)))
-	
+
 	// Calculate the appropriate unit
 	seconds := int(absDuration.Seconds())
 	minutes := int(absDuration.Minutes())

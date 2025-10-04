@@ -148,7 +148,6 @@ func TestTimeAgo(t *testing.T) {
 	}
 }
 
-
 // Test edge cases and boundary conditions
 func TestDiffForHumansEdgeCases(t *testing.T) {
 	dt1 := Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC)
