@@ -303,8 +303,8 @@ func TestDiffTypeForHumans(t *testing.T) {
 
 func TestDiffTypeForHumansComparison(t *testing.T) {
 	// Set to English for consistent testing
-	SetDefaultLocale("en-US")
-	defer SetDefaultLocale("en-US")
+	_ = SetDefaultLocale("en-US")
+	defer func() { _ = SetDefaultLocale("en-US") }()
 
 	dt1 := Date(2023, time.June, 15, 12, 0, 0, 0, time.UTC)
 	dt2 := Date(2023, time.June, 20, 12, 0, 0, 0, time.UTC)

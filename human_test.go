@@ -44,8 +44,8 @@ func TestDiffForHumans(t *testing.T) {
 
 func TestDiffForHumansComparison(t *testing.T) {
 	// Set to English for consistent testing
-	SetDefaultLocale("en-US")
-	defer SetDefaultLocale("en-US")
+	_ = SetDefaultLocale("en-US")
+	defer func() { _ = SetDefaultLocale("en-US") }()
 
 	dt1 := Date(2023, time.January, 15, 12, 0, 0, 0, time.UTC)
 	dt2 := Date(2023, time.January, 15, 13, 0, 0, 0, time.UTC)
@@ -79,8 +79,8 @@ func TestDiffForHumansNow(t *testing.T) {
 
 func TestHumanize(t *testing.T) {
 	// Set to English for consistent testing
-	SetDefaultLocale("en-US")
-	defer SetDefaultLocale("en-US")
+	_ = SetDefaultLocale("en-US")
+	defer func() { _ = SetDefaultLocale("en-US") }()
 
 	tests := []struct {
 		duration time.Duration
