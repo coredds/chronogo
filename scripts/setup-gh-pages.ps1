@@ -37,7 +37,7 @@ try {
     Write-Host "   4. Select 'gh-pages' branch and '/ (root)' folder"
     Write-Host "   5. Save the settings"
     Write-Host ""
-    Write-Host "🌐 Your site will be available at: https://coredds.github.io/ChronoGo/" -ForegroundColor Cyan
+    Write-Host "🌐 Your site will be available at: https://coredds.github.io/chronogo/" -ForegroundColor Cyan
 }
 catch {
     Write-Host "❌ Error occurred: $($_.Exception.Message)" -ForegroundColor Red

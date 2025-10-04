@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-## ChronoGo v0.6.5 - A Go Implementation with Localization Support — A Powerful and Easy-to-Use Datetime and Timezone Library
+## chronogo v0.6.5 - A Go Implementation with Localization Support — A Powerful and Easy-to-Use Datetime and Timezone Library
 
 ## Purpose
 

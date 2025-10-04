@@ -1,6 +1,6 @@
 # Scripts
 
-This directory contains utility scripts for the ChronoGo project.
+This directory contains utility scripts for the chronogo project.
 
 ## GitHub Pages Setup
 

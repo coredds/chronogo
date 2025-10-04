@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	chronogo "github.com/coredds/ChronoGo"
+	chronogo "github.com/coredds/chronogo"
 )
 
 func main() {

@@ -195,7 +195,7 @@ func BenchmarkCompareStdLibTimeNow(b *testing.B) {
 	}
 }
 
-func BenchmarkCompareChronoGoNow(b *testing.B) {
+func BenchmarkCompareChronogoNow(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Now()
@@ -214,7 +214,7 @@ func BenchmarkCompareStdLibTimeParse(b *testing.B) {
 	}
 }
 
-func BenchmarkCompareChronoGoParse(b *testing.B) {
+func BenchmarkCompareChronogoParse(b *testing.B) {
 	value := "2023-12-25T15:30:45Z"
 
 	b.ResetTimer()

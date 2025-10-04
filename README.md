@@ -1,14 +1,14 @@
-# ChronoGo
+# chronogo
 
-[![Version](https://img.shields.io/badge/version-v0.6.7-green.svg)](https://github.com/coredds/ChronoGo/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.7-green.svg)](https://github.com/coredds/chronogo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.23-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/ChronoGo/actions/workflows/ci.yml)
-[![Security](https://github.com/coredds/ChronoGo/actions/workflows/security.yml/badge.svg)](https://github.com/coredds/ChronoGo/actions/workflows/security.yml)
-[![Codecov](https://codecov.io/gh/coredds/ChronoGo/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/ChronoGo)
-[![Go Reference](https://pkg.go.dev/badge/github.com/coredds/ChronoGo.svg)](https://pkg.go.dev/github.com/coredds/ChronoGo)
+[![CI](https://github.com/coredds/chronogo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/chronogo/actions/workflows/ci.yml)
+[![Security](https://github.com/coredds/chronogo/actions/workflows/security.yml/badge.svg)](https://github.com/coredds/chronogo/actions/workflows/security.yml)
+[![Codecov](https://codecov.io/gh/coredds/chronogo/branch/main/graph/badge.svg)](https://codecov.io/gh/coredds/chronogo)
+[![Go Reference](https://pkg.go.dev/badge/github.com/coredds/chronogo.svg)](https://pkg.go.dev/github.com/coredds/chronogo)
 
-ChronoGo is a comprehensive Go datetime library inspired by Python's Pendulum. It provides a powerful, fluent API that enhances Go's standard time package with better timezone handling, human-friendly operations, and extensive business date functionality.
+chronogo is a comprehensive Go datetime library inspired by Python's Pendulum. It provides a powerful, fluent API that enhances Go's standard time package with better timezone handling, human-friendly operations, and extensive business date functionality.
 
 ## Key Features
 
@@ -20,14 +20,14 @@ ChronoGo is a comprehensive Go datetime library inspired by Python's Pendulum. I
 - **Immutable Operations**: All methods return new instances for thread safety
 - **Period and Duration Types**: Time intervals with powerful iteration capabilities
 - **Comprehensive Parsing**: Support for common datetime formats with intelligent detection
-- **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic with GoHoliday integration
+- **Business Date Operations**: Holiday checking, business day calculations, and working day arithmetic with goholiday integration
 - **Serialization Support**: Built-in JSON/Text marshalers and SQL driver integration
 - **High Performance**: Optimized operations with extensive test coverage (91.7%)
 
 ## Installation
 
 ```bash
-go get github.com/coredds/ChronoGo
+go get github.com/coredds/chronogo
 ```
 
 ## Quick Start
@@ -37,37 +37,37 @@ package main
 
 import (
     "fmt"
-    "github.com/coredds/ChronoGo"
+    "github.com/coredds/chronogo"
 )
 
 func main() {
     // Create and manipulate datetime instances
-    dt := ChronoGo.Now().AddDays(3).InTimezone("America/New_York")
+    dt := chronogo.Now().AddDays(3).InTimezone("America/New_York")
     fmt.Println(dt.HumanString()) // "in 3 days"
     
     // Business date calculations with enhanced performance
-    calc := ChronoGo.NewEnhancedBusinessDayCalculator("US")
-    workday := calc.AddBusinessDays(ChronoGo.Today(), 5)
+    calc := chronogo.NewEnhancedBusinessDayCalculator("US")
+    workday := calc.AddBusinessDays(chronogo.Today(), 5)
     fmt.Println(workday.Format("2006-01-02"))
     
     // Holiday-aware scheduling
-    scheduler := ChronoGo.NewHolidayAwareScheduler("US")
-    meetings := scheduler.ScheduleRecurring(ChronoGo.Now(), 24*time.Hour, 10)
+    scheduler := chronogo.NewHolidayAwareScheduler("US")
+    meetings := scheduler.ScheduleRecurring(chronogo.Now(), 24*time.Hour, 10)
     
     // Holiday calendar integration
-    calendar := ChronoGo.NewHolidayCalendar("US")
-    upcoming := calendar.GetUpcomingHolidays(ChronoGo.Now(), 5)
+    calendar := chronogo.NewHolidayCalendar("US")
+    upcoming := calendar.GetUpcomingHolidays(chronogo.Now(), 5)
     for _, holiday := range upcoming {
         fmt.Printf("Upcoming: %s\n", holiday.String())
     }
     
-    // Multi-country holiday checking (GoHoliday v0.6.3+ supports 34 countries)
-    usChecker := ChronoGo.NewGoHolidayChecker("US")
-    brChecker := ChronoGo.NewGoHolidayChecker("BR") // Brazil
-    trChecker := ChronoGo.NewGoHolidayChecker("TR") // Turkey (new in v0.6.3)
-    uaChecker := ChronoGo.NewGoHolidayChecker("UA") // Ukraine (new in v0.6.3)
+    // Multi-country holiday checking (goholiday v0.6.3+ supports 34 countries)
+    usChecker := chronogo.NewGoHolidayChecker("US")
+    brChecker := chronogo.NewGoHolidayChecker("BR") // Brazil
+    trChecker := chronogo.NewGoHolidayChecker("TR") // Turkey (new in v0.6.3)
+    uaChecker := chronogo.NewGoHolidayChecker("UA") // Ukraine (new in v0.6.3)
     
-    newYear := ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+    newYear := chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
     if usChecker.IsHoliday(newYear) {
         fmt.Println("US Holiday:", usChecker.GetHolidayName(newYear))
     }
@@ -75,7 +75,7 @@ func main() {
         fmt.Println("Brazil Holiday:", brChecker.GetHolidayName(newYear))
     }
     
-    // Enhanced holiday operations with GoHoliday v0.6.3+
+    // Enhanced holiday operations with goholiday v0.6.3+
     
     // New features in v0.6.3: subdivision support, holiday categories, language support
     subdivisions := usChecker.GetSubdivisions()
@@ -83,21 +83,21 @@ func main() {
     language := usChecker.GetLanguage()
     holidayCount, _ := usChecker.GetHolidayCount(2024)
     // Get all holidays in a date range
-    start := ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-    end := ChronoGo.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)
+    start := chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+    end := chronogo.Date(2024, 3, 31, 0, 0, 0, 0, time.UTC)
     holidays := usChecker.GetHolidaysInRange(start, end)
     fmt.Printf("Q1 2024 US holidays: %d\n", len(holidays))
     
     // Batch holiday checking for performance
-    dates := []ChronoGo.DateTime{
-        ChronoGo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),  // New Year's Day
-        ChronoGo.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),  // Independence Day
+    dates := []chronogo.DateTime{
+        chronogo.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),  // New Year's Day
+        chronogo.Date(2024, 7, 4, 0, 0, 0, 0, time.UTC),  // Independence Day
     }
     results := usChecker.AreHolidays(dates)
     fmt.Printf("Batch check results: %v\n", results)
     
     // Period iteration
-    period := ChronoGo.NewPeriod(ChronoGo.Now(), ChronoGo.Now().AddDays(7))
+    period := chronogo.NewPeriod(chronogo.Now(), chronogo.Now().AddDays(7))
     for _, day := range period.Days() {
         fmt.Println(day.Format("Monday, January 2"))
     }
@@ -106,7 +106,7 @@ func main() {
 
 ## Localization Support
 
-ChronoGo provides comprehensive localization support for formatting dates and human-readable time differences in multiple languages.
+chronogo provides comprehensive localization support for formatting dates and human-readable time differences in multiple languages.
 
 ### Supported Locales
 
@@ -120,7 +120,7 @@ ChronoGo provides comprehensive localization support for formatting dates and hu
 ### Localized Formatting
 
 ```go
-dt := ChronoGo.Date(2024, time.January, 15, 14, 30, 0, 0, time.UTC)
+dt := chronogo.Date(2024, time.January, 15, 14, 30, 0, 0, time.UTC)
 
 // English formatting
 result, _ := dt.FormatLocalized("dddd, MMMM Do YYYY", "en-US")
@@ -150,7 +150,7 @@ fmt.Println(result) // "segunda-feira, 15º de janeiro de 2024"
 ### Localized Human-Readable Differences
 
 ```go
-now := ChronoGo.Now()
+now := chronogo.Now()
 past := now.AddHours(-2)
 future := now.AddDays(3)
 
@@ -183,10 +183,10 @@ fmt.Println(result) // "há 2 horas"
 
 ```go
 // Set default locale for the application
-ChronoGo.SetDefaultLocale("es-ES")
+chronogo.SetDefaultLocale("es-ES")
 
 // Use default locale formatting
-dt := ChronoGo.Now()
+dt := chronogo.Now()
 result := dt.FormatLocalizedDefault("dddd, MMMM Do")
 fmt.Println(result) // Uses Spanish formatting
 
@@ -199,11 +199,11 @@ fmt.Println(result) // Uses Spanish phrasing
 
 ```go
 // Get available locales
-locales := ChronoGo.GetAvailableLocales()
+locales := chronogo.GetAvailableLocales()
 fmt.Println(locales) // ["en-US", "es-ES", "fr-FR", "de-DE", "zh-Hans", "pt-BR"]
 
 // Get month and weekday names
-dt := ChronoGo.Date(2024, time.June, 15, 0, 0, 0, 0, time.UTC) // Monday
+dt := chronogo.Date(2024, time.June, 15, 0, 0, 0, 0, time.UTC) // Monday
 
 monthName, _ := dt.GetMonthName("fr-FR")
 fmt.Println(monthName) // "juin"
@@ -222,7 +222,7 @@ fmt.Println(weekdayName) // "Montag"
 - **Comparison**: Before(), After(), Between(), Equal() methods
 
 ### Business Date Support
-- **Holiday Management**: Integrated GoHoliday v0.6.3+ library with comprehensive multi-country holiday data (34 countries including Turkey and Ukraine)
+- **Holiday Management**: Integrated goholiday v0.6.3+ library with comprehensive multi-country holiday data (34 countries including Turkey and Ukraine)
 - **Supported Countries**: 34 countries with comprehensive regional subdivisions (US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR, PT, PL, RU, CN, TH, SG, TR, UA, AT, BE, CH, CL, FI, IE, IL, NO, SE, AR, ID)
 - **Performance**: Sub-microsecond lookup performance with intelligent caching and thread-safe operations
 - **Multi-language Support**: Holiday names available in multiple languages
@@ -242,13 +242,13 @@ fmt.Println(weekdayName) // "Montag"
 
 ## Dependencies
 
-ChronoGo integrates with the following libraries:
+chronogo integrates with the following libraries:
 
-- **GoHoliday**: Enterprise-grade holiday data library providing comprehensive holiday support for multiple countries with optimized lookup performance.
+- **goholiday**: Enterprise-grade holiday data library providing comprehensive holiday support for multiple countries with optimized lookup performance.
 
 ## Documentation
 
-For detailed API documentation and examples, visit [pkg.go.dev/github.com/coredds/ChronoGo](https://pkg.go.dev/github.com/coredds/ChronoGo).
+For detailed API documentation and examples, visit [pkg.go.dev/github.com/coredds/chronogo](https://pkg.go.dev/github.com/coredds/chronogo).
 
 ## Testing
 
@@ -261,7 +261,7 @@ Current test coverage: 91.7% with comprehensive safety checks and edge case hand
 
 ## Security
 
-ChronoGo includes comprehensive security scanning and monitoring:
+chronogo includes comprehensive security scanning and monitoring:
 
 ### Automated Security Scanning
 - **GitHub Actions**: Automated security workflows on every push and PR
@@ -306,11 +306,11 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Version History
 
 - **v0.6.5**: Comprehensive localization support with 6 locales (en-US, es-ES, fr-FR, de-DE, zh-Hans, pt-BR), localized date formatting, human-readable differences, ordinal numbers, and AM/PM indicators
-- **v0.6.2**: GoHoliday v0.6.3+ integration with 34 countries support (added Turkey and Ukraine), enhanced business operations, holiday-aware scheduling, subdivision and category support, new APIs for subdivisions and holiday categories
+- **v0.6.2**: goholiday v0.6.3+ integration with 34 countries support (added Turkey and Ukraine), enhanced business operations, holiday-aware scheduling, subdivision and category support, new APIs for subdivisions and holiday categories
 - **v0.6.1**: Maintenance release and documentation improvements
 - **v0.6.0**: Security hardening with comprehensive vulnerability scanning and dependency review automation
-- **v0.5.0**: Advanced parsing functions, GoHoliday integration for enterprise holiday support
-- **GoHoliday v0.6.3**: Added Turkey and Ukraine support, subdivision/category APIs, enhanced performance, error handling improvements
+- **v0.5.0**: Advanced parsing functions, goholiday integration for enterprise holiday support
+- **goholiday v0.6.3**: Added Turkey and Ukraine support, subdivision/category APIs, enhanced performance, error handling improvements
 - **v0.4.3**: Enhanced test coverage (91.7%), improved safety checks, optimized DST handling
 - **v0.4.2**: GitHub Actions CI/CD, comprehensive linting, automated dependency management
 - **v0.4.0**: Business day operations, enhanced error handling, developer documentation

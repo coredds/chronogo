@@ -1,6 +1,6 @@
-# Contributing to ChronoGo
+# Contributing to chronogo
 
-Thank you for your interest in contributing to ChronoGo! We welcome contributions from the community and are pleased to have you join us.
+Thank you for your interest in contributing to chronogo! We welcome contributions from the community and are pleased to have you join us.
 
 ## Code of Conduct
 
@@ -45,8 +45,8 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/coredds/ChronoGo.git
-   cd ChronoGo
+   git clone https://github.com/coredds/chronogo.git
+   cd chronogo
    ```
 
 2. Install dependencies:
@@ -120,7 +120,7 @@ Examples:
 
 ## Release Process
 
-ChronoGo follows [Semantic Versioning](https://semver.org/):
+chronogo follows [Semantic Versioning](https://semver.org/):
 
 - MAJOR version when you make incompatible API changes
 - MINOR version when you add functionality in a backwards compatible manner
@@ -136,4 +136,4 @@ If you need help, you can:
 
 ## License
 
-By contributing to ChronoGo, you agree that your contributions will be licensed under the MIT License.
+By contributing to chronogo, you agree that your contributions will be licensed under the MIT License.

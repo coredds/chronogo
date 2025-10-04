@@ -1,11 +1,11 @@
-# Security check script for ChronoGo (PowerShell version)
+# Security check script for chronogo (PowerShell version)
 # This script runs basic security checks locally
 
 param(
     [switch]$SkipInstall = $false
 )
 
-Write-Host "🔒 Running ChronoGo Security Checks..." -ForegroundColor Green
+Write-Host "🔒 Running chronogo Security Checks..." -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
 
 # Check if we're in the right directory

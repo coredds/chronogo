@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	chronogo "github.com/coredds/ChronoGo"
+	chronogo "github.com/coredds/chronogo"
 )
 
 func main() {
-	fmt.Println("ChronoGo Localization Demo")
+	fmt.Println("chronogo Localization Demo")
 	fmt.Println("==========================")
 
 	// Create a sample datetime

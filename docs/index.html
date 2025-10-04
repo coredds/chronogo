@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChronoGo - Go DateTime Library Demo</title>
+    <title>chronogo - Go DateTime Library Demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
@@ -611,15 +611,15 @@
     <header>
         <div class="container">
             <div class="hero">
-                <h1>ChronoGo</h1>
+                <h1>chronogo</h1>
                 <p>A comprehensive Go datetime library with advanced parsing, business logic, holiday support, and enterprise-grade security</p>
                 
                 <!-- Live Demo Section -->
                 <div class="live-demo">
-                    <h3>🚀 See ChronoGo v0.6.7's Power in Action:</h3>
+                    <h3>🚀 See chronogo v0.6.7's Power in Action:</h3>
                     <div class="demo-container">
                         <div class="demo-input">
-                            <code>ChronoGo.Today().AddDays(7)</code>
+                            <code>chronogo.Today().AddDays(7)</code>
                         </div>
                         <div class="demo-arrow">→</div>
                         <div class="demo-output">
@@ -637,7 +637,7 @@
                 </div>
                 <div class="cta-buttons">
                     <a href="#playground" class="btn btn-primary">🎮 See Examples</a>
-                    <a href="https://github.com/coredds/ChronoGo" class="btn btn-secondary" target="_blank">📚 GitHub</a>
+                    <a href="https://github.com/coredds/chronogo" class="btn btn-secondary" target="_blank">📚 GitHub</a>
                 </div>
             </div>
         </div>
@@ -646,7 +646,7 @@
     <section id="playground" class="section">
         <div class="container">
             <h2 class="section-title">🎮 Code Examples</h2>
-            <p class="section-subtitle">See ChronoGo's power in action with these example code demonstrations</p>
+            <p class="section-subtitle">See chronogo's power in action with these example code demonstrations</p>
             
             <div class="playground-grid">
                 <!-- Demo 1: Human Readable Times -->
@@ -665,7 +665,7 @@ days := int(diff.Hours() / 24)
 fmt.Sprintf("in %d days", days)</code></pre>
                         </div>
                         <div class="after">
-                            <h4>✅ ChronoGo Magic</h4>
+                            <h4>✅ chronogo Magic</h4>
                             <pre><code>// One line of beauty
 future.DiffForHumans()
 // → "in 2 weeks"
@@ -682,7 +682,7 @@ future.DiffForHumans()
                         <p>Seamless timezone conversions and management</p>
                     </div>
                     <div class="demo-showcase">
-                        <pre><code>meeting := ChronoGo.Parse("2025-01-15 14:00")
+                        <pre><code>meeting := chronogo.Parse("2025-01-15 14:00")
   .InTimezone("America/New_York")
 
 // Show in multiple timezones
@@ -706,7 +706,7 @@ London: 19:00
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Project deadline in 10 business days
-deadline := ChronoGo.Today().AddBusinessDays(10)
+deadline := chronogo.Today().AddBusinessDays(10)
 
 // Check if it's a holiday
 isHoliday := deadline.IsHoliday()
@@ -730,7 +730,7 @@ nextWorkday := deadline.NextBusinessDay()
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Complex date manipulation in one line
-result := ChronoGo.Now()
+result := chronogo.Now()
   .StartOfMonth()
   .AddDays(15)
   .SetHour(14)
@@ -752,12 +752,12 @@ result := ChronoGo.Now()
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Generate a week's schedule
-start := ChronoGo.Date(2025, 1, 13) // Monday
+start := chronogo.Date(2025, 1, 13) // Monday
 end := start.AddDays(7)
-period := ChronoGo.NewPeriod(start, end)
+period := chronogo.NewPeriod(start, end)
 
 // Every 6 hours for a week
-for _, time := range period.RangeByUnitSlice(ChronoGo.Hour, 6) {
+for _, time := range period.RangeByUnitSlice(chronogo.Hour, 6) {
     fmt.Println(time.Format("Mon 15:04"))
 }
 
@@ -777,24 +777,24 @@ Tue 00:00, Tue 06:00, Tue 12:00, Tue 18:00
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// ISO 8601 Ordinal dates (day of year)
-ordinal1, _ := ChronoGo.Parse("2023-359")     // 2023-12-25
-ordinal2, _ := ChronoGo.Parse("2024366")      // 2024-12-31 (compact)
+ordinal1, _ := chronogo.Parse("2023-359")     // 2023-12-25
+ordinal2, _ := chronogo.Parse("2024366")      // 2024-12-31 (compact)
 
 // ISO 8601 Week dates  
-week1, _ := ChronoGo.Parse("2023-W52-1")      // Monday of week 52
-week2, _ := ChronoGo.Parse("2023W521")        // Compact format
-week3, _ := ChronoGo.Parse("2023-W52")        // Defaults to Monday
+week1, _ := chronogo.Parse("2023-W52-1")      // Monday of week 52
+week2, _ := chronogo.Parse("2023W521")        // Compact format
+week3, _ := chronogo.Parse("2023-W52")        // Defaults to Monday
 
 // Token-based custom formats
-date1, _ := ChronoGo.FromFormatTokens("25/12/2023 14:30", "DD/MM/YYYY HH:mm")
-date2, _ := ChronoGo.FromFormatTokens("December 25, 2023", "MMMM D, YYYY")
+date1, _ := chronogo.FromFormatTokens("25/12/2023 14:30", "DD/MM/YYYY HH:mm")
+date2, _ := chronogo.FromFormatTokens("December 25, 2023", "MMMM D, YYYY")
 
 // ISO 8601 Intervals
-interval1, _ := ChronoGo.Parse("2023-01-01T00:00:00Z/2023-12-31T23:59:59Z")
-interval2, _ := ChronoGo.Parse("2023-01-01T00:00:00Z/P1Y2M3DT4H5M6S")
+interval1, _ := chronogo.Parse("2023-01-01T00:00:00Z/2023-12-31T23:59:59Z")
+interval2, _ := chronogo.Parse("2023-01-01T00:00:00Z/P1Y2M3DT4H5M6S")
 
 // Fallback parsing with multiple format attempts
-result, _ := ChronoGo.ParseWithFallback("Mon, 25 Dec 2023 10:30:45 UTC")
+result, _ := chronogo.ParseWithFallback("Mon, 25 Dec 2023 10:30:45 UTC")
 
 <span class="output">
 ✅ Ordinal: 359th day = Dec 25, 2023
@@ -814,21 +814,21 @@ result, _ := ChronoGo.ParseWithFallback("Mon, 25 Dec 2023 10:30:45 UTC")
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Strict parsing - only allows exact formats
-strictOptions := ChronoGo.ParseOptions{Strict: true}
-result1, err := ChronoGo.Parse("2023-12-25T10:30:45Z", strictOptions)
+strictOptions := chronogo.ParseOptions{Strict: true}
+result1, err := chronogo.Parse("2023-12-25T10:30:45Z", strictOptions)
 // ✅ Succeeds - valid RFC3339
 
-result2, err := ChronoGo.Parse("2023/12/25 10:30:45", strictOptions)  
+result2, err := chronogo.Parse("2023/12/25 10:30:45", strictOptions)  
 // ❌ Fails - not RFC3339
 
 // Lenient parsing - tries multiple formats
-lenientOptions := ChronoGo.ParseOptions{Strict: false}
-result3, _ := ChronoGo.Parse("2023/12/25 10:30:45", lenientOptions)
+lenientOptions := chronogo.ParseOptions{Strict: false}
+result3, _ := chronogo.Parse("2023/12/25 10:30:45", lenientOptions)
 // ✅ Succeeds - automatically converts
 
 // Multiple format parsing
 formats := []string{"YYYY-MM-DD", "DD/MM/YYYY", "MMMM D, YYYY"}
-result4, _ := ChronoGo.ParseMultiple("25/12/2023", formats)
+result4, _ := chronogo.ParseMultiple("25/12/2023", formats)
 
 <span class="output">
 🔒 Strict: Enforces exact format compliance
@@ -856,7 +856,7 @@ dates := []string{
 }
 
 for _, dateStr := range dates {
-    dt, _ := ChronoGo.Parse(dateStr)
+    dt, _ := chronogo.Parse(dateStr)
     fmt.Println(dt.Format("2006-01-02 15:04"))
 }
 
@@ -878,17 +878,17 @@ for _, dateStr := range dates {
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Calculate someone's exact age
-birthday := ChronoGo.Date(1990, 5, 15)
+birthday := chronogo.Date(1990, 5, 15)
 age := birthday.Age()
 fmt.Printf("Age: %d years, %d months, %d days\n", 
     age.Years, age.Months, age.Days)
 
 // Days until next birthday
 nextBirthday := birthday.NextAnniversary()
-daysUntil := ChronoGo.Now().DiffInDays(nextBirthday)
+daysUntil := chronogo.Now().DiffInDays(nextBirthday)
 
 // Work anniversary
-startDate := ChronoGo.Date(2020, 3, 1)
+startDate := chronogo.Date(2020, 3, 1)
 tenure := startDate.DiffForHumans()
 
 <span class="output">
@@ -907,8 +907,8 @@ Work tenure: 5 years ago
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Event planning made easy
-eventDate := ChronoGo.Parse("2025-12-25")
-now := ChronoGo.Now()
+eventDate := chronogo.Parse("2025-12-25")
+now := chronogo.Now()
 
 // Multiple comparison methods
 isUpcoming := eventDate.IsFuture()
@@ -939,14 +939,14 @@ isSoon := eventDate.IsBetween(now, now.AddDays(30))
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Financial quarters and reporting
-today := ChronoGo.Today()
+today := chronogo.Today()
 quarter := today.Quarter()
 quarterStart := today.StartOfQuarter()
 quarterEnd := today.EndOfQuarter()
 
 // Get all Mondays in current month
 firstMonday := today.StartOfMonth().NextWeekday(time.Monday)
-var mondays []ChronoGo.DateTime
+var mondays []chronogo.DateTime
 for monday := firstMonday; monday.Month() == today.Month(); monday = monday.AddDays(7) {
     mondays = append(mondays, monday)
 }
@@ -968,11 +968,11 @@ Fiscal Year: 2025-04-01
                 <div class="demo-card">
                     <div class="demo-header">
                         <h3>🎄 Holiday & Business Logic</h3>
-                        <p>Enterprise-grade holiday support with GoHoliday integration</p>
+                        <p>Enterprise-grade holiday support with goholiday integration</p>
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Smart business day calculations
-today := ChronoGo.Today()
+today := chronogo.Today()
 
 // Check if today is a holiday (US by default)
 if today.IsHoliday() {
@@ -986,8 +986,8 @@ workDeadline := today.AddBusinessDays(5)
 nextWorkDay := today.NextBusinessDay()
 
 // Multi-country holiday support
-ukChecker := ChronoGo.NewHolidayChecker("GB")
-christmas := ChronoGo.Date(2025, 12, 25)
+ukChecker := chronogo.NewHolidayChecker("GB")
+christmas := chronogo.Date(2025, 12, 25)
 isUKHoliday := ukChecker.IsHoliday(christmas)
 
 // Business days in current month
@@ -1011,13 +1011,13 @@ businessDays := today.BusinessDaysInMonth()
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Create optimized business day calculator
-calc := ChronoGo.NewEnhancedBusinessDayCalculator("US")
+calc := chronogo.NewEnhancedBusinessDayCalculator("US")
 
 // Set custom weekends (e.g., Friday-Saturday for Middle East)
 calc.SetCustomWeekends([]time.Weekday{time.Friday, time.Saturday})
 
 // High-performance business day operations
-today := ChronoGo.Today()
+today := chronogo.Today()
 nextBiz := calc.NextBusinessDay(today)
 bizDays := calc.BusinessDaysBetween(today, nextBiz.AddDays(30))
 
@@ -1041,10 +1041,10 @@ isEOM := calc.IsEndOfMonth(today)
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Create holiday-aware scheduler for meetings
-scheduler := ChronoGo.NewHolidayAwareScheduler("US")
+scheduler := chronogo.NewHolidayAwareScheduler("US")
 
 // Schedule recurring weekly meetings (avoids holidays)
-startDate := ChronoGo.Date(2025, 9, 1)
+startDate := chronogo.Date(2025, 9, 1)
 weeklyMeetings := scheduler.ScheduleRecurring(
     startDate, 7*24*time.Hour, 8) // 8 weeks
 
@@ -1072,13 +1072,13 @@ businessMeetings := scheduler.ScheduleBusinessDays(startDate, 10)
                     </div>
                     <div class="demo-showcase">
                         <pre><code>// Create holiday calendar for any country
-calendar := ChronoGo.NewHolidayCalendar("US")
+calendar := chronogo.NewHolidayCalendar("US")
 
 // Get all holidays in current month
 thisMonth := calendar.GetMonthlyHolidays(2025, time.August)
 
 // Find upcoming holidays
-upcoming := calendar.GetUpcomingHolidays(ChronoGo.Now(), 3)
+upcoming := calendar.GetUpcomingHolidays(chronogo.Now(), 3)
 
 // Generate full month calendar with holiday info
 monthEntries := calendar.GenerateMonth(2025, time.December)
@@ -1108,15 +1108,15 @@ for _, entry := range monthEntries {
     <section id="installation" class="section">
         <div class="container">
             <h2 class="section-title">🚀 Get Started in Seconds</h2>
-            <p class="section-subtitle">Add ChronoGo to your project and start building amazing datetime experiences</p>
+            <p class="section-subtitle">Add chronogo to your project and start building amazing datetime experiences</p>
             
             <div class="install-flow">
                 <div class="install-step">
                     <div class="step-number">1</div>
                     <h3>Install</h3>
                     <div class="install-command">
-                        <code>go get github.com/coredds/ChronoGo</code>
-                        <button class="copy-btn" onclick="copyToClipboard('go get github.com/coredds/ChronoGo')">📋</button>
+                        <code>go get github.com/coredds/chronogo</code>
+                        <button class="copy-btn" onclick="copyToClipboard('go get github.com/coredds/chronogo')">📋</button>
                     </div>
                 </div>
                 
@@ -1124,7 +1124,7 @@ for _, entry := range monthEntries {
                     <div class="step-number">2</div>
                     <h3>Import</h3>
                     <div class="code-snippet">
-                        <pre><code class="language-go">import "github.com/coredds/ChronoGo"</code></pre>
+                        <pre><code class="language-go">import "github.com/coredds/chronogo"</code></pre>
                     </div>
                 </div>
                 
@@ -1132,7 +1132,7 @@ for _, entry := range monthEntries {
                     <div class="step-number">3</div>
                     <h3>Use</h3>
                     <div class="code-snippet">
-                        <pre><code class="language-go">dt := ChronoGo.Now().AddDays(30)
+                        <pre><code class="language-go">dt := chronogo.Now().AddDays(30)
 fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
                     </div>
                 </div>
@@ -1143,27 +1143,27 @@ fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
                 <div class="examples-row">
                     <div class="quick-example">
                         <h4>Parse & Format</h4>
-                        <code>ChronoGo.Parse("2025-01-15").Format("Jan 2, 2006")</code>
+                        <code>chronogo.Parse("2025-01-15").Format("Jan 2, 2006")</code>
                         <span class="result">→ "Jan 15, 2025"</span>
                     </div>
                     <div class="quick-example">
                         <h4>ISO 8601 Ordinal</h4>
-                        <code>ChronoGo.Parse("2023-359")</code>
+                        <code>chronogo.Parse("2023-359")</code>
                         <span class="result">→ Dec 25, 2023 (359th day)</span>
                     </div>
                     <div class="quick-example">
                         <h4>ISO 8601 Week Date</h4>
-                        <code>ChronoGo.Parse("2023-W52-1")</code>
+                        <code>chronogo.Parse("2023-W52-1")</code>
                         <span class="result">→ Monday of week 52</span>
                     </div>
                     <div class="quick-example">
                         <h4>Token Formats</h4>
-                        <code>ChronoGo.FromFormatTokens("25/12/2023", "DD/MM/YYYY")</code>
+                        <code>chronogo.FromFormatTokens("25/12/2023", "DD/MM/YYYY")</code>
                         <span class="result">→ Dec 25, 2023</span>
                     </div>
                     <div class="quick-example">
                         <h4>Business Days</h4>
-                        <code>ChronoGo.Today().AddBusinessDays(5)</code>
+                        <code>chronogo.Today().AddBusinessDays(5)</code>
                         <span class="result">→ Next Friday (skips weekends)</span>
                     </div>
                     <div class="quick-example">
@@ -1175,8 +1175,8 @@ fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
             </div>
 
             <div class="cta-section">
-                <a href="https://pkg.go.dev/github.com/coredds/ChronoGo" class="btn btn-primary" target="_blank">📖 Full Documentation</a>
-                <a href="https://github.com/coredds/ChronoGo/blob/main/example_test.go" class="btn btn-secondary" target="_blank">🔬 More Examples</a>
+                <a href="https://pkg.go.dev/github.com/coredds/chronogo" class="btn btn-primary" target="_blank">📖 Full Documentation</a>
+                <a href="https://github.com/coredds/chronogo/blob/main/example_test.go" class="btn btn-secondary" target="_blank">🔬 More Examples</a>
             </div>
         </div>
     </section>
@@ -1184,11 +1184,11 @@ fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
     <footer>
         <div class="container">
             <div class="footer-links">
-                <a href="https://github.com/coredds/ChronoGo" target="_blank">GitHub</a>
-                <a href="https://pkg.go.dev/github.com/coredds/ChronoGo" target="_blank">Documentation</a>
-                <a href="https://github.com/coredds/ChronoGo/blob/main/LICENSE" target="_blank">License</a>
+                <a href="https://github.com/coredds/chronogo" target="_blank">GitHub</a>
+                <a href="https://pkg.go.dev/github.com/coredds/chronogo" target="_blank">Documentation</a>
+                <a href="https://github.com/coredds/chronogo/blob/main/LICENSE" target="_blank">License</a>
             </div>
-            <p>&copy; 2025 ChronoGo. Built with ❤️ for Go developers.</p>
+            <p>&copy; 2025 chronogo. Built with ❤️ for Go developers.</p>
         </div>
     </footer>
 
@@ -1222,7 +1222,7 @@ fmt.Println(dt.DiffForHumans()) // "in 4 weeks"</code></pre>
             const futureDate = new Date(today);
             futureDate.setDate(today.getDate() + 7);
             
-            // Format as "MMM D, YYYY" to match the ChronoGo style
+            // Format as "MMM D, YYYY" to match the chronogo style
             const options = { 
                 year: 'numeric', 
                 month: 'short', 

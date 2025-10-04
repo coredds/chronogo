@@ -1,6 +1,6 @@
-# ChronoGo Developer Guide & Cookbook
+# chronogo Developer Guide & Cookbook
 
-This guide provides practical examples and patterns for using ChronoGo effectively in your applications.
+This guide provides practical examples and patterns for using chronogo effectively in your applications.
 
 ## Table of Contents
 
@@ -23,7 +23,7 @@ import (
     "fmt"
     "time"
     
-    "github.com/coredds/ChronoGo"
+    "github.com/coredds/chronogo"
 )
 
 func main() {
@@ -323,7 +323,7 @@ func calculateSLADeadlines(ticketCreated chronogo.DateTime, sla SLA) (response, 
 ### Common Replacements
 
 ```go
-// time package -> ChronoGo
+// time package -> chronogo
 time.Now()                    // -> chronogo.Now()
 time.Date(...)                // -> chronogo.Date(...)
 time.Parse(layout, value)     // -> chronogo.FromFormat(value, layout)

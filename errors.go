@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// ChronoError represents errors that occur in ChronoGo operations.
+// ChronoError represents errors that occur in chronogo operations.
 type ChronoError struct {
 	Op         string // Operation that caused the error
 	Path       string // Path or context where error occurred

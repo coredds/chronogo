@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 // CalendarEntry represents a day in a calendar with holiday information

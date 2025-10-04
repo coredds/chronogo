@@ -3,7 +3,7 @@ package chronogo
 import (
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
 // HolidayAwareScheduler provides intelligent scheduling that respects holidays and business days

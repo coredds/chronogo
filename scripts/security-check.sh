@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Security check script for ChronoGo
+# Security check script for chronogo
 # This script runs basic security checks locally
 
 set -e
 
-echo "🔒 Running ChronoGo Security Checks..."
+echo "🔒 Running chronogo Security Checks..."
 echo "======================================"
 
 # Check if we're in the right directory

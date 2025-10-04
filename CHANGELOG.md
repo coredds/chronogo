@@ -72,9 +72,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.6] - 2025-01-01
 
 ### Changed
-- Updated GoHoliday dependency to v0.6.4
+- Updated goholiday dependency to v0.6.4
 - Fixed India holiday test (New Year's Day is not a public holiday in India)
-- Updated all GoHoliday version references in documentation and comments
+- Updated all goholiday version references in documentation and comments
 
 ### Tests
 - Fixed `TestAllSupportedCountries` to correctly handle countries without New Year's Day
@@ -108,29 +108,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.2] - 2024-09-18
 
 ### Added
-- GoHoliday v0.6.3 integration with expanded country support (34 countries, up from 33)
-- Turkey (TR) and Ukraine (UA) holiday support via GoHoliday v0.6.3+
+- goholiday v0.6.3 integration with expanded country support (34 countries, up from 33)
+- Turkey (TR) and Ukraine (UA) holiday support via goholiday v0.6.3+
 - Enhanced holiday APIs: subdivision support, holiday categories, language detection
 - Holiday count API for efficient counting without loading all holidays
 - Country code validation API for safer holiday checker creation
 - IsEndOfMonth method for enhanced business day calculations
-- Multi-language holiday names support via GoHoliday
+- Multi-language holiday names support via goholiday
 - Sub-microsecond holiday lookup performance with intelligent caching
 - Thread-safe holiday operations for concurrent applications
 - Enhanced regional subdivision support across all supported countries
-- Version tracking: GoHoliday v0.6.3+ is based on Vacanza holidays framework for future update tracking
+- Version tracking: goholiday v0.6.3+ is based on Vacanza holidays framework for future update tracking
 
 ### Changed
-- Updated GoHoliday dependency from v0.5.3 to v0.6.3
+- Updated goholiday dependency from v0.5.3 to v0.6.3
 - Expanded supported countries: Added Turkey (TR) and Ukraine (UA) in v0.6.3, bringing total to 34 countries
-- Enhanced documentation to reflect new GoHoliday capabilities
+- Enhanced documentation to reflect new goholiday capabilities
 
 ## [0.6.1] - 2025-08-27
 
 ### Changed
-- Updated GoHoliday integration to support 15 countries (was 8)
+- Updated goholiday integration to support 15 countries (was 8)
 - Enhanced multi-country support: US, GB, CA, AU, NZ, DE, FR, JP, IN, BR, MX, IT, ES, NL, KR
-- Updated documentation to reflect GoHoliday v0.6.3+ capabilities with comprehensive regional subdivisions across 34 countries
+- Updated documentation to reflect goholiday v0.6.3+ capabilities with comprehensive regional subdivisions across 34 countries
 - Improved Quick Start examples to showcase new countries (Brazil, India, South Korea)
 - Enhanced demo application with multi-country holiday checking
 
@@ -146,13 +146,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Business day-only scheduling functionality
 
 ### Enhanced
-- GoHoliday dependency updated to latest version with expanded country support
+- goholiday dependency updated to latest version with expanded country support
 - Documentation website with new demo cards showcasing enhanced features
 - README with comprehensive examples of new business operations
 - Test coverage for all new enhanced features
 
 ### Performance
-- Optimized business day calculations using GoHoliday's enhanced algorithms
+- Optimized business day calculations using goholiday's enhanced algorithms
 - Improved holiday lookup performance with integrated caching
 - Enhanced scheduling algorithms for better performance with large date ranges
 
@@ -362,7 +362,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.1] - 2024-01-15
 
 ### Added
-- Initial implementation of ChronoGo datetime library
+- Initial implementation of chronogo datetime library
 - Core DateTime type with timezone-aware operations
 - Comprehensive parsing support for common datetime formats
 - Human-readable time differences with `DiffForHumans()`
@@ -406,19 +406,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/coredds/ChronoGo/compare/v0.6.5...HEAD
-[0.6.5]: https://github.com/coredds/ChronoGo/compare/v0.6.2...v0.6.5
-[0.6.2]: https://github.com/coredds/ChronoGo/compare/v0.6.1...v0.6.2
-[0.6.0]: https://github.com/coredds/ChronoGo/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/coredds/ChronoGo/compare/v0.4.3...v0.5.0
-[0.4.3]: https://github.com/coredds/ChronoGo/compare/v0.4.2...v0.4.3
-[0.4.2]: https://github.com/coredds/ChronoGo/compare/v0.4.1...v0.4.2
-[0.4.1]: https://github.com/coredds/ChronoGo/compare/v0.4.0...v0.4.1
-[0.4.0]: https://github.com/coredds/ChronoGo/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/coredds/ChronoGo/compare/v0.2.2...v0.3.0
-[0.2.2]: https://github.com/coredds/ChronoGo/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/coredds/ChronoGo/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/coredds/ChronoGo/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/coredds/ChronoGo/releases/tag/v0.1.0
+[unreleased]: https://github.com/coredds/chronogo/compare/v0.6.5...HEAD
+[0.6.5]: https://github.com/coredds/chronogo/compare/v0.6.2...v0.6.5
+[0.6.2]: https://github.com/coredds/chronogo/compare/v0.6.1...v0.6.2
+[0.6.0]: https://github.com/coredds/chronogo/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/coredds/chronogo/compare/v0.4.3...v0.5.0
+[0.4.3]: https://github.com/coredds/chronogo/compare/v0.4.2...v0.4.3
+[0.4.2]: https://github.com/coredds/chronogo/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/coredds/chronogo/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/coredds/chronogo/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/coredds/chronogo/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/coredds/chronogo/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/coredds/chronogo/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/coredds/chronogo/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/coredds/chronogo/releases/tag/v0.1.0
 
 **Note**: This changelog will be updated as new versions are released.

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	chronogo "github.com/coredds/ChronoGo"
+	chronogo "github.com/coredds/chronogo"
 )
 
-// Example demonstrates basic usage of ChronoGo similar to the PRD sample.
+// Example demonstrates basic usage of chronogo similar to the PRD sample.
 func Example() {
 	// Load timezone
 	loc, _ := chronogo.LoadLocation("America/New_York")

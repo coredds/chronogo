@@ -3,10 +3,10 @@ package chronogo
 import (
 	"time"
 
-	goholidays "github.com/coredds/GoHoliday"
+	goholidays "github.com/coredds/goholiday"
 )
 
-// EnhancedBusinessDayCalculator wraps GoHoliday's optimized BusinessDayCalculator
+// EnhancedBusinessDayCalculator wraps goholiday's optimized BusinessDayCalculator
 // to provide high-performance business day calculations with extensive holiday support.
 type EnhancedBusinessDayCalculator struct {
 	calculator *goholidays.BusinessDayCalculator
@@ -59,7 +59,7 @@ func (ebc *EnhancedBusinessDayCalculator) BusinessDaysBetween(start, end DateTim
 }
 
 // IsEndOfMonth checks if a date is the last business day of the month.
-// New in GoHoliday v0.6.3+ - useful for end-of-month business processes.
+// New in goholiday v0.6.3+ - useful for end-of-month business processes.
 func (ebc *EnhancedBusinessDayCalculator) IsEndOfMonth(dt DateTime) bool {
 	return ebc.calculator.IsEndOfMonth(dt.Time)
 }

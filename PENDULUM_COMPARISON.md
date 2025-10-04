@@ -1,14 +1,14 @@
-# ChronoGo vs Pendulum Feature Comparison
+# chronogo vs Pendulum Feature Comparison
 
 ## Overview
 
-ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/](https://pendulum.eustace.io/)). This document provides a comprehensive comparison between ChronoGo's current implementation and Pendulum's features to identify gaps and opportunities for enhancement.
+chronogo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/](https://pendulum.eustace.io/)). This document provides a comprehensive comparison between chronogo's current implementation and Pendulum's features to identify gaps and opportunities for enhancement.
 
 ## Feature Comparison Matrix
 
 ### Core Features
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | **DateTime Type** | ✅ Drop-in replacement for datetime | ✅ Wraps time.Time | ✅ Complete | Well implemented |
 | **Timezone Support** | ✅ Full IANA support | ✅ Full IANA support | ✅ Complete | Excellent DST handling |
@@ -18,7 +18,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### DateTime Creation & Instantiation
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | `now()` | ✅ | ✅ Now() | ✅ Complete | |
 | `today()` | ✅ | ✅ Today() | ✅ Complete | |
@@ -31,7 +31,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Parsing
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | ISO 8601 | ✅ | ✅ | ✅ Complete | |
 | RFC 3339 | ✅ | ✅ | ✅ Complete | |
@@ -45,7 +45,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Localization
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Multi-language support | ✅ | ✅ 6 locales | ✅ Complete | en, es, fr, de, zh, pt |
 | Localized formatting | ✅ | ✅ | ✅ Complete | |
@@ -57,7 +57,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Timezone Operations
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Conversion | ✅ in_timezone() | ✅ InTimezone() | ✅ Complete | |
 | UTC conversion | ✅ in_utc() | ✅ UTC() | ✅ Complete | |
@@ -69,7 +69,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Arithmetic & Manipulation
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Add years/months/days | ✅ | ✅ | ✅ Complete | |
 | Add hours/minutes/seconds | ✅ | ✅ | ✅ Complete | |
@@ -78,14 +78,14 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 | **previous(day_of_week)** | ✅ previous(pendulum.FRIDAY) | ✅ PreviousWeekday() | ✅ Complete | Get previous occurrence of weekday |
 | **closest(day_of_week)** | ✅ | ✅ ClosestWeekday() | ✅ Complete | Get closest occurrence |
 | **furthest(day_of_week)** | ✅ | ✅ FarthestWeekday() | ✅ Complete | Get furthest occurrence |
-| **next_or_same()** | ❌ | ✅ NextOrSameWeekday() | ✅ ChronoGo Extra | Next or current if same |
-| **previous_or_same()** | ❌ | ✅ PreviousOrSameWeekday() | ✅ ChronoGo Extra | Previous or current if same |
+| **next_or_same()** | ❌ | ✅ NextOrSameWeekday() | ✅ chronogo Extra | Next or current if same |
+| **previous_or_same()** | ❌ | ✅ PreviousOrSameWeekday() | ✅ chronogo Extra | Previous or current if same |
 | Start of period | ✅ start_of() | ✅ StartOf...() | ✅ Complete | Day, week, month, year, quarter |
 | End of period | ✅ end_of() | ✅ EndOf...() | ✅ Complete | Day, week, month, year, quarter |
 
 ### Modifiers
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | **set(component)** | ✅ | ✅ Set() fluent | ✅ Complete | |
 | **on(year, month, day)** | ✅ | ⚠️ | ⚠️ Partial | Have Set().Year().Month().Day() |
@@ -95,15 +95,15 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 | **nth_of(unit, nth, day)** | ✅ nth_of('month', 2, pendulum.MONDAY) | ✅ NthWeekdayOf() | ✅ Complete | Get nth occurrence in period |
 | **first_of(unit, day)** | ⚠️ Partial | ✅ FirstWeekdayOf() | ✅ Complete | First occurrence of weekday |
 | **last_of(unit, day)** | ⚠️ Partial | ✅ LastWeekdayOf() | ✅ Complete | Last occurrence of weekday |
-| **nth_of_month()** | ❌ | ✅ NthWeekdayOfMonth() | ✅ ChronoGo Extra | Convenience for month |
-| **nth_of_year()** | ❌ | ✅ NthWeekdayOfYear() | ✅ ChronoGo Extra | Convenience for year |
-| **is_nth_of()** | ❌ | ✅ IsNthWeekdayOf() | ✅ ChronoGo Extra | Check if nth occurrence |
-| **weekday_occurrence()** | ❌ | ✅ WeekdayOccurrenceInMonth() | ✅ ChronoGo Extra | Get occurrence number |
+| **nth_of_month()** | ❌ | ✅ NthWeekdayOfMonth() | ✅ chronogo Extra | Convenience for month |
+| **nth_of_year()** | ❌ | ✅ NthWeekdayOfYear() | ✅ chronogo Extra | Convenience for year |
+| **is_nth_of()** | ❌ | ✅ IsNthWeekdayOf() | ✅ chronogo Extra | Check if nth occurrence |
+| **weekday_occurrence()** | ❌ | ✅ WeekdayOccurrenceInMonth() | ✅ chronogo Extra | Get occurrence number |
 | **average(dt)** | ✅ | ❌ | ❌ Missing | Get datetime between two points |
 
 ### Comparison
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Before/After | ✅ | ✅ | ✅ Complete | |
 | Equal | ✅ | ✅ | ✅ Complete | |
@@ -115,7 +115,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Difference
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | diff() method | ✅ | ⚠️ | ⚠️ Partial | Have Sub() but not full diff |
 | **diff_for_humans()** | ✅ | ✅ DiffForHumans() | ✅ Complete | Excellent implementation |
@@ -126,7 +126,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Duration Type
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Duration class | ✅ | ✅ ChronoDuration | ✅ Complete | |
 | **years property** | ✅ duration.years | ✅ Years() | ✅ Complete | |
@@ -142,7 +142,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Period/Interval Type
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Period class | ✅ | ✅ Period | ✅ Complete | |
 | Iteration | ✅ for dt in period | ✅ Range() | ✅ Complete | Excellent with context |
@@ -154,7 +154,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Attributes & Properties
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | Year, month, day | ✅ | ✅ | ✅ Complete | |
 | Hour, minute, second | ✅ | ✅ | ✅ Complete | |
@@ -173,7 +173,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### String Formatting
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | format() | ✅ | ✅ Format() | ✅ Complete | Go layout format |
 | to_iso8601_string() | ✅ | ✅ ToISO8601() | ✅ Complete | |
@@ -188,23 +188,23 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ### Testing Helpers
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
 | **set_test_now()** | ✅ | ✅ SetTestNow() | ✅ Complete | Mock current time for testing |
 | **travel_to(dt)** | ✅ | ✅ TravelTo() | ✅ Complete | Time travel for testing |
 | **travel()** | ✅ Context manager for tests | ✅ WithTestNow() | ✅ Complete | Test time manipulation |
 | **freeze()** | ✅ Freeze time at specific point | ✅ FreezeTime() | ✅ Complete | Stop time for testing |
-| **travel_back()** | ❌ | ✅ TravelBack() | ✅ ChronoGo Extra | Go backwards in time |
-| **travel_forward()** | ❌ | ✅ TravelForward() | ✅ ChronoGo Extra | Go forward in time |
+| **travel_back()** | ❌ | ✅ TravelBack() | ✅ chronogo Extra | Go backwards in time |
+| **travel_forward()** | ❌ | ✅ TravelForward() | ✅ chronogo Extra | Go forward in time |
 
-### Business Date Features (ChronoGo Enhancement)
+### Business Date Features (chronogo Enhancement)
 
-| Feature | Pendulum | ChronoGo | Status | Notes |
+| Feature | Pendulum | chronogo | Status | Notes |
 |---------|----------|----------|--------|-------|
-| Holiday checking | ❌ | ✅ | ✅ ChronoGo Extra | 34 countries via GoHoliday |
-| Business day calculations | ❌ | ✅ | ✅ ChronoGo Extra | Advanced implementation |
-| Holiday calendars | ❌ | ✅ | ✅ ChronoGo Extra | |
-| Scheduling | ❌ | ✅ | ✅ ChronoGo Extra | Holiday-aware scheduling |
+| Holiday checking | ❌ | ✅ | ✅ chronogo Extra | 34 countries via goholiday |
+| Business day calculations | ❌ | ✅ | ✅ chronogo Extra | Advanced implementation |
+| Holiday calendars | ❌ | ✅ | ✅ chronogo Extra | |
+| Scheduling | ❌ | ✅ | ✅ chronogo Extra | Holiday-aware scheduling |
 
 ## Missing Critical Features
 
@@ -229,7 +229,7 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 11. **is_long_year()** - ISO 8601 long year detection
 12. **average()** - Get midpoint between two datetimes
 13. **closest()/farthest()** - Find closest/farthest datetime from list
-14. **More Locales** - Pendulum supports 80+ locales vs ChronoGo's 6
+14. **More Locales** - Pendulum supports 80+ locales vs chronogo's 6
 
 ### Low Priority
 
@@ -265,17 +265,17 @@ ChronoGo is inspired by Python's Pendulum library ([https://pendulum.eustace.io/
 
 ## Conclusion
 
-ChronoGo has implemented the core features of Pendulum very well and has added significant value with business date operations that Pendulum lacks. The main gaps are:
+chronogo has implemented the core features of Pendulum very well and has added significant value with business date operations that Pendulum lacks. The main gaps are:
 
 1. **Testing utilities** - Essential for developers
 2. **Weekday navigation helpers** - Very common use case
 3. **Natural language parsing** - Nice to have but complex
 4. **More locales** - Good for international applications
 
-ChronoGo's business date features (holiday checking, business day calculations, scheduling) are a significant advantage over Pendulum and provide unique value to Go developers.
+chronogo's business date features (holiday checking, business day calculations, scheduling) are a significant advantage over Pendulum and provide unique value to Go developers.
 
 ## References
 
 - Pendulum Documentation: [https://pendulum.eustace.io/](https://pendulum.eustace.io/)
-- ChronoGo Repository: github.com/coredds/ChronoGo
+- chronogo Repository: github.com/coredds/chronogo
 

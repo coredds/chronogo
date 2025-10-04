@@ -413,7 +413,7 @@ func TestDateTimeIsHoliday(t *testing.T) {
 		t.Error("Regular day should not be a holiday")
 	}
 
-	// Test with default checker (no arguments) - should use GoHoliday US by default
+	// Test with default checker (no arguments) - should use goholiday US by default
 	if !newYears.IsHoliday() {
 		t.Error("New Year's Day should be a holiday with default checker")
 	}
@@ -448,9 +448,9 @@ func TestBusinessDaysInYear(t *testing.T) {
 	}
 }
 
-// Test GoHoliday integration
+// Test goholiday integration
 func TestGoHolidayChecker(t *testing.T) {
-	// Test US holidays with GoHoliday
+	// Test US holidays with goholiday
 	usChecker := NewGoHolidayChecker("US")
 
 	testCases := []struct {
@@ -493,10 +493,10 @@ func TestGoHolidayGetHolidayName(t *testing.T) {
 }
 
 func TestDefaultHolidayChecker(t *testing.T) {
-	// Test that business day functions use GoHoliday by default
+	// Test that business day functions use goholiday by default
 	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC) // New Year's Day
 
-	// Should be a holiday (using default US GoHoliday checker)
+	// Should be a holiday (using default US goholiday checker)
 	if !newYears.IsHoliday() {
 		t.Error("New Year's Day should be detected as holiday with default checker")
 	}
@@ -537,7 +537,7 @@ func TestMultipleCountries(t *testing.T) {
 }
 
 func TestAllSupportedCountries(t *testing.T) {
-	// Test all countries officially supported by GoHoliday v0.6.4+ (per their README)
+	// Test all countries officially supported by goholiday v0.6.4+ (per their README)
 	countries := []string{"US", "GB", "CA", "AU", "NZ", "DE", "FR", "JP", "IN", "BR", "MX", "IT", "ES", "NL", "KR", "PT", "PL", "RU", "CN", "TH", "SG", "MY", "ID", "PH", "VN", "TW", "HK", "ZA", "EG", "NG", "KE", "GH", "MA", "TN"}
 
 	newYears := Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -648,7 +648,7 @@ func TestDateTimeGetHolidaysInRange(t *testing.T) {
 		t.Error("Expected at least 1 holiday in January 2024")
 	}
 
-	// Test new GoHoliday v0.6.3+ features
+	// Test new goholiday v0.6.3+ features
 	testNewGoHolidayV63Features(t)
 }
 

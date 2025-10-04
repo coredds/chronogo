@@ -178,7 +178,7 @@ func FromFormatInLocation(value, layout string, loc *time.Location) (DateTime, e
 	return DateTime{t}, nil
 }
 
-// FromFormatTokens parses a datetime string using ChronoGo-style format tokens.
+// FromFormatTokens parses a datetime string using chronogo-style format tokens.
 // Converts token-based format to Go time format and then parses.
 func FromFormatTokens(value, format string) (DateTime, error) {
 	return FromFormatTokensInLocation(value, format, time.UTC)
