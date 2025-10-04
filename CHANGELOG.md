@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.8] - 2025-10-04
+
+### Changed
+- Restructured main demo application with comprehensive feature showcase
+- Reorganized GitHub Pages documentation for better clarity
+- Removed repetitive content and emojis from documentation
+- Updated demo to show all current features without duplication
+
+### Improved
+- Demo organization with logical section grouping
+- Documentation presentation with clean, professional formatting
+- Feature demonstration from basic to advanced
+- API coverage across all major components
+
 ## [0.6.7] - 2025-10-01
 
 ### Added

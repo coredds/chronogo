@@ -1,6 +1,6 @@
 # chronogo
 
-[![Version](https://img.shields.io/badge/version-v0.6.7-green.svg)](https://github.com/coredds/chronogo/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.8-green.svg)](https://github.com/coredds/chronogo/releases)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.23-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/coredds/chronogo/actions/workflows/ci.yml/badge.svg)](https://github.com/coredds/chronogo/actions/workflows/ci.yml)
