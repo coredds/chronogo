@@ -16,13 +16,13 @@ func main() {
 	demoParsingAndFormatting()
 	demoArithmeticOperations()
 	demoConvenienceMethods()
-	
+
 	// Advanced Features
 	demoDiffType()
 	demoTimezoneOperations()
 	demoPeriodOperations()
 	demoFluentAPI()
-	
+
 	// Specialized Features
 	demoWeekdayOperations()
 	demoComparisonMethods()
@@ -38,11 +38,11 @@ func printHeader(title string) {
 	fmt.Println(title)
 	fmt.Println(repeat("=", len(title)))
 	fmt.Println()
-	}
+}
 
 func printSection(title string) {
 	fmt.Printf("\n%s\n%s\n", title, repeat("-", len(title)))
-	}
+}
 
 func printFooter() {
 	fmt.Println()
