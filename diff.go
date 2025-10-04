@@ -187,15 +187,30 @@ func (d Diff) InSeconds() float64 {
 }
 
 // ForHumans returns a human-readable string describing the difference.
-// Examples: "2 years ago", "in 3 months", "5 days ago"
+// Uses the default locale (set via SetDefaultLocale). Defaults to English.
+//
+// Examples:
+//   - English: "2 years ago", "in 3 months"
+//   - Spanish: "hace 2 años", "en 3 meses"
+//   - Japanese: "2年前", "3ヶ月後"
 func (d Diff) ForHumans() string {
-	return diffForHumans(d.end, d.start, false)
+	return d.end.DiffForHumans(d.start)
+}
+
+// ForHumansLocalized returns a human-readable string in the specified locale.
+func (d Diff) ForHumansLocalized(localeCode string) (string, error) {
+	return d.end.HumanStringLocalized(localeCode, d.start)
 }
 
 // ForHumansComparison returns a human-readable comparison string.
-// Examples: "2 years before", "3 months after"
+// Uses the default locale.
+//
+// Examples:
+//   - English: "2 years before", "3 months after"
+//   - Spanish: "hace 2 años", "en 3 meses"
+//   - Japanese: "2年前", "3ヶ月後"
 func (d Diff) ForHumansComparison() string {
-	return diffForHumans(d.end, d.start, true)
+	return d.end.DiffForHumansComparison(d.start)
 }
 
 // String returns a detailed string representation of the difference.

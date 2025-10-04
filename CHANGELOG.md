@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-10-04
+
+### Changed - BREAKING
+- **All human-readable methods now respect default locale**
+  - `DiffForHumans()` now uses default locale instead of English-only
+  - `Diff.ForHumans()` now uses default locale
+  - `Humanize()` now uses default locale for time unit names
+  - `Age()` now uses default locale for time unit names
+  - `TimeAgo()`, `TimeFromNow()` now use default locale
+  - `DiffForHumansComparison()` now uses default locale
+  - Default locale is English (`en-US`) for backward compatibility
+  - Users can change default locale with `SetDefaultLocale()`
+
+### Added
+- `Diff.ForHumansLocalized(localeCode)` for explicit locale selection
+- Comprehensive locale support across all human-readable output
+
+### Improved
+- Consistent localization behavior across all methods
+- Cleaner API - no more English-only vs localized method duplication
+- Better multi-language support out of the box
+
+### Removed
+- Internal `diffForHumans()` and `getHumanTimeUnit()` functions (implementation details)
+
 ## [0.6.9] - 2025-10-04
 
 ### Added
