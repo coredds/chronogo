@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	goholidays "github.com/coredds/goholiday"
+	goholiday "github.com/coredds/goholiday"
 )
 
 // CalendarEntry represents a day in a calendar with holiday information
@@ -18,14 +18,14 @@ type CalendarEntry struct {
 
 // HolidayCalendar provides calendar functionality with holiday awareness
 type HolidayCalendar struct {
-	calendar *goholidays.HolidayCalendar
-	country  *goholidays.Country
+	calendar *goholiday.HolidayCalendar
+	country  *goholiday.Country
 }
 
 // NewHolidayCalendar creates a new holiday calendar for the specified country
 func NewHolidayCalendar(countryCode string) *HolidayCalendar {
-	country := goholidays.NewCountry(countryCode)
-	calendar := goholidays.NewHolidayCalendar(country)
+	country := goholiday.NewCountry(countryCode)
+	calendar := goholiday.NewHolidayCalendar(country)
 
 	return &HolidayCalendar{
 		calendar: calendar,

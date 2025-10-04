@@ -3,8 +3,7 @@ package chronogo
 import (
 	"time"
 
-	goholidays "github.com/coredds/goholiday"
-	goholiday "github.com/coredds/goholiday/chronogo"
+	goholiday "github.com/coredds/goholiday"
 )
 
 // HolidayChecker is an interface for checking if a date is a holiday.
@@ -184,12 +183,81 @@ func (hc *DefaultHolidayChecker) findWeekdayOccurrence(year int, month time.Mont
 	return target
 }
 
+// fastCountryChecker is an internal adapter that wraps goholiday's Country
+// to provide fast holiday checking with DateTime support.
+// This replaces the previous dependency on goholiday/chronogo adapter package.
+type fastCountryChecker struct {
+	country *goholiday.Country
+}
+
+// newFastCountryChecker creates a new fast country checker for the given country code.
+func newFastCountryChecker(countryCode string) *fastCountryChecker {
+	return &fastCountryChecker{
+		country: goholiday.NewCountry(countryCode),
+	}
+}
+
+// IsHoliday checks if the given time is a holiday.
+func (fc *fastCountryChecker) IsHoliday(t time.Time) bool {
+	_, ok := fc.country.IsHoliday(t)
+	return ok
+}
+
+// GetHolidayName returns the name of the holiday if the date is a holiday.
+func (fc *fastCountryChecker) GetHolidayName(t time.Time) string {
+	holiday, ok := fc.country.IsHoliday(t)
+	if ok && holiday != nil {
+		return holiday.Name
+	}
+	return ""
+}
+
+// CountHolidaysInRange counts holidays within a date range.
+func (fc *fastCountryChecker) CountHolidaysInRange(start, end time.Time) int {
+	count := 0
+	current := start
+	for !current.After(end) {
+		if fc.IsHoliday(current) {
+			count++
+		}
+		current = current.AddDate(0, 0, 1)
+	}
+	return count
+}
+
+// GetHolidaysInRange returns all holidays in the specified date range.
+func (fc *fastCountryChecker) GetHolidaysInRange(start, end time.Time) map[time.Time]string {
+	result := make(map[time.Time]string)
+	current := start
+	for !current.After(end) {
+		if name := fc.GetHolidayName(current); name != "" {
+			result[current] = name
+		}
+		current = current.AddDate(0, 0, 1)
+	}
+	return result
+}
+
+// AreHolidays performs batch holiday checking.
+func (fc *fastCountryChecker) AreHolidays(times []time.Time) []bool {
+	result := make([]bool, len(times))
+	for i, t := range times {
+		result[i] = fc.IsHoliday(t)
+	}
+	return result
+}
+
+// ClearCache clears the holiday cache.
+func (fc *fastCountryChecker) ClearCache() {
+	// goholiday Country doesn't expose cache clearing directly
+	// The cache is managed internally
+}
+
 // GoHolidayChecker wraps the goholiday library to implement the HolidayChecker interface.
 // This provides comprehensive holiday data for multiple countries and regions.
 type GoHolidayChecker struct {
-	checker        *goholiday.FastCountryChecker
-	countryChecker *goholidays.Country
-	country        string
+	checker *fastCountryChecker
+	country string
 }
 
 // NewGoHolidayChecker creates a new holiday checker using the goholiday library.
@@ -198,9 +266,8 @@ type GoHolidayChecker struct {
 // Based on Vacanza holidays framework. See DEPENDENCIES.md for version tracking.
 func NewGoHolidayChecker(country string) *GoHolidayChecker {
 	return &GoHolidayChecker{
-		checker:        goholiday.Checker(country),
-		countryChecker: goholidays.NewCountry(country),
-		country:        country,
+		checker: newFastCountryChecker(country),
+		country: country,
 	}
 }
 
@@ -226,7 +293,7 @@ func (ghc *GoHolidayChecker) GetHolidaysInRange(start, end DateTime) map[DateTim
 	holidays := ghc.checker.GetHolidaysInRange(start.Time, end.Time)
 	result := make(map[DateTime]string, len(holidays))
 	for date, name := range holidays {
-		result[DateTime{Time: date}] = name
+		result[FromTime(date)] = name
 	}
 	return result
 }
@@ -234,11 +301,7 @@ func (ghc *GoHolidayChecker) GetHolidaysInRange(start, end DateTime) map[DateTim
 // AreHolidays performs batch holiday checking for efficient range operations.
 // New in goholiday v0.6.4+ - optimized for bulk date processing.
 func (ghc *GoHolidayChecker) AreHolidays(dates []DateTime) []bool {
-	times := make([]time.Time, len(dates))
-	for i, dt := range dates {
-		times[i] = dt.Time
-	}
-	return ghc.checker.AreHolidays(times)
+	return ghc.checker.AreHolidays(ToTimes(dates))
 }
 
 // ClearCache clears the holiday cache to free memory.
@@ -255,31 +318,31 @@ func (ghc *GoHolidayChecker) GetCountry() string {
 // GetSubdivisions returns the supported subdivisions for this country.
 // New in goholiday v0.6.3+ - provides access to regional holiday data.
 func (ghc *GoHolidayChecker) GetSubdivisions() []string {
-	return ghc.countryChecker.GetSubdivisions()
+	return ghc.checker.country.GetSubdivisions()
 }
 
 // GetHolidayCategories returns the supported holiday categories for this country.
 // New in goholiday v0.6.3+ - categories include "public", "bank", "school", etc.
-func (ghc *GoHolidayChecker) GetHolidayCategories() []goholidays.HolidayCategory {
-	return ghc.countryChecker.GetCategories()
+func (ghc *GoHolidayChecker) GetHolidayCategories() []goholiday.HolidayCategory {
+	return ghc.checker.country.GetCategories()
 }
 
 // GetLanguage returns the language used for holiday names.
 // New in goholiday v0.6.3+ - supports multi-language holiday names.
 func (ghc *GoHolidayChecker) GetLanguage() string {
-	return ghc.countryChecker.GetLanguage()
+	return ghc.checker.country.GetLanguage()
 }
 
 // GetHolidayCount returns the number of holidays in a given year.
 // New in goholiday v0.6.3+ - efficient counting without loading all holidays.
 func (ghc *GoHolidayChecker) GetHolidayCount(year int) (int, error) {
-	return ghc.countryChecker.GetHolidayCount(year)
+	return ghc.checker.country.GetHolidayCount(year)
 }
 
 // ValidateCountryCode validates if a country code is supported.
 // New in goholiday v0.6.3+ - provides validation before creating checkers.
 func ValidateCountryCode(countryCode string) error {
-	return goholidays.ValidateCountryCode(countryCode)
+	return goholiday.ValidateCountryCode(countryCode)
 }
 
 // NewHolidayChecker creates a new goholiday-based holiday checker for the specified country.

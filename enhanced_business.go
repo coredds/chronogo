@@ -3,21 +3,21 @@ package chronogo
 import (
 	"time"
 
-	goholidays "github.com/coredds/goholiday"
+	goholiday "github.com/coredds/goholiday"
 )
 
 // EnhancedBusinessDayCalculator wraps goholiday's optimized BusinessDayCalculator
 // to provide high-performance business day calculations with extensive holiday support.
 type EnhancedBusinessDayCalculator struct {
-	calculator *goholidays.BusinessDayCalculator
-	country    *goholidays.Country
+	calculator *goholiday.BusinessDayCalculator
+	country    *goholiday.Country
 }
 
 // NewEnhancedBusinessDayCalculator creates a new enhanced business day calculator
 // for the specified country with optimized performance.
 func NewEnhancedBusinessDayCalculator(countryCode string) *EnhancedBusinessDayCalculator {
-	country := goholidays.NewCountry(countryCode)
-	calculator := goholidays.NewBusinessDayCalculator(country)
+	country := goholiday.NewCountry(countryCode)
+	calculator := goholiday.NewBusinessDayCalculator(country)
 
 	return &EnhancedBusinessDayCalculator{
 		calculator: calculator,

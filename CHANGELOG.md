@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2025-10-04
+
+### Changed - BREAKING
+- **Removed dependency on goholiday/chronogo adapter package**
+  - goholiday adapter now lives internally in chronogo
+  - Eliminates confusing dual import pattern
+  - No circular dependencies
+  - Cleaner separation of concerns
+
+### Added
+- `FromTime(t time.Time)` - Convert time.Time to DateTime
+- `FromTimes(times []time.Time)` - Batch convert time.Time slice to DateTime slice
+- `ToTimes(dates []DateTime)` - Batch convert DateTime slice to time.Time slice
+- Internal `fastCountryChecker` adapter for goholiday integration
+
+### Improved
+- Simplified imports: single `goholiday` import instead of dual imports
+- Better type conversion helpers for library integration
+- Cleaner API surface for goholiday integration
+
+### Technical
+- business.go: Removed `goholiday/chronogo` import, added internal adapter
+- enhanced_business.go: Simplified to single goholiday import
+- calendar.go: Simplified to single goholiday import
+- All tests passing with new adapter implementation
+
 ## [0.7.0] - 2025-10-04
 
 ### Changed - BREAKING

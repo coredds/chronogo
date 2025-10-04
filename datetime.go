@@ -112,6 +112,32 @@ func FromUnix(sec int64, nsec int64, loc *time.Location) DateTime {
 	return DateTime{time.Unix(sec, nsec).In(loc)}
 }
 
+// FromTime creates a DateTime from a time.Time value.
+// This is a convenience function to wrap standard library time values.
+func FromTime(t time.Time) DateTime {
+	return DateTime{t}
+}
+
+// FromTimes creates a slice of DateTime from a slice of time.Time values.
+// This is useful for batch conversions when integrating with libraries that return []time.Time.
+func FromTimes(times []time.Time) []DateTime {
+	result := make([]DateTime, len(times))
+	for i, t := range times {
+		result[i] = DateTime{t}
+	}
+	return result
+}
+
+// ToTimes converts a slice of DateTime to a slice of time.Time values.
+// This is useful for batch conversions when calling libraries that expect []time.Time.
+func ToTimes(dates []DateTime) []time.Time {
+	result := make([]time.Time, len(dates))
+	for i, dt := range dates {
+		result[i] = dt.Time
+	}
+	return result
+}
+
 // In converts the datetime to the specified timezone.
 func (dt DateTime) In(loc *time.Location) DateTime {
 	return DateTime{dt.Time.In(loc)}
