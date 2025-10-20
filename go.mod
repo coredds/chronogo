@@ -5,5 +5,5 @@ go 1.23
 
 require (
 	github.com/coredds/godateparser v1.3.3
-	github.com/coredds/goholiday v0.6.5
+	github.com/coredds/goholiday v0.7.0
 )
